@@ -1,6 +1,6 @@
 package model;
 
-// TODO
+// A size of a piece of clothing
 public enum Size {
     XXS,
     XS,
@@ -8,5 +8,6 @@ public enum Size {
     M,
     L,
     XL,
-    XXL;
+    XXL,
+    UNKNOWN;
 }

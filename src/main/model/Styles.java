@@ -1,6 +1,6 @@
 package model;
 
-// TODO
+// A collection of common clothing styles
 public enum Styles implements Style {
     Formal("Formal"),
     SemiFormal("Semi-formal"),
@@ -9,7 +9,7 @@ public enum Styles implements Style {
     Sport("Sport"),
     OutdoorWork("Outdoor work");
 
-    private String name;
+    private final String name;
 
     Styles(String name) {
         this.name = name;
