@@ -24,7 +24,10 @@ public class VirtualClosetConsoleApp {
                     "list accounts"),
             new ConsoleCommand(this::createAccount,
                     "Creates a new account based on the info provided.",
-                    "create account")
+                    "create account"),
+            new ConsoleCommand(this::setActiveAccount,
+                    "Sets the active account for which to perform closet commands for.",
+                    "set active account", "set active")
     };
 
     private AccountManager accountManager;
@@ -78,7 +81,7 @@ public class VirtualClosetConsoleApp {
     //          and stores an account with the given name. If the account
     //          name is already taken, notifies user.
     private void createAccount() {
-        System.out.print("Enter account name: ");
+        System.out.print("\tEnter account name: ");
         String accountName = input.nextLine().trim();
         Account a = new Account(accountName);
         if (!this.accountManager.addAccount(a)) {
@@ -97,13 +100,13 @@ public class VirtualClosetConsoleApp {
     // Effects: Prints a list of all accounts in the account manager
     private void listAccounts() {
         if (this.accountManager.getAccounts().size() == 0) {
-            System.out.println("There are no accounts.");
+            System.out.println("\tThere are no accounts.");
         } else {
             String accountListString = this.accountManager.getAccounts()
                     .stream()
                     .map(Account::getName)
                     .collect(Collectors.joining(", "));
-            System.out.println("Accounts: " + accountListString + ".");
+            System.out.println("\tAccounts: " + accountListString + ".");
         }
     }
 
@@ -116,5 +119,18 @@ public class VirtualClosetConsoleApp {
                 + Arrays.stream(commands)
                 .map(ConsoleCommand::getDigest)
                 .collect(Collectors.joining(prefix)));
+    }
+
+    // Modifies: this
+    // Effects: Sets the active account to the name of the one input by user,
+    //          or informs them if the account does not exist.
+    private void setActiveAccount() {
+        System.out.print("\tEnter account name: ");
+        String accountName = input.nextLine().trim();
+        if (this.accountManager.setActiveAccount(accountName)) {
+            System.out.println("\tActive account set to \"" + accountName + "\".");
+        } else {
+            System.out.println("\tCould not set active account to \"" + accountName + "\".");
+        }
     }
 }

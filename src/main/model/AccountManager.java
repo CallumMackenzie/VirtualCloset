@@ -69,7 +69,7 @@ public class AccountManager implements Serializable {
         if (!this.hasActiveAccount()) {
             return false;
         }
-        return this.getActiveAccount().get().setName(name, this.accounts);
+        return this.activeAccount.setName(name, this.accounts);
     }
 
     // Modifies: this
