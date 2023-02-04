@@ -9,12 +9,19 @@ import java.util.Map;
 public class Closet {
 
     private final List<Clothing> clothing;
+    private final String name;
     private final Map<Brand, List<Clothing>> brandMap;
 
     // Effects: Constructs a new closet with no clothing
-    public Closet() {
+    public Closet(String name) {
         this.clothing = new ArrayList<>();
         this.brandMap = new HashMap<>();
+        this.name = name;
+    }
+
+    // Effects: Returns the name of this closet
+    public String getName() {
+        return this.name;
     }
 
     // Effects: Returns the clothing in this closet

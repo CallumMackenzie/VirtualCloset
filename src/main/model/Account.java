@@ -2,6 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // A user account with a closet, clothing catalogue, and name
 public class Account {
@@ -37,6 +38,43 @@ public class Account {
         return true;
     }
 
+    // Modifies: this
+    // Effects: Adds a new closet with the given name to the
+    //          list of closets if the name is not already taken.
+    //          Returns true if it was added, false otherwise.
+    public boolean addCloset(String name) {
+        if (this.closets.stream()
+                .anyMatch(n -> n.getName().equalsIgnoreCase(name))) {
+            return false;
+        }
+        this.closets.add(new Closet(name));
+        return true;
+    }
+
+    // Modifies: this
+    // Effects: Removes the closet with the given name if it is
+    //          present. Returns true if it was removed, false if
+    //          it was not present.
+    public boolean removeCloset(String name) {
+        int lengthBefore = this.closets.size();
+        this.closets.removeIf(c -> c.getName().equalsIgnoreCase(name));
+        return lengthBefore != this.closets.size();
+    }
+
+    // Effects: Returns true if there is a closet matching the given
+    //          name in this account, false otherwise.
+    public boolean hasCloset(String name) {
+        return this.closets.stream()
+                .anyMatch(c -> c.getName().equalsIgnoreCase(name));
+    }
+
+    // Effects: Returns the named closet if present, Optional.empty() otherwise
+    public Optional<Closet> getCloset(String name) {
+        return this.closets.stream()
+                .filter(c -> c.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
     // Effects: Returns the catalogue for this account
     public Catalogue getCatalogue() {
         return this.catalogue;
@@ -44,7 +82,7 @@ public class Account {
 
     // Effects: Returns the closets in this account
     public List<Closet> getClosets() {
-        return  this.closets;
+        return this.closets;
     }
 
 }

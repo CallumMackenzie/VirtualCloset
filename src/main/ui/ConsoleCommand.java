@@ -1,25 +1,41 @@
 package ui;
 
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 // A command for the console interface with a set of strings
-// to activate the command, and a command response.
+// to activate the command, a condition, a command response,
+// and a message if the command condition is not met.
 public final class ConsoleCommand {
 
     private final Set<String> validCommands;
     private final Runnable responseFn;
+    private final BooleanSupplier activeCondition;
+    private final String inactiveMessage;
     private final String description;
+
+    // Effects: Constructs a new console command from the given command
+    //          keys, active condition, response function, description,
+    //          and inactive message.
+    public ConsoleCommand(Runnable responseFn,
+                          BooleanSupplier activeCondition,
+                          String inactiveMessage,
+                          String description,
+                          String... validCommands) {
+        this.validCommands = Set.of(validCommands);
+        this.responseFn = responseFn;
+        this.description = description;
+        this.inactiveMessage = inactiveMessage;
+        this.activeCondition = activeCondition;
+    }
 
     // Effects: Constructs a new console command from the given command
     //          keys, response function, and description.
     public ConsoleCommand(Runnable responseFn,
                           String description,
                           String... validCommands) {
-        this.validCommands = Set.of(validCommands);
-        this.responseFn = responseFn;
-        this.description = description;
+        this(responseFn, () -> true, "", description, validCommands);
     }
 
     // Effects: Executes the response function if the given command
@@ -34,11 +50,20 @@ public final class ConsoleCommand {
         }
         if (this.matchesCommand(cmd)) {
             if (run) {
+                if (!this.isActive()) {
+                    System.out.println(this.inactiveMessage);
+                    return;
+                }
                 this.responseFn.run();
             } else {
                 System.out.println(this.description);
             }
         }
+    }
+
+    // Effects: Returns whether this command is active
+    public boolean isActive() {
+        return this.activeCondition.getAsBoolean();
     }
 
     // Effects: Returns whether the given command activates this console command

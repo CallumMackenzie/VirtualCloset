@@ -14,7 +14,7 @@ public class ClosetTest {
 
     @BeforeEach
     void createCloset() {
-        this.closet1 = new Closet();
+        this.closet1 = new Closet("C1");
     }
 
     @Test

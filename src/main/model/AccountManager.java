@@ -62,6 +62,13 @@ public class AccountManager implements Serializable {
     }
 
     // Modifies: this
+    // Effects: Removes the active account if present, otherwise
+    //          does nothing
+    public void removeActiveAccount() {
+        this.activeAccount = null;
+    }
+
+    // Modifies: this
     // Effects: Sets the current account name if no other account
     //          has the same name and returns true, otherwise it
     //          does not set and returns false.
@@ -84,6 +91,23 @@ public class AccountManager implements Serializable {
             this.accounts.add(account);
             return true;
         }
+    }
+
+    // Modifies: this
+    // Effects: Removes the given account if it is tracked,
+    //          returns whether it was removed or not.
+    public boolean removeAccount(String accountName) {
+        if (this.accountExists(accountName)) {
+            this.accounts.removeIf(account ->
+                    account.getName().equalsIgnoreCase(accountName));
+            if (this.hasActiveAccount()
+                    && this.activeAccount.getName()
+                    .equalsIgnoreCase(accountName)) {
+                this.removeActiveAccount();
+            }
+            return true;
+        }
+        return false;
     }
 
     // Effects: Returns the accounts this system manages

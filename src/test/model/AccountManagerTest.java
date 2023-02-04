@@ -3,8 +3,6 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountManagerTest {
@@ -73,6 +71,14 @@ public class AccountManagerTest {
     }
 
     @Test
+    void testRemoveActiveAccount() {
+        this.acm.addAccount(eric);
+        this.acm.setActiveAccount("Eric");
+        this.acm.removeActiveAccount();
+        assertFalse(this.acm.hasActiveAccount());
+    }
+
+    @Test
     void testSetActiveAccountName() {
         this.acm.addAccount(eric);
         this.acm.addAccount(jake);
@@ -84,6 +90,21 @@ public class AccountManagerTest {
 
         assertTrue(this.acm.setActiveAccountName("Sam"));
         assertEquals(this.acm.getActiveAccount().get().getName(), "Sam");
+    }
+
+    @Test
+    void testRemoveAccount() {
+        this.acm.addAccount(eric);
+        assertFalse(this.acm.removeAccount("Jake"));
+        assertTrue(this.acm.removeAccount("Eric"));
+        assertTrue(this.acm.getAccounts().isEmpty());
+
+        this.acm.addAccount(jake);
+        this.acm.addAccount(eric);
+        this.acm.setActiveAccount("Jake");
+        assertTrue(this.acm.removeAccount("Jake"));
+        assertFalse(this.acm.hasActiveAccount());
+        assertEquals(this.acm.getAccounts().get(0), eric);
     }
 
 }
