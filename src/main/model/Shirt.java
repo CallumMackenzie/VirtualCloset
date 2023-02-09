@@ -6,11 +6,11 @@ import java.util.List;
 // A shirt
 public class Shirt extends Clothing {
     public Shirt(Size size,
-                 Brand brand,
-                 Material material,
-                 List<Style> styles,
+                 String brand,
+                 String material,
+                 List<String> styles,
                  boolean dirty,
                  Image image) {
-        super(size, brand, material, styles, dirty, image);
+        super(List.of("Shirt"), size, brand, material, styles, dirty, image);
     }
 }

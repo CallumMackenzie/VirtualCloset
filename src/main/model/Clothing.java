@@ -1,25 +1,33 @@
 package model;
 
 import java.awt.Image;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO
-public abstract class Clothing {
+public class Clothing {
 
     private boolean dirty;
-    private List<Style> styles;
-    private Brand brand;
+    private final Collection<String> types;
+    private final List<String> styles;
+    private String brand;
     private Size size;
-    private Material material;
+    private String material;
     private Image image;
 
     // Effects: Constructs a new piece of clothing
-    public Clothing(Size size,
-                    Brand brand,
-                    Material material,
-                    List<Style> styles,
+    public Clothing(Collection<String> types,
+                    Size size,
+                    String brand,
+                    String material,
+                    List<String> styles,
                     boolean dirty,
                     Image image) {
+        this.types = types.stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toCollection(ArrayList::new));
         this.dirty = dirty;
         this.styles = styles;
         this.brand = brand;
@@ -40,24 +48,18 @@ public abstract class Clothing {
     }
 
     // Effects: Returns the list of styles for this clothing
-    public List<Style> getStyles() {
+    public List<String> getStyles() {
         return this.styles;
     }
 
-    // Modifies: this
-    // Effects: Sets styles to the given styles
-    public void setStyles(List<Style> styles) {
-        this.styles = styles;
-    }
-
     // Effects: Returns the brand this clothing is from
-    public Brand getBrand() {
+    public String getBrand() {
         return this.brand;
     }
 
     // Modifies: this
     // Effects: Sets the brand of this clothing
-    public void setBrand(Brand brand) {
+    public void setBrand(String brand) {
         this.brand = brand;
     }
 
@@ -84,13 +86,30 @@ public abstract class Clothing {
     }
 
     // Effects: Returns the material for this clothing
-    public Material getMaterial() {
+    public String getMaterial() {
         return this.material;
     }
 
     // Modifies: this
     // Effects: Sets the material for this clothing
-    void setMaterial(Material material) {
+    void setMaterial(String material) {
         this.material = material;
+    }
+
+    // Effects: Returns the types of this clothing
+    public Collection<String> getTypes() {
+        return types;
+    }
+
+    // Effects: Returns a string representation of this object
+    @Override
+    public String toString() {
+        return "[" + String.join(", ", this.types) + "] {"
+                + "\n\tbrand: " + this.brand
+                + "\n\tsize: " + this.size
+                + "\n\tmaterial: " + this.material
+                + "\n\tstyles: " + String.join(", ", this.styles)
+                + "\n\tdirty: " + this.dirty
+                + "\n}";
     }
 }

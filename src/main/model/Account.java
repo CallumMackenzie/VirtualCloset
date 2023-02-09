@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class Account {
     // Effects: Sets the name of this account and returns true, if no account in
     //          allAccounts that is not this one has the same name. If one does,
     //          the method returns false.
-    public boolean setName(String name, List<Account> allAccounts) {
+    public boolean setName(String name, Collection<Account> allAccounts) {
         for (Account a : allAccounts) {
             if (a != this && a.getName().equals(name)) {
                 return false;

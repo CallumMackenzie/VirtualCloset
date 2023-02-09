@@ -57,6 +57,13 @@ public abstract class CommandSystem {
                 .trim();
     }
 
+    // Effects: Prompts input with the given string, and trims it.
+    protected String getInputTrimOnly(String prompt) {
+        System.out.print(prompt);
+        return this.input.nextLine()
+                .trim();
+    }
+
     // Modifies: this
     // Effects: Adds all given commands to the command system
     protected void addCommands(ConsoleCommand... cmds) {

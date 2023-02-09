@@ -11,10 +11,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ClosetTest {
 
     private Closet closet1;
+    private Shirt shirt1;
 
     @BeforeEach
-    void createCloset() {
+    void setup() {
         this.closet1 = new Closet("C1");
+        this.shirt1 = new Shirt(Size.XL,
+                "Adidas",
+                "Silk",
+                new ArrayList<>(),
+                true,
+                null);
     }
 
     @Test
@@ -24,26 +31,34 @@ public class ClosetTest {
 
     @Test
     void testAddClothing() {
-        Clothing c = new Shirt(Size.XL,
-                new Brand("Adidas"),
-                new Material("Silk"),
-                new ArrayList<>(),
-                true,
-                null);
-        this.closet1.addClothing(c);
+        this.closet1.addClothing(shirt1);
 
         assertEquals(this.closet1.getClothing().size(), 1);
-        assertEquals(this.closet1.getClothing().get(0), c);
+        assertEquals(this.closet1.getClothing().get(0), shirt1);
 
         Clothing c2 = new Shirt(Size.S,
-                new Brand("Nike"),
-                new Material("Cotton"),
+                "Nike",
+                "Cotton",
                 new ArrayList<>(),
                 true, null);
         this.closet1.addClothing(c2);
 
         assertEquals(this.closet1.getClothing().size(), 2);
         assertEquals(this.closet1.getClothing().get(1), c2);
+    }
+
+    @Test
+    void testGetTypes() {
+        this.closet1.addClothing(shirt1);
+        assertTrue(this.closet1.getTypes().contains("shirt"));
+        assertEquals(this.closet1.getTypes().size(), 1);
+    }
+
+    @Test
+    void testGetBrands() {
+        this.closet1.addClothing(shirt1);
+        assertTrue(this.closet1.getBrands().stream()
+                .anyMatch(b -> b.equalsIgnoreCase("Adidas")));
     }
 
 }
