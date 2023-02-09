@@ -6,67 +6,63 @@ import java.util.stream.Collectors;
 // TODO
 public final class ClothingAddress {
 
-    private Optional<List<String>> brands;
-    private Optional<List<Size>> sizes;
-    private Optional<List<String>> styles;
-    private Optional<List<String>> types;
+    private List<String> brands;
+    private List<Size> sizes;
+    private List<String> styles;
+    private List<String> types;
 
-    // "b:Adidas, n:"
     // TODO
     public ClothingAddress() {
-        this.brands = Optional.empty();
-        this.sizes = Optional.empty();
-        this.types = Optional.empty();
-        this.styles = Optional.empty();
     }
 
     // TODO
     public static ClothingAddress of(String expr) {
         // TODO
+         Scanner s = new Scanner(expr);
         return null;
     }
 
     // Effects: Returns the brands this address matches
-    public Optional<List<String>> getBrands() {
+    public List<String> getBrands() {
         return brands;
     }
 
     // Modifies: this
     // Effects: Sets the brands this address matches
-    public void setBrands(Optional<List<String>> brands) {
+    public void setBrands(List<String> brands) {
         this.brands = brands;
     }
 
     // Effects: Returns the sizes this address matches
-    public Optional<List<Size>> getSizes() {
+    public List<Size> getSizes() {
         return sizes;
     }
 
     // Modifies: this
     // Effects: Sets the sizes this address matches
-    public void setSizes(Optional<List<Size>> sizes) {
+    public void setSizes(List<Size> sizes) {
         this.sizes = sizes;
     }
 
     // Effects: Returns the styles this address matches
-    public Optional<List<String>> getStyles() {
+    public List<String> getStyles() {
         return styles;
     }
 
     // Modifies: this
     // Effects: Sets the styles this address matches
-    public void setStyles(Optional<List<String>> styles) {
+    public void setStyles(List<String> styles) {
         this.styles = styles;
     }
 
     // Effects: Returns the types this address matches
-    public Optional<List<String>> getTypes() {
+    public List<String> getTypes() {
         return types;
     }
 
     // Modifies: this
     // Effects: Sets the types this address matches
-    public void setTypes(Optional<List<String>> types) {
+    public void setTypes(List<String> types) {
         this.types = types;
     }
 }
