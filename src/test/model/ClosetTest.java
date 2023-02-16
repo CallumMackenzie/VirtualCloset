@@ -61,4 +61,10 @@ public class ClosetTest {
                 .anyMatch(b -> b.equalsIgnoreCase("Adidas")));
     }
 
+    @Test
+    void testGetStyles() {
+        this.closet1.addClothing(shirt1);
+        assertEquals(0, this.closet1.getStyles().size());
+    }
+
 }

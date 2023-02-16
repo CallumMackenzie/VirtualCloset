@@ -5,19 +5,22 @@ import model.search.ClothingAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// A closet having a list of clothing
+// A closet having a list of clothing and various categorizations
+// of said clothing
 public class Closet {
 
     private final List<Clothing> clothing;
     private final String name;
     private final HashMap<String, List<Clothing>> brandMap;
     private final Map<String, List<Clothing>> typeMap;
+    private final Map<String, List<Clothing>> styleMap;
 
     // Effects: Constructs a new closet with no clothing
     public Closet(String name) {
         this.clothing = new ArrayList<>();
         this.brandMap = new HashMap<>();
         this.typeMap = new HashMap<>();
+        this.styleMap = new HashMap<>();
         this.name = name;
     }
 
@@ -39,15 +42,8 @@ public class Closet {
     public List<Clothing> findClothingExact(ClothingAddress address) {
         // TODO
         Map<Clothing, Integer> matchMap = new HashMap<>();
-        for (String brand : address.getBrands()) {
-            this.brandMap.get(brand).forEach(c -> {
-                if (matchMap.containsKey(c)) {
-                    matchMap.put(c, matchMap.get(c) + 1);
-                } else {
-                    matchMap.put(c, 1);
-                }
-            });
-        }
+        countMapMatches(this.brandMap, address.getBrands(), matchMap);
+        countMapMatches(this.styleMap, address.getStyles(), matchMap);
         return matchMap.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
@@ -74,24 +70,53 @@ public class Closet {
         return this.brandMap.keySet();
     }
 
+    // EFFECTS: Returns the styles present in this closet
+    public Set<String> getStyles() {
+        return this.styleMap.keySet();
+    }
+
     // Modifies: this
     // Effects: Adds the given clothing to this closet
     public void addClothing(Clothing clothing) {
         this.clothing.add(clothing);
 
-        // Add to brand map
-        if (!this.brandMap.containsKey(clothing.getBrand())) {
-            this.brandMap.put(clothing.getBrand(), new ArrayList<>());
-        }
-        this.brandMap.get(clothing.getBrand()).add(clothing);
-
-        // Add to type map
-        clothing.getTypes().forEach(t -> {
-            if (!this.typeMap.containsKey(t)) {
-                this.typeMap.put(t, new ArrayList<>());
-            }
-            this.typeMap.get(t).add(clothing);
-        });
+        congregateByKey(this.brandMap, List.of(clothing.getBrand()), clothing);
+        congregateByKey(this.typeMap, clothing.getTypes(), clothing);
+        congregateByKey(this.styleMap, clothing.getStyles(), clothing);
     }
 
+    // MODIFIES: matchCountMap
+    // EFFECTS: Increments the value of the entry under the key of a given
+    //          piece of clothing for every time it appears the list of clothing
+    //          for each given map key.
+    private static void countMapMatches(Map<String, List<Clothing>> refMap,
+                                        List<String> mapKeys,
+                                        Map<Clothing, Integer> matchCountMap) {
+        for (String brand : mapKeys) {
+            if (refMap.containsKey(brand)) {
+                refMap.get(brand).forEach(c -> {
+                    if (matchCountMap.containsKey(c)) {
+                        matchCountMap.put(c, matchCountMap.get(c) + 1);
+                    } else {
+                        matchCountMap.put(c, 1);
+                    }
+                });
+            }
+        }
+    }
+
+    // MODIFIES: categoryMap
+    // EFFECTS: Places element in the lists associated with each key in keys,
+    //          and creates a new list first if it is not already present in
+    //          the map.
+    private static <K, V> void congregateByKey(Map<K, List<V>> categoryMap,
+                                               Iterable<K> keys,
+                                               V element) {
+        keys.forEach(e -> {
+            if (!categoryMap.containsKey(e)) {
+                categoryMap.put(e, new ArrayList<>());
+            }
+            categoryMap.get(e).add(element);
+        });
+    }
 }

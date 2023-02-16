@@ -23,7 +23,7 @@ public final class ClothingAddress {
     }
 
     // TODO
-    public static ClothingAddress of(String expr) {
+    public static ClothingAddress of(String expr) throws ClothingAddressParseException {
         CAStateMachine parser = new CAStateMachine();
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
         return out.getAddress();

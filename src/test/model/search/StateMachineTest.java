@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StateMachineTest {
 
-    StateMachine<String> sm;
+    StateMachine<String, Throwable> sm;
 
     @BeforeEach
     void createStateMachine() {
@@ -20,7 +20,7 @@ class StateMachineTest {
     }
 
     @Test
-    void testStep() {
+    void testStep() throws Throwable {
         this.sm.step('a');
         assertEquals("Aa", this.sm.getState());
         this.sm.step('Z');
@@ -28,13 +28,13 @@ class StateMachineTest {
     }
 
     @Test
-    void testProcessInput() {
+    void testProcessInput() throws Throwable {
         String out = this.sm.processInput("ABCDEF".toCharArray());
         assertEquals("AABCDEF", out);
     }
 
     @Test
-    void testNextState() {
+    void testNextState() throws Throwable {
         String next = this.sm.nextState("CURRENT", 'a');
         assertEquals("CURRENTa", next);
     }

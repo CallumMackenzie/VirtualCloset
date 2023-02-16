@@ -2,6 +2,7 @@ package ui;
 
 import model.*;
 import model.search.ClothingAddress;
+import model.search.ClothingAddressParseException;
 
 import java.awt.*;
 import java.util.*;
@@ -58,7 +59,13 @@ public final class ClosetModeConsole extends CommandSystem {
     //          from the user
     private void clothingAddressSearch() {
         String input = this.getInput("Enter clothing addres expression: ");
-        ClothingAddress address = ClothingAddress.of(input);
+        ClothingAddress address = null;
+        try {
+            address = ClothingAddress.of(input);
+        } catch (ClothingAddressParseException e) {
+            // TODO
+            throw new RuntimeException(e);
+        }
         List<Clothing> clothing = this.closet.findClothing(address);
         if (clothing.isEmpty()) {
             System.out.println("No clothing matched the given expression.");

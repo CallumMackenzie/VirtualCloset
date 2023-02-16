@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 // A clothing address state machine for parsing a clothing address
 // from a character-based input.
 public class CAStateMachine
-        extends StateMachine<CAStateMachine.State> {
+        extends StateMachine<CAStateMachine.State, ClothingAddressParseException> {
 
     public static final String STYLE_CAPTURE_STR = "style";
     public static final String BRAND_CAPTURE_STR = "brand";
@@ -17,7 +17,7 @@ public class CAStateMachine
     // EFFECTS: Retrieves the next state given the current internal
     //          state.
     @Override
-    public State nextState(State in, char input) {
+    public State nextState(State in, char input) throws ClothingAddressParseException {
         return in.process(input);
     }
 
@@ -61,7 +61,8 @@ public class CAStateMachine
 
         // MODIFIES: this
         // EFFECTS: Processes the given input, producing a new state.
-        public abstract State process(char input);
+        public abstract State process(char input)
+                throws ClothingAddressParseException;
     }
 
     // A state which parses outer filter items such as brand, size, etc
@@ -85,7 +86,7 @@ public class CAStateMachine
         //          parses input preceding EQUALITY_STR as the key
         //          to dictate the next state.
         @Override
-        public State process(char input) {
+        public State process(char input) throws ClothingAddressParseException {
             // Consume leading whitespace
             if (this.whitespaceConsumer.shouldConsumeWhitespace(input)) {
                 return this;
@@ -103,9 +104,9 @@ public class CAStateMachine
         // EFFECTS: Returns the next state dependent on the current
         //          string input. If this input is not found, returns
         //          null.
-        private State nextStateFromCaptured() {
-            switch (captured.toString()
-                    .toLowerCase().trim()) {
+        private State nextStateFromCaptured() throws ClothingAddressParseException {
+            String key = captured.toString().toLowerCase().trim();
+            switch (key) {
                 case BRAND_CAPTURE_STR:
                     return new StringListCaptureState(this,
                             getAddress().getBrands()::addAll);
@@ -114,7 +115,7 @@ public class CAStateMachine
                             getAddress().getStyles()::addAll);
                 // TODO
                 default:
-                    return null;
+                    throw new NoSuchKeyException(key);
             }
         }
     }

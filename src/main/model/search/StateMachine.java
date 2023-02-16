@@ -3,7 +3,7 @@ package model.search;
 // An abstract state machine with a current state of type S,
 // initial state, and next state function with some utilities
 // for processing more lengthy inputs.
-public abstract class StateMachine<S> {
+public abstract class StateMachine<S, E extends Throwable> {
 
     private S state;
 
@@ -15,14 +15,14 @@ public abstract class StateMachine<S> {
     // MODIFIES: this
     // EFFECTS: Steps the state machine once, assigning the result of
     //          the next state function to the internal current state.
-    public final void step(char input) {
+    public final void step(char input) throws E {
         this.state = this.nextState(this.state, input);
     }
 
     // MODIFIES: this
     // REQUIRES: input != null
     // EFFECTS: Steps the state for each input in the given char array.
-    public final S processInput(char[] input) {
+    public final S processInput(char[] input) throws E {
         for (char c : input) {
             this.step(c);
         }
@@ -36,6 +36,6 @@ public abstract class StateMachine<S> {
 
     // EFFECTS: The next state function to be implemented by inheriting
     //          classes.
-    public abstract S nextState(S in, char input);
+    public abstract S nextState(S in, char input) throws E;
 
 }

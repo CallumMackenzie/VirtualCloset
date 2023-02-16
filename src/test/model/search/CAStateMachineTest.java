@@ -17,14 +17,21 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureBrandSimple() {
+    void testUnknownKey() {
+        String in = "UNINDWID" + CAStateMachine.EQUALITY_STR
+                + "DKSDKDS";
+        assertThrows(NoSuchKeyException.class, () -> sm.processInput(in.toCharArray()));
+    }
+
+    @Test
+    void testCaptureBrandSimple() throws ClothingAddressParseException {
         String in = CAStateMachine.BRAND_CAPTURE_STR + CAStateMachine.EQUALITY_STR;
         assertTrue(sm.processInput(in.toCharArray())
                 instanceof CAStateMachine.StringListCaptureState);
     }
 
     @Test
-    void testCaptureBrandWhitespaceBefore() {
+    void testCaptureBrandWhitespaceBefore() throws ClothingAddressParseException {
         String in = "\t  \t " + CAStateMachine.BRAND_CAPTURE_STR
                 + CAStateMachine.EQUALITY_STR;
         assertTrue(sm.processInput(in.toCharArray())
@@ -32,7 +39,7 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureBrandWhitespaceBetween() {
+    void testCaptureBrandWhitespaceBetween() throws ClothingAddressParseException {
         String in = CAStateMachine.BRAND_CAPTURE_STR
                 + " \t  \t" + CAStateMachine.EQUALITY_STR;
         assertTrue(sm.processInput(in.toCharArray())
@@ -40,7 +47,7 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureBrandSingleListItem() {
+    void testCaptureBrandSingleListItem() throws ClothingAddressParseException {
         String in = CAStateMachine.BRAND_CAPTURE_STR
                 + CAStateMachine.EQUALITY_STR
                 + "BRAND A"
@@ -52,7 +59,7 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureBrandMultipleItems() {
+    void testCaptureBrandMultipleItems() throws ClothingAddressParseException {
         String in = CAStateMachine.BRAND_CAPTURE_STR
                 + CAStateMachine.EQUALITY_STR
                 + "BRAND A" + CAStateMachine.LIST_SEPARATOR_STR
@@ -69,13 +76,13 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testNoCapture() {
+    void testNoCapture() throws ClothingAddressParseException {
         assertTrue(sm.processInput("".toCharArray())
                 instanceof CAStateMachine.CapturingState);
     }
 
     @Test
-    void testCaptureBrandStyle() {
+    void testCaptureBrandStyle() throws ClothingAddressParseException {
         String in = CAStateMachine.STYLE_CAPTURE_STR
                 + CAStateMachine.EQUALITY_STR
                 + "casual"
