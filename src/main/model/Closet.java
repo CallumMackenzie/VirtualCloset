@@ -3,6 +3,7 @@ package model;
 import model.search.ClothingAddress;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 // A closet having a list of clothing
 public class Closet {
@@ -37,10 +38,20 @@ public class Closet {
     // EFFECTS: Returns exact matches in this closet for this given address
     public List<Clothing> findClothingExact(ClothingAddress address) {
         // TODO
+        Map<Clothing, Integer> matchMap = new HashMap<>();
         for (String brand : address.getBrands()) {
-
+            this.brandMap.get(brand).forEach(c -> {
+                if (matchMap.containsKey(c)) {
+                    matchMap.put(c, matchMap.get(c) + 1);
+                } else {
+                    matchMap.put(c, 1);
+                }
+            });
         }
-        return null;
+        return matchMap.entrySet().stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
     // Effects: Returns the name of this closet
