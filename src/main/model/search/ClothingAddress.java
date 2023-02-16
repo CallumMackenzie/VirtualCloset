@@ -1,7 +1,8 @@
-package model;
+package model.search;
+
+import model.Size;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 // TODO
 public final class ClothingAddress {
@@ -10,16 +11,22 @@ public final class ClothingAddress {
     private List<Size> sizes;
     private List<String> styles;
     private List<String> types;
+    private SearchMode searchMode;
 
     // TODO
     public ClothingAddress() {
+        this.brands = new ArrayList<>();
+        this.sizes = new ArrayList<>();
+        this.styles = new ArrayList<>();
+        this.types = new ArrayList<>();
+        this.searchMode = SearchMode.EXACT;
     }
 
     // TODO
     public static ClothingAddress of(String expr) {
-        // TODO
-         Scanner s = new Scanner(expr);
-        return null;
+        CAStateMachine parser = new CAStateMachine();
+        CAStateMachine.State out = parser.processInput(expr.toCharArray());
+        return out.address;
     }
 
     // Effects: Returns the brands this address matches
@@ -65,4 +72,21 @@ public final class ClothingAddress {
     public void setTypes(List<String> types) {
         this.types = types;
     }
+
+    // Effects: Returns the search mode for this address
+    public SearchMode getSearchMode() {
+        return this.searchMode;
+    }
+
+    // Modifies: this
+    // Effects: Sets the search mode for this address
+    public void setSearchMode(SearchMode searchMode) {
+        this.searchMode = searchMode;
+    }
+
+    public enum SearchMode {
+        EXACT,
+        SORTED_ALL_SIMILAR;
+    }
+
 }

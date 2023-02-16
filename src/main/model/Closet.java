@@ -1,5 +1,7 @@
 package model;
 
+import model.search.ClothingAddress;
+
 import java.util.*;
 
 // A closet having a list of clothing
@@ -19,8 +21,25 @@ public class Closet {
     }
 
     // TODO
-    public Optional<List<Clothing>> findClothing(ClothingAddress address) {
+    public List<Clothing> findClothing(ClothingAddress address) {
+        switch (address.getSearchMode()) {
+            case EXACT:
+                return this.findClothingExact(address);
+            case SORTED_ALL_SIMILAR:
+                return null;
+            default:
+                break;
+        }
+        throw new RuntimeException("Unreachable statement");
+    }
+
+    // REQUIRES: address must have searchMode of SearchMode.EXACT
+    // EFFECTS: Returns exact matches in this closet for this given address
+    public List<Clothing> findClothingExact(ClothingAddress address) {
         // TODO
+        for (String brand : address.getBrands()) {
+
+        }
         return null;
     }
 

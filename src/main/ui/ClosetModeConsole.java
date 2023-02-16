@@ -1,6 +1,7 @@
 package ui;
 
 import model.*;
+import model.search.ClothingAddress;
 
 import java.awt.*;
 import java.util.*;
@@ -49,6 +50,20 @@ public final class ClosetModeConsole extends CommandSystem {
         } else {
             System.out.println("Types in closet: \n\t - "
                     + String.join("\n\t - ", closet.getTypes()));
+        }
+    }
+
+    // Modifies: this
+    // Effects: searches this closet with the clothing address parsed
+    //          from the user
+    private void clothingAddressSearch() {
+        String input = this.getInput("Enter clothing addres expression: ");
+        ClothingAddress address = ClothingAddress.of(input);
+        List<Clothing> clothing = this.closet.findClothing(address);
+        if (clothing.isEmpty()) {
+            System.out.println("No clothing matched the given expression.");
+        } else {
+            System.out.println("Matches: \n" + clothing);
         }
     }
 
@@ -200,7 +215,10 @@ public final class ClosetModeConsole extends CommandSystem {
                         "create clothing", "new"),
                 new ConsoleCommand(this::listTypes,
                         "Lists the types of clothing in this closet.",
-                        "list types"));
+                        "list types"),
+                new ConsoleCommand(this::clothingAddressSearch,
+                        "Search closet by clothing address.",
+                        "search"));
     }
 
 }
