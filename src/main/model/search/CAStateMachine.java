@@ -1,14 +1,18 @@
 package model.search;
 
+import java.util.List;
+import java.util.function.Consumer;
+
 // A clothing address state machine for parsing a clothing address
 // from a character-based input.
 public class CAStateMachine
         extends StateMachine<CAStateMachine.State> {
 
+    public static final String STYLE_CAPTURE_STR = "style";
     public static final String BRAND_CAPTURE_STR = "brand";
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
-    public static final String LIST_END_STR = "D;";
+    public static final String LIST_END_STR = ";";
 
     // EFFECTS: Retrieves the next state given the current internal
     //          state.
@@ -37,7 +41,7 @@ public class CAStateMachine
     // as information entered is parsed.
     public abstract static class State {
 
-        public final ClothingAddress address;
+        private final ClothingAddress address;
 
         // EFFECTS: Creates a new state with the given clothing address
         public State(ClothingAddress address) {
@@ -47,6 +51,12 @@ public class CAStateMachine
         // EFFECTS: Creates a new state from the previous
         public State(State base) {
             this.address = base.address;
+        }
+
+        // EFFECTS: Returns the clothing address constructed by
+        //          this state.
+        public ClothingAddress getAddress() {
+            return this.address;
         }
 
         // MODIFIES: this
@@ -97,7 +107,11 @@ public class CAStateMachine
             switch (captured.toString()
                     .toLowerCase().trim()) {
                 case BRAND_CAPTURE_STR:
-                    return new BrandCaptureState(this);
+                    return new StringListCaptureState(this,
+                            getAddress().getBrands()::addAll);
+                case STYLE_CAPTURE_STR:
+                    return new StringListCaptureState(this,
+                            getAddress().getStyles()::addAll);
                 // TODO
                 default:
                     return null;
@@ -106,13 +120,16 @@ public class CAStateMachine
     }
 
     // TODO
-    public static class BrandCaptureState extends State {
+    public static class StringListCaptureState extends State {
 
         private final StringListCapture listCapture;
+        private final Consumer<List<String>> onCapture;
 
         // TODO
-        public BrandCaptureState(State last) {
+        public StringListCaptureState(State last,
+                                      Consumer<List<String>> onCapture) {
             super(last);
+            this.onCapture = onCapture;
             this.listCapture = new StringListCapture(
                     LIST_SEPARATOR_STR,
                     LIST_END_STR
@@ -123,7 +140,7 @@ public class CAStateMachine
         @Override
         public State process(char input) {
             if (listCapture.isListFinished(input)) {
-                this.address.getBrands().addAll(listCapture.getTokensCaptured());
+                this.onCapture.accept(listCapture.getTokensCaptured());
                 return new CapturingState(this);
             }
             return this;

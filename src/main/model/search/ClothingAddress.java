@@ -26,7 +26,7 @@ public final class ClothingAddress {
     public static ClothingAddress of(String expr) {
         CAStateMachine parser = new CAStateMachine();
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
-        return out.address;
+        return out.getAddress();
     }
 
     // Effects: Returns the brands this address matches
