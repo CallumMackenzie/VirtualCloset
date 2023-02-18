@@ -1,5 +1,6 @@
 package model.search;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -10,6 +11,7 @@ public class CAStateMachine
 
     public static final String STYLE_CAPTURE_STR = "style";
     public static final String BRAND_CAPTURE_STR = "brand";
+    public static final String TYPE_CAPTURE_STR = "type";
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
@@ -113,6 +115,9 @@ public class CAStateMachine
                 case STYLE_CAPTURE_STR:
                     return new StringListCaptureState(this,
                             getAddress().getStyles()::addAll);
+                case TYPE_CAPTURE_STR:
+                    return new StringListCaptureState(this,
+                            getAddress().getTypes()::addAll);
                 // TODO
                 default:
                     throw new NoSuchKeyException(key);
@@ -120,13 +125,15 @@ public class CAStateMachine
         }
     }
 
-    // TODO
+    // Captures a list of strings, passing the completed list to the
+    // user-provided consumer when it has been fully completed.
     public static class StringListCaptureState extends State {
 
         private final StringListCapture listCapture;
         private final Consumer<List<String>> onCapture;
 
-        // TODO
+        // EFFECTS: Constructs a new string list capture state from the previous
+        //          state data and the given string list consumer.
         public StringListCaptureState(State last,
                                       Consumer<List<String>> onCapture) {
             super(last);
@@ -137,7 +144,9 @@ public class CAStateMachine
             );
         }
 
-        // TODO
+        // MODIFIES: this
+        // EFFECTS: Processes the given character in the state machine
+        //          to build the string list.
         @Override
         public State process(char input) {
             if (listCapture.isListFinished(input)) {

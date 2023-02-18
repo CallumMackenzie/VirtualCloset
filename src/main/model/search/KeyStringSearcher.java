@@ -52,6 +52,7 @@ class KeyStringSearcher {
     public void reset() {
         this.currentKeyIndex = -1;
     }
+    
 
     // MODIFIES: this
     // EFFECTS: Captures input if it is matching the given key string

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Captures a list of strings from character-by-character input
-public class StringListCapture {
+public class StringListCapture implements ListCapture<String> {
 
     private final WhitespaceConsumer whitespaceConsumer;
     private final KeyStringSearcher listSeparatorSearcher;
@@ -25,16 +25,19 @@ public class StringListCapture {
     }
 
     // EFFECTS: Returns the list separator string
+    @Override
     public String getListSeparatorString() {
         return this.listSeparatorSearcher.getKey();
     }
 
     // EFFECTS: Returns the list end string
+    @Override
     public String getListTerminatorString() {
         return this.listEndSearcher.getKey();
     }
 
     // EFFECTS: Returns the tokens captured
+    @Override
     public List<String> getTokensCaptured() {
         return this.tokensCaptured;
     }
@@ -42,6 +45,7 @@ public class StringListCapture {
     // MODIFIES: this
     // EFFECTS: Returns true if the list has finished building,
     //          false otherwise.
+    @Override
     public boolean isListFinished(char input) {
         if (this.whitespaceConsumer.shouldConsumeWhitespace(input)) {
             return false;

@@ -99,4 +99,15 @@ class CAStateMachineTest {
         assertEquals(1, out.getStyles().size());
         assertEquals("casual", out.getStyles().get(0));
     }
+
+    @Test
+    void testCaptureType() throws ClothingAddressParseException {
+        String in = CAStateMachine.TYPE_CAPTURE_STR
+                + CAStateMachine.EQUALITY_STR
+                + "pants"
+                + CAStateMachine.LIST_END_STR;
+        ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
+        assertEquals(1, o.getTypes().size());
+        assertEquals("pants", o.getTypes().get(0));
+    }
 }
