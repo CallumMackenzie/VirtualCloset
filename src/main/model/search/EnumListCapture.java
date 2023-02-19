@@ -27,7 +27,9 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
         this.enumClass = enumClass;
     }
 
-    // TODO
+    // MODIFIES: this
+    // EFFECTS: Processes the next char in the input, returning true if the
+    //          list has completed.
     @Override
     public boolean isListFinished(char input) {
         boolean finished = this.stringListCapture.isListFinished(input);

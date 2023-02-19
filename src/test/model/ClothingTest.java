@@ -3,6 +3,7 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,7 @@ public class ClothingTest {
                 "Adidas",
                 "Polyester",
                 List.of("Casual"),
+                List.of(Color.ORANGE),
                 false,
                 null);
     }

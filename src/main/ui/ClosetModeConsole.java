@@ -101,6 +101,7 @@ public final class ClosetModeConsole extends CommandSystem {
                                     List<String> styles,
                                     Boolean dirty,
                                     Image image) {
+        // TODO: Add color
         if (Objects.isNull(types = this.parseStringList("\tEnter clothing types", types))
                 || Objects.isNull(size = this.parseEnumType("\tEnter size or type \"exit\": ", Size.class, size))
                 || Objects.isNull(brand = this.parseString("brand", brand))
@@ -111,7 +112,7 @@ public final class ClosetModeConsole extends CommandSystem {
             System.out.println("Cancelled.");
             return null;
         }
-        return new Clothing(types, size, brand, material, styles, dirty, image);
+        return new Clothing(types, size, brand, material, styles, List.of(), dirty, image);
     }
 
     // Effects: Returns t if it is not null, otherwise invokes and

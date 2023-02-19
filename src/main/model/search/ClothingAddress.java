@@ -4,25 +4,24 @@ import model.Size;
 
 import java.util.*;
 
-// TODO
+// Search parameters for an article of clothing.
 public final class ClothingAddress {
 
     private List<String> brands;
     private List<Size> sizes;
     private List<String> styles;
     private List<String> types;
-    private SearchMode searchMode;
 
-    // TODO
+    // EFFECTS: Creates a new clothing address with all empty lists
+    //          and default values.
     public ClothingAddress() {
         this.brands = new ArrayList<>();
         this.sizes = new ArrayList<>();
         this.styles = new ArrayList<>();
         this.types = new ArrayList<>();
-        this.searchMode = SearchMode.EXACT;
     }
 
-    // TODO
+    // EFFECTS: Parses the given string expression into a clothing address.
     public static ClothingAddress of(String expr) throws ClothingAddressParseException {
         CAStateMachine parser = new CAStateMachine();
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
@@ -71,22 +70,6 @@ public final class ClothingAddress {
     // Effects: Sets the types this address matches
     public void setTypes(List<String> types) {
         this.types = types;
-    }
-
-    // Effects: Returns the search mode for this address
-    public SearchMode getSearchMode() {
-        return this.searchMode;
-    }
-
-    // Modifies: this
-    // Effects: Sets the search mode for this address
-    public void setSearchMode(SearchMode searchMode) {
-        this.searchMode = searchMode;
-    }
-
-    public enum SearchMode {
-        EXACT,
-        SORTED_ALL_SIMILAR;
     }
 
 }

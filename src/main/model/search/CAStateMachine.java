@@ -1,6 +1,7 @@
 package model.search;
 
-import java.util.ArrayList;
+import model.Size;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -12,6 +13,7 @@ public class CAStateMachine
     public static final String STYLE_CAPTURE_STR = "style";
     public static final String BRAND_CAPTURE_STR = "brand";
     public static final String TYPE_CAPTURE_STR = "type";
+    public static final String SIZE_CAPTURE_STR = "size";
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
@@ -118,6 +120,10 @@ public class CAStateMachine
                 case TYPE_CAPTURE_STR:
                     return new StringListCaptureState(this,
                             getAddress().getTypes()::addAll);
+                case SIZE_CAPTURE_STR:
+                    return new EnumListCaptureState<>(this,
+                            Size.class,
+                            getAddress().getSizes()::addAll);
                 // TODO
                 default:
                     throw new NoSuchKeyException(key);
@@ -151,6 +157,38 @@ public class CAStateMachine
         public State process(char input) {
             if (listCapture.isListFinished(input)) {
                 this.onCapture.accept(listCapture.getTokensCaptured());
+                return new CapturingState(this);
+            }
+            return this;
+        }
+    }
+
+    // Captures a list of enum values, passing the fully completed
+    // list to the user-provided consumer when it has been completed.
+    public static class EnumListCaptureState<T extends Enum<T>> extends State {
+
+        private final EnumListCapture<T> enumListCapture;
+        private final Consumer<List<T>> onCapture;
+
+        // EFFECTS: Creates a new enum list capture state from the given
+        //          enum class, previous state, and capture function.
+        public EnumListCaptureState(State prev,
+                                    Class<T> enumClass,
+                                    Consumer<List<T>> onCapture) {
+            super(prev);
+            this.onCapture = onCapture;
+            this.enumListCapture = new EnumListCapture<>(false,
+                    enumClass,
+                    LIST_SEPARATOR_STR,
+                    LIST_END_STR);
+        }
+
+        // MODIFIES: this
+        // EFFECTS: Processes the next character and returns the next state.
+        @Override
+        public State process(char input) {
+            if (this.enumListCapture.isListFinished(input)) {
+                this.onCapture.accept(this.enumListCapture.getTokensCaptured());
                 return new CapturingState(this);
             }
             return this;

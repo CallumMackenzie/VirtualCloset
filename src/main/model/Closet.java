@@ -24,22 +24,9 @@ public class Closet {
         this.name = name;
     }
 
-    // TODO
+    // EFFECTS: Searches the clothing in this closet for the pieces matching
+    //          the given clothing address most closely, and returns them.
     public List<Clothing> findClothing(ClothingAddress address) {
-        switch (address.getSearchMode()) {
-            case EXACT:
-                return this.findClothingExact(address);
-            case SORTED_ALL_SIMILAR:
-                return null;
-            default:
-                break;
-        }
-        throw new RuntimeException("Unreachable statement");
-    }
-
-    // REQUIRES: address must have searchMode of SearchMode.EXACT
-    // EFFECTS: Returns exact matches in this closet for this given address
-    public List<Clothing> findClothingExact(ClothingAddress address) {
         // TODO
         Map<Clothing, Integer> matchMap = new HashMap<>();
         countMapMatches(this.brandMap, address.getBrands(), matchMap);

@@ -7,9 +7,11 @@ import java.util.List;
 // TODO
 public class Outfit {
 
+    // TODO
     public Outfit(List<Clothing> clothing) {
     }
 
+    // TODO
     public Outfit() {
         this(new ArrayList<>());
     }

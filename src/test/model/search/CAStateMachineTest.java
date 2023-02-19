@@ -1,5 +1,6 @@
 package model.search;
 
+import model.Size;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -109,5 +110,29 @@ class CAStateMachineTest {
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(1, o.getTypes().size());
         assertEquals("pants", o.getTypes().get(0));
+    }
+
+    @Test
+    void testCaptureSize() throws ClothingAddressParseException {
+        String in = CAStateMachine.SIZE_CAPTURE_STR
+                + CAStateMachine.EQUALITY_STR
+                + Size.XL
+                + CAStateMachine.LIST_SEPARATOR_STR
+                + Size.XXL.toString().toLowerCase()
+                + CAStateMachine.LIST_END_STR;
+        ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
+        assertEquals(2, o.getSizes().size());
+        assertTrue(o.getSizes().containsAll(List.of(Size.XL, Size.XXL)));
+    }
+
+    @Test
+    void testCaptureSizeNull() throws ClothingAddressParseException {
+        String in = CAStateMachine.SIZE_CAPTURE_STR
+                + CAStateMachine.EQUALITY_STR
+                + "djaisjdosajdsad"
+                + CAStateMachine.LIST_END_STR;
+        ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
+        assertEquals(1, o.getSizes().size());
+        assertNull(o.getSizes().get(0));
     }
 }

@@ -1,16 +1,18 @@
 package model;
 
-import java.awt.Image;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-// TODO
+// An article of clothing with a list of types, styles, colors, and a brand, size, material,
+// image, and whether it is dirty or not.
 public class Clothing {
 
     private boolean dirty;
+    private List<Color> colors;
     private final Collection<String> types;
     private final List<String> styles;
     private String brand;
@@ -24,12 +26,14 @@ public class Clothing {
                     String brand,
                     String material,
                     List<String> styles,
+                    List<Color> colors,
                     boolean dirty,
                     Image image) {
         this.types = types.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toCollection(ArrayList::new));
         this.dirty = dirty;
+        this.colors = colors;
         this.styles = styles;
         this.brand = brand;
         this.size = size;
@@ -100,6 +104,17 @@ public class Clothing {
     // Effects: Returns the types of this clothing
     public Collection<String> getTypes() {
         return types;
+    }
+
+    // EFFECTS: Returns the colors for this piece of clothing.
+    public List<Color> getColors() {
+        return this.colors;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets the colors for this piece of clothing.
+    public void setColors(List<Color> colors) {
+        this.colors = colors;
     }
 
     // Effects: Returns a string representation of this object

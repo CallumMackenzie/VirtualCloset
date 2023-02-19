@@ -3,7 +3,9 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,15 +13,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ClosetTest {
 
     private Closet closet1;
-    private Shirt shirt1;
+    private Clothing shirt1;
 
     @BeforeEach
     void setup() {
         this.closet1 = new Closet("C1");
-        this.shirt1 = new Shirt(Size.XL,
+        this.shirt1 = new Clothing(List.of("shirt"),
+                Size.XL,
                 "Adidas",
                 "Silk",
                 new ArrayList<>(),
+                List.of(Color.BLUE),
                 true,
                 null);
     }
@@ -36,10 +40,12 @@ public class ClosetTest {
         assertEquals(this.closet1.getClothing().size(), 1);
         assertEquals(this.closet1.getClothing().get(0), shirt1);
 
-        Clothing c2 = new Shirt(Size.S,
+        Clothing c2 = new Clothing(List.of("shirt"),
+                Size.S,
                 "Nike",
                 "Cotton",
                 new ArrayList<>(),
+                List.of(Color.RED),
                 true, null);
         this.closet1.addClothing(c2);
 

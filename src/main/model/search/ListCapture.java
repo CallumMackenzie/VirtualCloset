@@ -2,17 +2,18 @@ package model.search;
 
 import java.util.List;
 
-// TODO
+// Captures a list of the given type from a sequence of characters.
 public interface ListCapture<T> {
-    // TODO
+    // EFFECTS: Processes the next character in the input. Returns
+    //          true if the list is finished, false otherwise.
     boolean isListFinished(char input);
 
-    // TODO
+    // EFFECTS: Returns the tokens captured to the list so far.
     List<T> getTokensCaptured();
 
-    // TODO
+    // EFFECTS: Returns the list separator string.
     String getListSeparatorString();
 
-    // TODO
+    // EFFECTS: Returns the list terminator string.
     String getListTerminatorString();
 }
