@@ -1,11 +1,17 @@
 package ui;
 
-import model.*;
-import model.search.*;
+import model.Closet;
+import model.Clothing;
+import model.Size;
+import model.search.ClothingAddress;
+import model.search.ClothingAddressParseException;
+import model.search.EnumListCapture;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -20,6 +26,23 @@ public final class ClosetModeConsole extends CommandSystem {
         super(input);
         this.closet = closet;
         this.run();
+    }
+
+    // Effects: Returns t if it is not null, otherwise invokes and
+    //          returns the value of the supplier ifNull.
+    private static <T> T ifNull(T t, Supplier<T> ifNull) {
+        if (Objects.isNull(t)) {
+            return ifNull.get();
+        }
+        return t;
+    }
+
+    // EFFECTS: Formats a list of enum types in the given enum class to a string.
+    private static <T extends Enum<T>> String formatEnumTypes(Class<T> enumClass) {
+        return "Types: "
+                + Arrays.stream(enumClass.getEnumConstants())
+                .map(Object::toString)
+                .collect(Collectors.joining("\n\t - "));
     }
 
     // MODIFIES: this
@@ -113,15 +136,6 @@ public final class ClosetModeConsole extends CommandSystem {
         return new Clothing(types, size, brand, material, styles, List.of(), dirty, image);
     }
 
-    // Effects: Returns t if it is not null, otherwise invokes and
-    //          returns the value of the supplier ifNull.
-    private static <T> T ifNull(T t, Supplier<T> ifNull) {
-        if (Objects.isNull(t)) {
-            return ifNull.get();
-        }
-        return t;
-    }
-
     // EFFECTS: If the input boolean is not null, returns it. Prompts the user
     //          for some boolean input and returns true or false depending on
     //          the user input.
@@ -135,14 +149,6 @@ public final class ClosetModeConsole extends CommandSystem {
             }
             return null;
         });
-    }
-
-    // EFFECTS: Formats a list of enum types in the given enum class to a string.
-    private static <T extends Enum<T>> String formatEnumTypes(Class<T> enumClass) {
-        return "Types: "
-                + Arrays.stream(enumClass.getEnumConstants())
-                .map(Object::toString)
-                .collect(Collectors.joining("\n\t - "));
     }
 
     // EFFECTS: Prompts the user for an enum input, parses it from a string, and returns the

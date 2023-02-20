@@ -3,8 +3,6 @@ package model.search;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.function.IntPredicate;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class BooleanCaptureTest {

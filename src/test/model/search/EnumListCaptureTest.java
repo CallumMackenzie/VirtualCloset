@@ -9,12 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EnumListCaptureTest {
 
-    enum TestEnum {
-        VALUE_A,
-        Value_a,
-        valueA
-    }
-
     EnumListCapture<TestEnum> strict;
     EnumListCapture<TestEnum> loose;
 
@@ -95,6 +89,12 @@ class EnumListCaptureTest {
         assertEquals(TestEnum.valueA,
                 EnumListCapture.stringToEnumStrict(TestEnum.class, "valueA"));
         assertNull(EnumListCapture.stringToEnumStrict(TestEnum.class, "x"));
+    }
+
+    enum TestEnum {
+        VALUE_A,
+        Value_a,
+        valueA
     }
 
 }

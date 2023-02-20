@@ -31,6 +31,54 @@ public class Closet {
         this.materialsMap = new HashMap<>();
     }
 
+    // MODIFIES: matchCountMap
+    // EFFECTS: Increments the value of the entry under the key of a given
+    //          piece of clothing for every time it appears the list of clothing
+    //          for each given map key.
+    private static <T> void countMapMatches(Map<T, List<Clothing>> refMap,
+                                            List<T> mapKeys,
+                                            Map<Clothing, Integer> matchCountMap) {
+        for (T t : mapKeys) {
+            if (refMap.containsKey(t)) {
+                refMap.get(t).forEach(c -> {
+                    if (matchCountMap.containsKey(c)) {
+                        matchCountMap.put(c, matchCountMap.get(c) + 1);
+                    } else {
+                        matchCountMap.put(c, 1);
+                    }
+                });
+            }
+        }
+    }
+
+    // MODIFIES: categoryMap
+    // EFFECTS: Places element in the lists associated with each key in keys,
+    //          and creates a new list first if it is not already present in
+    //          the map.
+    private static <K, V> void congregateByKey(Map<K, List<V>> categoryMap,
+                                               Iterable<K> keys,
+                                               V element) {
+        keys.forEach(e -> {
+            if (!categoryMap.containsKey(e)) {
+                categoryMap.put(e, new ArrayList<>());
+            }
+            categoryMap.get(e).add(element);
+        });
+    }
+
+    // MODIFIES: categoryMap
+    // EFFECTS: Removes the element provided from each key in the category map
+    //          if present.
+    private static <K, V> void removeByKey(Map<K, List<V>> categoryMap,
+                                           Iterable<K> keys,
+                                           V element) {
+        keys.forEach(e -> {
+            if (categoryMap.containsKey(e)) {
+                categoryMap.get(e).remove(element);
+            }
+        });
+    }
+
     // EFFECTS: Searches the clothing in this closet for the pieces matching
     //          the given clothing address most closely, and returns them.
     public List<Clothing> findClothing(ClothingAddress address) {
@@ -100,53 +148,5 @@ public class Closet {
         congregateByKey(this.sizeMap, List.of(clothing.getSize()), clothing);
         congregateByKey(this.dirtyMap, List.of(clothing.isDirty()), clothing);
         congregateByKey(this.materialsMap, List.of(clothing.getMaterial()), clothing);
-    }
-
-    // MODIFIES: matchCountMap
-    // EFFECTS: Increments the value of the entry under the key of a given
-    //          piece of clothing for every time it appears the list of clothing
-    //          for each given map key.
-    private static <T> void countMapMatches(Map<T, List<Clothing>> refMap,
-                                            List<T> mapKeys,
-                                            Map<Clothing, Integer> matchCountMap) {
-        for (T t : mapKeys) {
-            if (refMap.containsKey(t)) {
-                refMap.get(t).forEach(c -> {
-                    if (matchCountMap.containsKey(c)) {
-                        matchCountMap.put(c, matchCountMap.get(c) + 1);
-                    } else {
-                        matchCountMap.put(c, 1);
-                    }
-                });
-            }
-        }
-    }
-
-    // MODIFIES: categoryMap
-    // EFFECTS: Places element in the lists associated with each key in keys,
-    //          and creates a new list first if it is not already present in
-    //          the map.
-    private static <K, V> void congregateByKey(Map<K, List<V>> categoryMap,
-                                               Iterable<K> keys,
-                                               V element) {
-        keys.forEach(e -> {
-            if (!categoryMap.containsKey(e)) {
-                categoryMap.put(e, new ArrayList<>());
-            }
-            categoryMap.get(e).add(element);
-        });
-    }
-
-    // MODIFIES: categoryMap
-    // EFFECTS: Removes the element provided from each key in the category map
-    //          if present.
-    private static <K, V> void removeByKey(Map<K, List<V>> categoryMap,
-                                           Iterable<K> keys,
-                                           V element) {
-        keys.forEach(e -> {
-            if (categoryMap.containsKey(e)) {
-                categoryMap.get(e).remove(element);
-            }
-        });
     }
 }

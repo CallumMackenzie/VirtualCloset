@@ -2,7 +2,6 @@ package ui;
 
 import java.util.Set;
 import java.util.function.BooleanSupplier;
-import java.util.function.Supplier;
 
 // A command for the console interface with a set of strings
 // to activate the command, a condition, a command response,

@@ -11,11 +11,11 @@ import java.util.stream.Collectors;
 public class Clothing {
 
     private final List<String> styles;
-    private String brand;
     private final Collection<String> types;
+    private String brand;
     private Size size;
     private boolean dirty;
-    
+
     private List<Color> colors;
     private String material;
     private Image image;

@@ -8,9 +8,9 @@ import java.util.Optional;
 // A user account with a closet, clothing catalogue, and name
 public class Account {
 
-    private String name;
     private final Catalogue catalogue;
     private final List<Closet> closets;
+    private String name;
 
     // Effects: Constructs a new account with the given name
     public Account(String name) {

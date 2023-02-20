@@ -9,8 +9,8 @@ import java.util.Optional;
 // all accounts.
 public class AccountManager implements Serializable {
 
-    private Account activeAccount;
     private final List<Account> accounts;
+    private Account activeAccount;
 
     // Effects: Constructs a new account manager without any
     //          accounts or an active one.

@@ -1,11 +1,7 @@
 package model.search;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.security.Key;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
 
 import static org.junit.jupiter.api.Assertions.*;

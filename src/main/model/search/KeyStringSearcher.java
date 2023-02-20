@@ -6,34 +6,9 @@ import java.util.function.Consumer;
 // to the provided onNoMatch function.
 class KeyStringSearcher {
 
-    // Represents match states for a given quantized input.
-    public enum MatchState {
-        // No match, or match failed
-        NO_MATCH,
-        // Possible match depending on upcoming input
-        PARTIAL_MATCH,
-        // Match
-        MATCH;
-
-        // EFFECTS: Returns true if this is MATCH
-        public boolean wasMatch() {
-            return this == MATCH;
-        }
-
-        // EFFECTS: Returns true if this is PARTIAL_MATCH
-        public boolean wasPartialMatch() {
-            return this == PARTIAL_MATCH;
-        }
-
-        // EFFECTS: Returns true if this is NO_MATCH
-        public boolean wasNoMatch() {
-            return this == NO_MATCH;
-        }
-    }
-
     private final String key;
-    private int currentKeyIndex;
     private final Consumer<String> onNoMatch;
+    private int currentKeyIndex;
 
     // REQUIRES: Key cannot match a pattern deeply which needs to be
     //           captured elsewhere.
@@ -62,7 +37,6 @@ class KeyStringSearcher {
     public void reset() {
         this.currentKeyIndex = -1;
     }
-
 
     // MODIFIES: this
     // EFFECTS: Captures input if it is matching the given key string
@@ -96,6 +70,32 @@ class KeyStringSearcher {
             return MatchState.PARTIAL_MATCH;
         } else {
             return MatchState.NO_MATCH;
+        }
+    }
+
+
+    // Represents match states for a given quantized input.
+    public enum MatchState {
+        // No match, or match failed
+        NO_MATCH,
+        // Possible match depending on upcoming input
+        PARTIAL_MATCH,
+        // Match
+        MATCH;
+
+        // EFFECTS: Returns true if this is MATCH
+        public boolean wasMatch() {
+            return this == MATCH;
+        }
+
+        // EFFECTS: Returns true if this is PARTIAL_MATCH
+        public boolean wasPartialMatch() {
+            return this == PARTIAL_MATCH;
+        }
+
+        // EFFECTS: Returns true if this is NO_MATCH
+        public boolean wasNoMatch() {
+            return this == NO_MATCH;
         }
     }
 }

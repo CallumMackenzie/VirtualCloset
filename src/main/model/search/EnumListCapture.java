@@ -27,23 +27,6 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
         this.enumClass = enumClass;
     }
 
-    // MODIFIES: this
-    // EFFECTS: Processes the next char in the input, returning true if the
-    //          list has completed.
-    @Override
-    public boolean isListFinished(char input) {
-        boolean finished = this.stringListCapture.isListFinished(input);
-        List<String> stringTokens = this.stringListCapture.getTokensCaptured();
-        if (stringTokens.size() != this.tokens.size()
-                && !stringTokens.isEmpty()) {
-            String latestToken = stringTokens.get(stringTokens.size() - 1);
-            this.tokens.add(this.matchStrict
-                    ? stringToEnumStrict(this.enumClass, latestToken)
-                    : stringToEnumLoose(this.enumClass, latestToken));
-        }
-        return finished;
-    }
-
     // EFFECTS: Returns the matching enum name based on the given string,
     //          or null if it does not match any. Matches must be exact
     //          to case and order.
@@ -66,6 +49,23 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
                         .equalsIgnoreCase(formatted))
                 .findFirst()
                 .orElse(null);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Processes the next char in the input, returning true if the
+    //          list has completed.
+    @Override
+    public boolean isListFinished(char input) {
+        boolean finished = this.stringListCapture.isListFinished(input);
+        List<String> stringTokens = this.stringListCapture.getTokensCaptured();
+        if (stringTokens.size() != this.tokens.size()
+                && !stringTokens.isEmpty()) {
+            String latestToken = stringTokens.get(stringTokens.size() - 1);
+            this.tokens.add(this.matchStrict
+                    ? stringToEnumStrict(this.enumClass, latestToken)
+                    : stringToEnumLoose(this.enumClass, latestToken));
+        }
+        return finished;
     }
 
     // EFFECTS: Returns the tokens captured by this list capture so far.
