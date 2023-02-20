@@ -73,4 +73,28 @@ class EnumListCaptureTest {
                 .stream().filter(x -> x == TestEnum.VALUE_A).count());
     }
 
+    @Test
+    void testStringToEnumLoose() {
+        assertEquals(TestEnum.VALUE_A,
+                EnumListCapture.stringToEnumLoose(TestEnum.class, "VALUE_A"));
+        assertEquals(TestEnum.VALUE_A,
+                EnumListCapture.stringToEnumLoose(TestEnum.class, "VALUE A"));
+        assertEquals(TestEnum.VALUE_A,
+                EnumListCapture.stringToEnumLoose(TestEnum.class, "VALue_A"));
+        assertEquals(TestEnum.valueA,
+                EnumListCapture.stringToEnumLoose(TestEnum.class, "valueA"));
+        assertNull(EnumListCapture.stringToEnumLoose(TestEnum.class, "x"));
+    }
+
+    @Test
+    void testStringToEnumStrict() {
+        assertEquals(TestEnum.VALUE_A,
+                EnumListCapture.stringToEnumStrict(TestEnum.class, "VALUE_A"));
+        assertNull(EnumListCapture.stringToEnumStrict(TestEnum.class, "VALUE A"));
+        assertNull(EnumListCapture.stringToEnumStrict(TestEnum.class, "VALue A"));
+        assertEquals(TestEnum.valueA,
+                EnumListCapture.stringToEnumStrict(TestEnum.class, "valueA"));
+        assertNull(EnumListCapture.stringToEnumStrict(TestEnum.class, "x"));
+    }
+
 }

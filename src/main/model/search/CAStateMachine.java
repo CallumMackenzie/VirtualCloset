@@ -16,6 +16,7 @@ public class CAStateMachine
     public static final String TYPE_CAPTURE_STR = "type";
     public static final String SIZE_CAPTURE_STR = "size";
     public static final String IS_DIRTY_CAPTURE_STR = "dirty";
+
     public static final String TRUE_STR = "yes";
     public static final String FALSE_STR = "no";
     public static final String EQUALITY_STR = "=";

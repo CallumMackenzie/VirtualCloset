@@ -38,8 +38,8 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
                 && !stringTokens.isEmpty()) {
             String latestToken = stringTokens.get(stringTokens.size() - 1);
             this.tokens.add(this.matchStrict
-                    ? this.stringToEnumStrict(latestToken)
-                    : this.stringToEnumLoose(latestToken));
+                    ? stringToEnumStrict(this.enumClass, latestToken)
+                    : stringToEnumLoose(this.enumClass, latestToken));
         }
         return finished;
     }
@@ -47,8 +47,9 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
     // EFFECTS: Returns the matching enum name based on the given string,
     //          or null if it does not match any. Matches must be exact
     //          to case and order.
-    private T stringToEnumStrict(String in) {
-        return Arrays.stream(this.enumClass.getEnumConstants())
+    public static <T extends Enum<T>> T stringToEnumStrict(Class<T> enumClass,
+                                                           String in) {
+        return Arrays.stream(enumClass.getEnumConstants())
                 .filter(t -> t.name().equals(in))
                 .findFirst()
                 .orElse(null);
@@ -57,9 +58,10 @@ public class EnumListCapture<T extends Enum<T>> implements ListCapture<T> {
     // EFFECTS: Returns the matching enum name based on the given string,
     //          or null if it does not match any. Matches may have different
     //          case and whitespace. The first match is returned.
-    private T stringToEnumLoose(String in) {
+    public static <T extends Enum<T>> T stringToEnumLoose(Class<T> enumClass,
+                                                          String in) {
         String formatted = in.replaceAll("\\s+", "_");
-        return Arrays.stream(this.enumClass.getEnumConstants())
+        return Arrays.stream(enumClass.getEnumConstants())
                 .filter(t -> t.name()
                         .equalsIgnoreCase(formatted))
                 .findFirst()

@@ -1,8 +1,7 @@
 package ui;
 
 import model.*;
-import model.search.ClothingAddress;
-import model.search.ClothingAddressParseException;
+import model.search.*;
 
 import java.awt.*;
 import java.util.*;
@@ -66,6 +65,12 @@ public final class ClosetModeConsole extends CommandSystem {
         ClothingAddress address = null;
         try {
             address = ClothingAddress.of(input);
+        } catch (UnexpectedInputException e) {
+            System.out.println("\tMalformed search expression: " + e.getMessage());
+            return;
+        } catch (NoSuchKeyException e) {
+            System.out.println("\t" + e.getMessage());
+            return;
         } catch (ClothingAddressParseException e) {
             // TODO
             throw new RuntimeException(e);
@@ -154,12 +159,11 @@ public final class ClosetModeConsole extends CommandSystem {
         return ifNull(type, () -> {
             String typeInput = this.getInputTrimOnly(formatEnumTypes(enumClass)
                     + "\n" + prompt);
-            try {
-                return Enum.valueOf(enumClass, typeInput);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Input did not match a given type.");
-                return null;
+            T val = EnumListCapture.stringToEnumLoose(enumClass, typeInput.trim());
+            if (val == null) {
+                System.out.println("Input \"" + typeInput + "\" did not match any given value.");
             }
+            return val;
         });
     }
 
