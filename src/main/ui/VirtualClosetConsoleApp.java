@@ -271,7 +271,15 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                                     "create closet",
                                     "c1",
                                     "open closet",
-                                    "c1")) + "\n";
+                                    "c1",
+                                    "new", "pants", "xl", "adidas", "cotton", "casual, sweatpants", "no",
+                                    "new", "shirt", "l", "uniqlo", "synthetic", "casual, smooth, oversize", "no",
+                                    "new", "pants", "xl", "under armor", "cotton", "casual, sweatpants", "yes",
+                                    "new", "pants", "xl", "uniqlo", "cotton", "semicasual, cargos", "no",
+                                    "new", "shirt", "l", "under armor", "polyester", "gym, workout, casual", "no",
+                                    "new", "shorts", "xl", "youngla", "cotton", "gym, workout", "no",
+                                    "new", "sweater", "xl", "ubc", "cotton blend", "casual, outdoor", "no",
+                                    "help")) + "\n";
                     this.getInput().addScanner(new Scanner(cmds));
                 }, "", "dbg")
         );

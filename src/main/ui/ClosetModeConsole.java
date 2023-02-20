@@ -9,6 +9,7 @@ import model.search.EnumListCapture;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -68,13 +69,16 @@ public final class ClosetModeConsole extends CommandSystem {
                 + this.closet.getName() + "\".");
     }
 
-    // EFFECTS: Prints the types of clothing present in this closet
-    private void listTypes() {
-        if (this.closet.getTypes().isEmpty()) {
-            System.out.println("\tNo types in closet.");
+    // EFFECTS: Formats and prints the given list to the console
+    //          with the given title.
+    private <T> void printClosetStringList(String title,
+                                           Collection<T> types) {
+        if (types.isEmpty()) {
+            System.out.println("\tNo " + title.toLowerCase() + " in closet.");
         } else {
-            System.out.println("Types in closet: \n\t - "
-                    + String.join("\n\t - ", closet.getTypes()));
+            System.out.println(title + " in closet: \n\t - "
+                    + types.stream().map(T::toString)
+                    .collect(Collectors.joining("\n\t - ")));
         }
     }
 
@@ -199,6 +203,7 @@ public final class ClosetModeConsole extends CommandSystem {
 
     // MODIFIES: this
     // EFFECTS: Sets up the commands for this console interface.
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void initCommands() {
         this.addCommands(
                 new ConsoleCommand(this::exit,
@@ -210,9 +215,18 @@ public final class ClosetModeConsole extends CommandSystem {
                 new ConsoleCommand(this::createClothing,
                         "Creates a new piece of clothing.",
                         "create clothing", "new"),
-                new ConsoleCommand(this::listTypes,
+                new ConsoleCommand(() -> this.printClosetStringList("Types",
+                        this.closet.getTypes()),
                         "Lists the types of clothing in this closet.",
                         "list types"),
+                new ConsoleCommand(() -> this.printClosetStringList("Brands",
+                        this.closet.getBrands()),
+                        "Lists the brands of clothing in this closet.",
+                        "list brands"),
+                new ConsoleCommand(() -> this.printClosetStringList("Styles",
+                        this.closet.getStyles()),
+                        "Lists the styles of clothing in this closet.",
+                        "list styles"),
                 new ConsoleCommand(this::clothingAddressSearch,
                         "Search closet by clothing address.",
                         "search")
