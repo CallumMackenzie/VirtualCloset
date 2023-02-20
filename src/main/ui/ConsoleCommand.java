@@ -14,7 +14,7 @@ public final class ConsoleCommand {
     private final String inactiveMessage;
     private final String description;
 
-    // Effects: Constructs a new console command from the given command
+    // EFFECTS: Constructs a new console command from the given command
     //          keys, active condition, response function, description,
     //          and inactive message.
     public ConsoleCommand(Runnable responseFn,
@@ -29,7 +29,7 @@ public final class ConsoleCommand {
         this.activeCondition = activeCondition;
     }
 
-    // Effects: Constructs a new console command from the given command
+    // EFFECTS: Constructs a new console command from the given command
     //          keys, response function, and description.
     public ConsoleCommand(Runnable responseFn,
                           String description,
@@ -37,7 +37,7 @@ public final class ConsoleCommand {
         this(responseFn, () -> true, "", description, validCommands);
     }
 
-    // Effects: Executes the response function if the given command
+    // EFFECTS: Executes the response function if the given command
     //          is in the valid command set. If the given command starts
     //          with a question mark, it provides the description for this
     //          command if it matches the given.
@@ -60,22 +60,22 @@ public final class ConsoleCommand {
         }
     }
 
-    // Effects: Returns whether this command is active
+    // EFFECTS: Returns whether this command is active
     public boolean isActive() {
         return this.activeCondition.getAsBoolean();
     }
 
-    // Effects: Returns whether the given command activates this console command
+    // EFFECTS: Returns whether the given command activates this console command
     public boolean matchesCommand(String cmd) {
         return this.validCommands.contains(cmd);
     }
 
-    // Effects: Returns a string digest summarizing the command.
+    // EFFECTS: Returns a string digest summarizing the command.
     public String getDigest() {
         return String.join(", ", this.validCommands);
     }
 
-    // Effects: Returns the description for this command.
+    // EFFECTS: Returns the description for this command.
     public String getDescription() {
         return this.description;
     }

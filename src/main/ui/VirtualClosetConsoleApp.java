@@ -14,15 +14,15 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
 
     private AccountManager accountManager;
 
-    // Effects: Runs the Virtual Closet console application
+    // EFFECTS: Runs the Virtual Closet console application
     public VirtualClosetConsoleApp() {
         super(new Scanner(System.in));
         this.run();
         this.getInput().close();
     }
 
-    // Modifies: this
-    // Effects: Sets up the scanner, account manager, and marks the application
+    // MODIFIES: this
+    // EFFECTS: Sets up the scanner, account manager, and marks the application
     //          to run.
     @Override
     protected void init() {
@@ -32,7 +32,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         System.out.println("Welcome to Virtual Closet!");
     }
 
-    // Effects: Prompts the user for a command and returns it
+    // EFFECTS: Prompts the user for a command and returns it
     @Override
     protected String promptInput() {
         String prompt = this.accountManager.getActiveAccount()
@@ -44,19 +44,20 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         return this.getInput(prompt);
     }
 
-    // Modifies: this
-    // Effects: Marks the application to be closed when ready,
+    // MODIFIES: this
+    // EFFECTS: Marks the application to be closed when ready,
     //          and prints a message for the user to see.
     private void exit() {
         this.setShouldRun(false);
         System.out.println("Closing application ...");
     }
 
-    // Requires: this.accountManager has an active account
-    // Modifies: this
-    // Effects: creates a new closet with the given name unless
+    // REQUIRES: this.accountManager has an active account
+    // MODIFIES: this
+    // EFFECTS: creates a new closet with the given name unless
     //          a closet with the name is already present
     private void createCloset() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String closetName = this.getInput("\tEnter closet name to create: ");
         Account active = this.accountManager.getActiveAccount().get();
         if (active.addCloset(closetName)) {
@@ -66,11 +67,12 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Requires: this.accountManager has an active account
-    // Modifies: this
-    // Effects: Removes the closet with the given name and informs
+    // REQUIRES: this.accountManager has an active account
+    // MODIFIES: this
+    // EFFECTS: Removes the closet with the given name and informs
     //          the user if it was removed successfully.
     private void removeCloset() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String closetName = this.getInput("\tEnter a closet name to remove: ");
         String verify = this.getInput("\tEnter the closet name again to confirm: ");
         Account active = this.accountManager.getActiveAccount().get();
@@ -83,8 +85,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Modifies: this
-    // Effects: Retrieves an account name from the user, then creates
+    // MODIFIES: this
+    // EFFECTS: Retrieves an account name from the user, then creates
     //          and stores an account with the given name. If the account
     //          name is already taken, notifies user.
     private void createAccount() {
@@ -103,8 +105,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Modifies: this
-    // Effects: Attempts to remove the account which the user specifies
+    // MODIFIES: this
+    // EFFECTS: Attempts to remove the account which the user specifies
     //          if it exists, and prints whether it was successful.
     private void removeAccount() {
         String accountName = this.getInput("\tEnter account name to delete: ");
@@ -120,7 +122,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Effects: Prints a list of all accounts in the account manager
+    // EFFECTS: Prints a list of all accounts in the account manager
     private void listAccounts() {
         if (this.accountManager.getAccounts().size() == 0) {
             System.out.println("\tThere are no accounts.");
@@ -133,8 +135,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Modifies: this
-    // Effects: Sets the active account to the name of the one input by user,
+    // MODIFIES: this
+    // EFFECTS: Sets the active account to the name of the one input by user,
     //          or informs them if the account does not exist.
     private void setActiveAccount() {
         String accountName = this.getInput("\tEnter account name: ");
@@ -145,9 +147,10 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Requires: this.accountManager has an active account
-    // Effects: Lists the closets of the given active account
+    // REQUIRES: this.accountManager has an active account
+    // EFFECTS: Lists the closets of the given active account
     private void listClosets() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         Account a = this.accountManager.getActiveAccount().get();
         System.out.println("\tClosets: "
                 + a.getClosets().stream()
@@ -155,12 +158,13 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                 .collect(Collectors.joining(", ")));
     }
 
-    // Requires: this.accountManager has an active account
-    // Modifies: this
-    // Effects: Prompts the user for a new account name,
+    // REQUIRES: this.accountManager has an active account
+    // MODIFIES: this
+    // EFFECTS: Prompts the user for a new account name,
     //          and renames the active account if no other
     //          account presently has the same name.
     private void renameActive() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String name = this.getInput("\tEnter new account name: ");
         String nameBefore = this.accountManager.getActiveAccount()
                 .get().getName();
@@ -173,22 +177,25 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
-    // Requires: this.accountManager must have an active account
-    // Modifies: this
-    // Effects: Enters closet mode for the given closet name provided
+    // REQUIRES: this.accountManager must have an active account
+    // MODIFIES: this
+    // EFFECTS: Enters closet mode for the given closet name provided
     //          by the user
     private void openCloset() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
+
         String closetName = this.getInput("\tEnter closet name: ");
         Account active = this.accountManager.getActiveAccount().get();
         if (active.hasCloset(closetName)) {
+            assert active.getCloset(closetName).isPresent() : "Active account did not have the required closet!";
             new ClosetModeConsole(this.getInput(), active.getCloset(closetName).get());
         } else {
             System.out.println("\tCloset \"" + closetName + "\" does not exist.");
         }
     }
 
-    // Modifies: this
-    // Effects: Initializes the list of commands with the given
+    // MODIFIES: this
+    // EFFECTS: Initializes the list of commands with the given
     //          class state.
     @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void initCommands() {
@@ -232,9 +239,10 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         "Removes the closet with the given name.",
                         "remove closet"),
                 new ConsoleCommand(this::listClosets,
-                        () -> this.accountManager.hasActiveAccount()
-                                && !this.accountManager.getActiveAccount()
-                                .get().getClosets().isEmpty(),
+                        () -> this.accountManager.getActiveAccount()
+                                .map(Account::getClosets)
+                                .map(l -> !l.isEmpty())
+                                .orElse(false),
                         "No active account, or no closets!",
                         "Lists the closets for the given active account.",
                         "list closets"),

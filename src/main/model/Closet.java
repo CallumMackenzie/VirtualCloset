@@ -18,7 +18,7 @@ public class Closet {
     private final Map<Boolean, List<Clothing>> dirtyMap;
     private final Map<String, List<Clothing>> materialsMap;
 
-    // Effects: Constructs a new closet with no clothing
+    // EFFECTS: Constructs a new closet with no clothing
     public Closet(String name) {
         this.clothing = new ArrayList<>();
         this.name = name;
@@ -99,22 +99,22 @@ public class Closet {
                 .collect(Collectors.toList());
     }
 
-    // Effects: Returns the name of this closet
+    // EFFECTS: Returns the name of this closet
     public String getName() {
         return this.name;
     }
 
-    // Effects: Returns the clothing in this closet
+    // EFFECTS: Returns the clothing in this closet
     public List<Clothing> getClothing() {
         return this.clothing;
     }
 
-    // Effects: Returns the types of clothing present in this closet
+    // EFFECTS: Returns the types of clothing present in this closet
     public Set<String> getTypes() {
         return this.typeMap.keySet();
     }
 
-    // Effects: Returns the brands present in this closet
+    // EFFECTS: Returns the brands present in this closet
     public Set<String> getBrands() {
         return this.brandMap.keySet();
     }
@@ -137,8 +137,8 @@ public class Closet {
         removeByKey(this.materialsMap, List.of(clothing.getMaterial()), clothing);
     }
 
-    // Modifies: this
-    // Effects: Adds the given clothing to this closet
+    // MODIFIES: this
+    // EFFECTS: Adds the given clothing to this closet
     public void addClothing(Clothing clothing) {
         this.clothing.add(clothing);
 

@@ -28,7 +28,7 @@ public final class ClosetModeConsole extends CommandSystem {
         this.run();
     }
 
-    // Effects: Returns t if it is not null, otherwise invokes and
+    // EFFECTS: Returns t if it is not null, otherwise invokes and
     //          returns the value of the supplier ifNull.
     private static <T> T ifNull(T t, Supplier<T> ifNull) {
         if (Objects.isNull(t)) {
@@ -80,8 +80,8 @@ public final class ClosetModeConsole extends CommandSystem {
         }
     }
 
-    // Modifies: this
-    // Effects: searches this closet with the clothing address parsed
+    // MODIFIES: this
+    // EFFECTS: searches this closet with the clothing address parsed
     //          from the user
     private void clothingAddressSearch() {
         String input = this.getInput("Enter clothing address expression: ");
@@ -99,8 +99,8 @@ public final class ClosetModeConsole extends CommandSystem {
         }
     }
 
-    // Modifies: this
-    // Effects: Guides the user through a clothing creation process.
+    // MODIFIES: this
+    // EFFECTS: Guides the user through a clothing creation process.
     private void createClothing() {
         String input = this.getInput("\tEnter a clothing type to create: ")
                 .toLowerCase();
@@ -113,7 +113,7 @@ public final class ClosetModeConsole extends CommandSystem {
         this.closet.addClothing(newClothing);
     }
 
-    // Effects: Guides user through a clothing creation process and returns.
+    // EFFECTS: Guides user through a clothing creation process and returns.
     //          Requests any null items from the user.
     private Clothing createClothing(List<String> types,
                                     Size size,

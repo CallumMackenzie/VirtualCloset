@@ -62,22 +62,22 @@ public final class ClothingAddress {
         this.isDirty = isDirty;
     }
 
-    // Effects: Returns the brands this address matches
+    // EFFECTS: Returns the brands this address matches
     public List<String> getBrands() {
         return brands;
     }
 
-    // Effects: Returns the sizes this address matches
+    // EFFECTS: Returns the sizes this address matches
     public List<Size> getSizes() {
         return sizes;
     }
 
-    // Effects: Returns the styles this address matches
+    // EFFECTS: Returns the styles this address matches
     public List<String> getStyles() {
         return styles;
     }
 
-    // Effects: Returns the types this address matches
+    // EFFECTS: Returns the types this address matches
     public List<String> getTypes() {
         return types;
     }

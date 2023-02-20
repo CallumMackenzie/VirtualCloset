@@ -12,18 +12,18 @@ public class AccountManager implements Serializable {
     private final List<Account> accounts;
     private Account activeAccount;
 
-    // Effects: Constructs a new account manager without any
+    // EFFECTS: Constructs a new account manager without any
     //          accounts or an active one.
     public AccountManager() {
         this.accounts = new ArrayList<>();
     }
 
-    // Effects: Returns whether there is an active account or not
+    // EFFECTS: Returns whether there is an active account or not
     public boolean hasActiveAccount() {
         return this.activeAccount != null;
     }
 
-    // Effects: Returns account wrapped in optional if present,
+    // EFFECTS: Returns account wrapped in optional if present,
     //          otherwise returns Optional.empty().
     public Optional<Account> getActiveAccount() {
         if (this.hasActiveAccount()) {
@@ -32,13 +32,13 @@ public class AccountManager implements Serializable {
         return Optional.empty();
     }
 
-    // Effects: Returns true if the given account name is
+    // EFFECTS: Returns true if the given account name is
     //          currently taken.
     private boolean accountExists(String accountName) {
         return this.getAccount(accountName) != null;
     }
 
-    // Effects: Finds an account by name. If it is not found,
+    // EFFECTS: Finds an account by name. If it is not found,
     //          returns null.
     public Account getAccount(String name) {
         for (Account a : this.getAccounts()) {
@@ -49,8 +49,8 @@ public class AccountManager implements Serializable {
         return null;
     }
 
-    // Modifies: this
-    // Effects: If the given account name is found in the list of
+    // MODIFIES: this
+    // EFFECTS: If the given account name is found in the list of
     //          accounts managed, it will set that to be the active account
     //          and return true. Otherwise, it will return false.
     public boolean setActiveAccount(String accountName) {
@@ -61,15 +61,15 @@ public class AccountManager implements Serializable {
         return ac != null;
     }
 
-    // Modifies: this
-    // Effects: Removes the active account if present, otherwise
+    // MODIFIES: this
+    // EFFECTS: Removes the active account if present, otherwise
     //          does nothing
     public void removeActiveAccount() {
         this.activeAccount = null;
     }
 
-    // Modifies: this
-    // Effects: Sets the current account name if no other account
+    // MODIFIES: this
+    // EFFECTS: Sets the current account name if no other account
     //          has the same name and returns true, otherwise it
     //          does not set and returns false.
     public boolean setActiveAccountName(String name) {
@@ -79,8 +79,8 @@ public class AccountManager implements Serializable {
         return this.activeAccount.setName(name, this.accounts);
     }
 
-    // Modifies: this
-    // Effects: Adds the given account to the list of accounts
+    // MODIFIES: this
+    // EFFECTS: Adds the given account to the list of accounts
     //          managed and returns true if the given account
     //          name is not already taken. Otherwise, returns false
     //          and does not add account.
@@ -93,8 +93,8 @@ public class AccountManager implements Serializable {
         }
     }
 
-    // Modifies: this
-    // Effects: Removes the given account if it is tracked,
+    // MODIFIES: this
+    // EFFECTS: Removes the given account if it is tracked,
     //          returns whether it was removed or not.
     public boolean removeAccount(String accountName) {
         if (this.accountExists(accountName)) {
@@ -110,7 +110,7 @@ public class AccountManager implements Serializable {
         return false;
     }
 
-    // Effects: Returns the accounts this system manages
+    // EFFECTS: Returns the accounts this system manages
     public List<Account> getAccounts() {
         return this.accounts;
     }

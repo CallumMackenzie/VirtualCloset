@@ -20,7 +20,7 @@ public class Clothing {
     private String material;
     private Image image;
 
-    // Effects: Constructs a new piece of clothing
+    // EFFECTS: Constructs a new piece of clothing
     public Clothing(Collection<String> types,
                     Size size,
                     String brand,
@@ -41,67 +41,67 @@ public class Clothing {
         this.material = material;
     }
 
-    // Effects: Returns whether this clothing is dirty
+    // EFFECTS: Returns whether this clothing is dirty
     public boolean isDirty() {
         return this.dirty;
     }
 
-    // Modifies: this
-    // Effects: Sets whether the clothing is dirty or not
+    // MODIFIES: this
+    // EFFECTS: Sets whether the clothing is dirty or not
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
 
-    // Effects: Returns the list of styles for this clothing
+    // EFFECTS: Returns the list of styles for this clothing
     public List<String> getStyles() {
         return this.styles;
     }
 
-    // Effects: Returns the brand this clothing is from
+    // EFFECTS: Returns the brand this clothing is from
     public String getBrand() {
         return this.brand;
     }
 
-    // Modifies: this
-    // Effects: Sets the brand of this clothing
+    // MODIFIES: this
+    // EFFECTS: Sets the brand of this clothing
     public void setBrand(String brand) {
         this.brand = brand;
     }
 
-    // Effects: Returns this size of this clothing
+    // EFFECTS: Returns this size of this clothing
     public Size getSize() {
         return this.size;
     }
 
-    // Modifies: this
-    // Effects: Sets the size of this clothing
+    // MODIFIES: this
+    // EFFECTS: Sets the size of this clothing
     void setSize(Size size) {
         this.size = size;
     }
 
-    // Effects: Returns the image for this clothing
+    // EFFECTS: Returns the image for this clothing
     public Image getImage() {
         return this.image;
     }
 
-    // Modifies: this
-    // Effects: Sets the image for this clothing
+    // MODIFIES: this
+    // EFFECTS: Sets the image for this clothing
     public void setImage(Image image) {
         this.image = image;
     }
 
-    // Effects: Returns the material for this clothing
+    // EFFECTS: Returns the material for this clothing
     public String getMaterial() {
         return this.material;
     }
 
-    // Modifies: this
-    // Effects: Sets the material for this clothing
+    // MODIFIES: this
+    // EFFECTS: Sets the material for this clothing
     void setMaterial(String material) {
         this.material = material;
     }
 
-    // Effects: Returns the types of this clothing
+    // EFFECTS: Returns the types of this clothing
     public Collection<String> getTypes() {
         return types;
     }
@@ -117,7 +117,7 @@ public class Clothing {
         this.colors = colors;
     }
 
-    // Effects: Returns a string representation of this object
+    // EFFECTS: Returns a string representation of this object
     @Override
     public String toString() {
         return "[" + String.join(", ", this.types) + "] {"
