@@ -108,10 +108,8 @@ class KeyStringSearcherTest {
     void testTryFindKeyBrokenByStartChar() {
         Stack<String> capture = new Stack<>();
         KeyStringSearcher s = new KeyStringSearcher("A;", capture::push);
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                s.tryFindKey('A'));
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                s.tryFindKey('A'));
+        assertTrue(s.tryFindKey('A').wasPartialMatch());
+        assertTrue(s.tryFindKey('A').wasPartialMatch());
         assertEquals(1, capture.size());
         assertEquals("A", capture.pop());
     }

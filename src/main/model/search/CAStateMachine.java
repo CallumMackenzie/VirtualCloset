@@ -2,7 +2,6 @@ package model.search;
 
 import model.Size;
 
-import java.lang.management.LockInfo;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
