@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 // image, and whether it is dirty or not.
 public class Clothing {
 
-    private boolean dirty;
-    private List<Color> colors;
-    private final Collection<String> types;
     private final List<String> styles;
     private String brand;
+    private final Collection<String> types;
     private Size size;
+    private boolean dirty;
+    
+    private List<Color> colors;
     private String material;
     private Image image;
 

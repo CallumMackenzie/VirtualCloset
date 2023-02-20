@@ -16,6 +16,7 @@ public class Closet {
     private final Map<String, List<Clothing>> typeMap;
     private final Map<Size, List<Clothing>> sizeMap;
     private final Map<Boolean, List<Clothing>> dirtyMap;
+    private final Map<String, List<Clothing>> materialsMap;
 
     // Effects: Constructs a new closet with no clothing
     public Closet(String name) {
@@ -27,13 +28,14 @@ public class Closet {
         this.typeMap = new HashMap<>();
         this.sizeMap = new HashMap<>();
         this.dirtyMap = new HashMap<>();
+        this.materialsMap = new HashMap<>();
     }
 
     // EFFECTS: Searches the clothing in this closet for the pieces matching
     //          the given clothing address most closely, and returns them.
     public List<Clothing> findClothing(ClothingAddress address) {
-        // TODO
         Map<Clothing, Integer> matchMap = new HashMap<>();
+
         countMapMatches(this.styleMap, address.getStyles(), matchMap);
         countMapMatches(this.brandMap, address.getBrands(), matchMap);
         countMapMatches(this.typeMap, address.getTypes(), matchMap);
@@ -41,6 +43,8 @@ public class Closet {
         if (address.getIsDirty() != null) {
             countMapMatches(this.dirtyMap, List.of(address.getIsDirty()), matchMap);
         }
+        countMapMatches(this.materialsMap, address.getMaterials(), matchMap);
+
         return matchMap.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
@@ -82,6 +86,7 @@ public class Closet {
         removeByKey(this.typeMap, clothing.getTypes(), clothing);
         removeByKey(this.sizeMap, List.of(clothing.getSize()), clothing);
         removeByKey(this.dirtyMap, List.of(clothing.isDirty()), clothing);
+        removeByKey(this.materialsMap, List.of(clothing.getMaterial()), clothing);
     }
 
     // Modifies: this
@@ -94,6 +99,7 @@ public class Closet {
         congregateByKey(this.typeMap, clothing.getTypes(), clothing);
         congregateByKey(this.sizeMap, List.of(clothing.getSize()), clothing);
         congregateByKey(this.dirtyMap, List.of(clothing.isDirty()), clothing);
+        congregateByKey(this.materialsMap, List.of(clothing.getMaterial()), clothing);
     }
 
     // MODIFIES: matchCountMap

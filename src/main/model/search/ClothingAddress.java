@@ -2,15 +2,17 @@ package model.search;
 
 import model.Size;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 // Search parameters for an article of clothing.
 public final class ClothingAddress {
 
-    private List<String> brands;
-    private List<Size> sizes;
-    private List<String> styles;
-    private List<String> types;
+    private final List<String> brands;
+    private final List<Size> sizes;
+    private final List<String> styles;
+    private final List<String> types;
+    private final List<String> materials;
     private Boolean isDirty;
 
     // EFFECTS: Creates a new clothing address with all empty lists
@@ -20,6 +22,7 @@ public final class ClothingAddress {
         this.sizes = new ArrayList<>();
         this.styles = new ArrayList<>();
         this.types = new ArrayList<>();
+        this.materials = new ArrayList<>();
         this.isDirty = null;
     }
 
@@ -64,21 +67,9 @@ public final class ClothingAddress {
         return brands;
     }
 
-    // Modifies: this
-    // Effects: Sets the brands this address matches
-    public void setBrands(List<String> brands) {
-        this.brands = brands;
-    }
-
     // Effects: Returns the sizes this address matches
     public List<Size> getSizes() {
         return sizes;
-    }
-
-    // Modifies: this
-    // Effects: Sets the sizes this address matches
-    public void setSizes(List<Size> sizes) {
-        this.sizes = sizes;
     }
 
     // Effects: Returns the styles this address matches
@@ -86,21 +77,14 @@ public final class ClothingAddress {
         return styles;
     }
 
-    // Modifies: this
-    // Effects: Sets the styles this address matches
-    public void setStyles(List<String> styles) {
-        this.styles = styles;
-    }
-
     // Effects: Returns the types this address matches
     public List<String> getTypes() {
         return types;
     }
 
-    // Modifies: this
-    // Effects: Sets the types this address matches
-    public void setTypes(List<String> types) {
-        this.types = types;
+    // EFFECTS: Returns the materials this address matches
+    public List<String> getMaterials() {
+        return this.materials;
     }
 
 }

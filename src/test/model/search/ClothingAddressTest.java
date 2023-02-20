@@ -1,9 +1,7 @@
 package model.search;
 
 import model.Size;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 
 import java.util.List;
 
@@ -20,25 +18,7 @@ class ClothingAddressTest {
         assertTrue(ca.getStyles().isEmpty());
         assertTrue(ca.getTypes().isEmpty());
         assertNull(ca.getIsDirty());
-    }
-
-    @Test
-    void testSetters() {
-        ClothingAddress ca = new ClothingAddress();
-        ca.setBrands(List.of("A"));
-        ca.setSizes(List.of(Size.XL));
-        ca.setTypes(List.of("C"));
-        ca.setStyles(List.of("D"));
-        ca.setIsDirty(true);
-        assertEquals(1, ca.getBrands().size());
-        assertEquals(1, ca.getSizes().size());
-        assertEquals(1, ca.getTypes().size());
-        assertEquals(1, ca.getStyles().size());
-        assertEquals("A", ca.getBrands().get(0));
-        assertEquals(Size.XL, ca.getSizes().get(0));
-        assertEquals("C", ca.getTypes().get(0));
-        assertEquals("D", ca.getStyles().get(0));
-        assertTrue(ca.getIsDirty());
+        assertTrue(ca.getMaterials().isEmpty());
     }
 
     @Test
@@ -62,6 +42,7 @@ class ClothingAddressTest {
                         + TYPE_CAPTURE_STR + EQUALITY_STR + "pants" + LIST_END_STR
                         + STYLE_CAPTURE_STR + EQUALITY_STR + "casual" + LIST_SEPARATOR_STR
                         + "formal" + LIST_END_STR
+                        + MATERIAL_CAPTURE_STR + EQUALITY_STR + "silk" + LIST_END_STR
         );
         assertEquals(1, ca.getSizes().size());
         assertEquals(Size.XXL, ca.getSizes().get(0));
@@ -69,6 +50,8 @@ class ClothingAddressTest {
         assertEquals("pants", ca.getTypes().get(0));
         assertEquals(2, ca.getStyles().size());
         assertTrue(ca.getStyles().containsAll(List.of("casual", "formal")));
+        assertEquals(1, ca.getMaterials().size());
+        assertEquals("silk", ca.getMaterials().get(0));
     }
 
     @Test

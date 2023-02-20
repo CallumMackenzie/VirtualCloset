@@ -16,6 +16,7 @@ public class CAStateMachine
     public static final String TYPE_CAPTURE_STR = "type";
     public static final String SIZE_CAPTURE_STR = "size";
     public static final String IS_DIRTY_CAPTURE_STR = "dirty";
+    public static final String MATERIAL_CAPTURE_STR = "material";
 
     public static final String TRUE_STR = "yes";
     public static final String FALSE_STR = "no";
@@ -23,19 +24,19 @@ public class CAStateMachine
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
 
+    // EFFECTS: Creates a new clothing address state machine
+    //          with default initial state.
+    public CAStateMachine() {
+        super(null);
+        this.setState(new CapturingState());
+    }
+
     // EFFECTS: Retrieves the next state given the current internal
     //          state.
     @Override
     public State nextState(State in, char input)
             throws ClothingAddressParseException {
         return in.next(input);
-    }
-
-    // EFFECTS: Creates a new clothing address state machine
-    //          with default initial state.
-    public CAStateMachine() {
-        super(null);
-        this.setState(new CapturingState());
     }
 
     // An abstract state representation for the clothing address
@@ -146,6 +147,9 @@ public class CAStateMachine
                 case IS_DIRTY_CAPTURE_STR:
                     return new BooleanCaptureState(
                             getAddress()::setIsDirty);
+                case MATERIAL_CAPTURE_STR:
+                    return new StringListCaptureState(
+                            getAddress().getMaterials()::addAll);
                 // TODO
                 default:
                     throw new NoSuchKeyException(this, key);
