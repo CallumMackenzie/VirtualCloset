@@ -3,6 +3,7 @@ package model.search;
 import model.Size;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 // A clothing address state machine for parsing a clothing address
@@ -28,16 +29,8 @@ public class CAStateMachine
     // EFFECTS: Creates a new clothing address state machine
     //          with default initial state.
     public CAStateMachine() {
-        // Dummy state to copy from, kinda hacky but avoids adding
-        // a default constructor which may be accidentally invoked
-        // implicitly instead of the previous state based one which
-        // would be an annoying bug.
-        super(new CapturingState(new State(new ClothingAddress()) {
-            @Override
-            public State process(char input) {
-                return null;
-            }
-        }));
+        super(null);
+        this.setState(new CapturingState());
     }
 
     // An abstract state representation for the clothing address
@@ -47,14 +40,16 @@ public class CAStateMachine
 
         private final ClothingAddress address;
 
-        // EFFECTS: Creates a new state with the given clothing address
-        public State(ClothingAddress address) {
-            this.address = address;
-        }
-
-        // EFFECTS: Creates a new state from the previous
+        // EFFECTS: Creates a new state from the previous. If the previous
+        //          base has no clothing address (null value), creates a new
+        //          one for this state.
         public State(State base) {
-            this.address = base.address;
+            if (base == null) {
+                this.address = new ClothingAddress();
+            } else {
+                this.address = Objects.requireNonNullElseGet(base.address,
+                        ClothingAddress::new);
+            }
         }
 
         // EFFECTS: Returns the clothing address constructed by
@@ -70,15 +65,16 @@ public class CAStateMachine
     }
 
     // A state which parses outer filter items such as brand, size, etc
-    public static class CapturingState extends State {
+    public class CapturingState extends State {
 
         private final StringBuilder captured;
         private final KeyStringSearcher equalityStrSearcher;
         private final WhitespaceConsumer whitespaceConsumer;
 
-        // EFFECTS: Creates a new capturing state
-        public CapturingState(State last) {
-            super(last);
+        // EFFECTS: Creates a new capturing state with the last state
+        //          as the current one in this state machine.
+        public CapturingState() {
+            super(getState());
             this.captured = new StringBuilder();
             this.whitespaceConsumer = new WhitespaceConsumer();
             this.equalityStrSearcher = new KeyStringSearcher(EQUALITY_STR,
@@ -112,17 +108,16 @@ public class CAStateMachine
             String key = captured.toString().toLowerCase().trim();
             switch (key) {
                 case BRAND_CAPTURE_STR:
-                    return new StringListCaptureState(this,
+                    return new StringListCaptureState(
                             getAddress().getBrands()::addAll);
                 case STYLE_CAPTURE_STR:
-                    return new StringListCaptureState(this,
+                    return new StringListCaptureState(
                             getAddress().getStyles()::addAll);
                 case TYPE_CAPTURE_STR:
-                    return new StringListCaptureState(this,
+                    return new StringListCaptureState(
                             getAddress().getTypes()::addAll);
                 case SIZE_CAPTURE_STR:
-                    return new EnumListCaptureState<>(this,
-                            Size.class,
+                    return new EnumListCaptureState<>(Size.class,
                             getAddress().getSizes()::addAll);
                 // TODO
                 default:
@@ -133,16 +128,15 @@ public class CAStateMachine
 
     // Captures a list of strings, passing the completed list to the
     // user-provided consumer when it has been fully completed.
-    public static class StringListCaptureState extends State {
+    public class StringListCaptureState extends State {
 
         private final StringListCapture listCapture;
         private final Consumer<List<String>> onCapture;
 
-        // EFFECTS: Constructs a new string list capture state from the previous
-        //          state data and the given string list consumer.
-        public StringListCaptureState(State last,
-                                      Consumer<List<String>> onCapture) {
-            super(last);
+        // EFFECTS: Constructs a new string list capture state from the current
+        //          state in this machine and the given string list consumer.
+        public StringListCaptureState(Consumer<List<String>> onCapture) {
+            super(getState());
             this.onCapture = onCapture;
             this.listCapture = new StringListCapture(
                     LIST_SEPARATOR_STR,
@@ -157,7 +151,7 @@ public class CAStateMachine
         public State process(char input) {
             if (listCapture.isListFinished(input)) {
                 this.onCapture.accept(listCapture.getTokensCaptured());
-                return new CapturingState(this);
+                return new CapturingState();
             }
             return this;
         }
@@ -165,17 +159,17 @@ public class CAStateMachine
 
     // Captures a list of enum values, passing the fully completed
     // list to the user-provided consumer when it has been completed.
-    public static class EnumListCaptureState<T extends Enum<T>> extends State {
+    public class EnumListCaptureState<T extends Enum<T>> extends State {
 
         private final EnumListCapture<T> enumListCapture;
         private final Consumer<List<T>> onCapture;
 
         // EFFECTS: Creates a new enum list capture state from the given
-        //          enum class, previous state, and capture function.
-        public EnumListCaptureState(State prev,
-                                    Class<T> enumClass,
+        //          enum class and capture function. Previous state data is
+        //          pulled from the current state of this machine.
+        public EnumListCaptureState(Class<T> enumClass,
                                     Consumer<List<T>> onCapture) {
-            super(prev);
+            super(getState());
             this.onCapture = onCapture;
             this.enumListCapture = new EnumListCapture<>(false,
                     enumClass,
@@ -189,7 +183,7 @@ public class CAStateMachine
         public State process(char input) {
             if (this.enumListCapture.isListFinished(input)) {
                 this.onCapture.accept(this.enumListCapture.getTokensCaptured());
-                return new CapturingState(this);
+                return new CapturingState();
             }
             return this;
         }
