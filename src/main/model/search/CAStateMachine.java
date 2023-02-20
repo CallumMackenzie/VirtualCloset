@@ -2,6 +2,7 @@ package model.search;
 
 import model.Size;
 
+import java.lang.management.LockInfo;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -15,6 +16,9 @@ public class CAStateMachine
     public static final String BRAND_CAPTURE_STR = "brand";
     public static final String TYPE_CAPTURE_STR = "type";
     public static final String SIZE_CAPTURE_STR = "size";
+    public static final String IS_DIRTY_CAPTURE_STR = "dirty";
+    public static final String TRUE_STR = "yes";
+    public static final String FALSE_STR = "no";
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
@@ -36,18 +40,18 @@ public class CAStateMachine
     // An abstract state representation for the clothing address
     // state machine with an internal clothing address to modify
     // as information entered is parsed.
-    public abstract static class State {
+    public abstract class State {
 
         private final ClothingAddress address;
 
-        // EFFECTS: Creates a new state from the previous. If the previous
+        // EFFECTS: Creates a new state from the current. If the previous
         //          base has no clothing address (null value), creates a new
         //          one for this state.
-        public State(State base) {
-            if (base == null) {
+        public State() {
+            if (getState() == null) {
                 this.address = new ClothingAddress();
             } else {
-                this.address = Objects.requireNonNullElseGet(base.address,
+                this.address = Objects.requireNonNullElseGet(getState().address,
                         ClothingAddress::new);
             }
         }
@@ -74,7 +78,6 @@ public class CAStateMachine
         // EFFECTS: Creates a new capturing state with the last state
         //          as the current one in this state machine.
         public CapturingState() {
-            super(getState());
             this.captured = new StringBuilder();
             this.whitespaceConsumer = new WhitespaceConsumer();
             this.equalityStrSearcher = new KeyStringSearcher(EQUALITY_STR,
@@ -119,6 +122,9 @@ public class CAStateMachine
                 case SIZE_CAPTURE_STR:
                     return new EnumListCaptureState<>(Size.class,
                             getAddress().getSizes()::addAll);
+                case IS_DIRTY_CAPTURE_STR:
+                    return new BooleanCaptureState(
+                            getAddress()::setIsDirty);
                 // TODO
                 default:
                     throw new NoSuchKeyException(key);
@@ -136,7 +142,6 @@ public class CAStateMachine
         // EFFECTS: Constructs a new string list capture state from the current
         //          state in this machine and the given string list consumer.
         public StringListCaptureState(Consumer<List<String>> onCapture) {
-            super(getState());
             this.onCapture = onCapture;
             this.listCapture = new StringListCapture(
                     LIST_SEPARATOR_STR,
@@ -169,7 +174,6 @@ public class CAStateMachine
         //          pulled from the current state of this machine.
         public EnumListCaptureState(Class<T> enumClass,
                                     Consumer<List<T>> onCapture) {
-            super(getState());
             this.onCapture = onCapture;
             this.enumListCapture = new EnumListCapture<>(false,
                     enumClass,
@@ -183,6 +187,35 @@ public class CAStateMachine
         public State process(char input) {
             if (this.enumListCapture.isListFinished(input)) {
                 this.onCapture.accept(this.enumListCapture.getTokensCaptured());
+                return new CapturingState();
+            }
+            return this;
+        }
+    }
+
+    // Captures a single boolean value, providing it to the consumer when
+    // it is captured.
+    public class BooleanCaptureState extends State {
+
+        private final Consumer<Boolean> onCapture;
+        private final BooleanCapture booleanCapture;
+
+        // EFFECTS: Creates a new boolean capture state from the given
+        //          capture function.
+        public BooleanCaptureState(Consumer<Boolean> onCapture) {
+            this.onCapture = onCapture;
+            this.booleanCapture = new BooleanCapture(TRUE_STR,
+                    FALSE_STR);
+        }
+
+        // MODIFIES: this
+        // EFFECTS: Processes the next character and transitions state
+        //          if necessary.
+        @Override
+        public State process(char input)
+                throws ClothingAddressParseException {
+            if (this.booleanCapture.foundBoolean(input)) {
+                this.onCapture.accept(this.booleanCapture.getBoolCaptured());
                 return new CapturingState();
             }
             return this;

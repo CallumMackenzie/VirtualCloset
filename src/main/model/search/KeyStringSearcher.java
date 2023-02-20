@@ -19,6 +19,16 @@ class KeyStringSearcher {
         public boolean wasMatch() {
             return this == MATCH;
         }
+
+        // EFFECTS: Returns true if this is PARTIAL_MATCH
+        public boolean wasPartialMatch() {
+            return this == PARTIAL_MATCH;
+        }
+
+        // EFFECTS: Returns true if this is NO_MATCH
+        public boolean wasNoMatch() {
+            return this == NO_MATCH;
+        }
     }
 
     private final String key;
@@ -52,7 +62,7 @@ class KeyStringSearcher {
     public void reset() {
         this.currentKeyIndex = -1;
     }
-    
+
 
     // MODIFIES: this
     // EFFECTS: Captures input if it is matching the given key string

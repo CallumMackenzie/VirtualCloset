@@ -18,6 +18,7 @@ class ClothingAddressTest {
         assertTrue(ca.getBrands().isEmpty());
         assertTrue(ca.getStyles().isEmpty());
         assertTrue(ca.getTypes().isEmpty());
+        assertNull(ca.getIsDirty());
     }
 
     @Test
@@ -27,6 +28,7 @@ class ClothingAddressTest {
         ca.setSizes(List.of(Size.XL));
         ca.setTypes(List.of("C"));
         ca.setStyles(List.of("D"));
+        ca.setIsDirty(true);
         assertEquals(1, ca.getBrands().size());
         assertEquals(1, ca.getSizes().size());
         assertEquals(1, ca.getTypes().size());
@@ -35,6 +37,7 @@ class ClothingAddressTest {
         assertEquals(Size.XL, ca.getSizes().get(0));
         assertEquals("C", ca.getTypes().get(0));
         assertEquals("D", ca.getStyles().get(0));
+        assertTrue(ca.getIsDirty());
     }
 
     @Test

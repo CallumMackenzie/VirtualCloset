@@ -11,6 +11,7 @@ public final class ClothingAddress {
     private List<Size> sizes;
     private List<String> styles;
     private List<String> types;
+    private Boolean isDirty;
 
     // EFFECTS: Creates a new clothing address with all empty lists
     //          and default values.
@@ -19,6 +20,7 @@ public final class ClothingAddress {
         this.sizes = new ArrayList<>();
         this.styles = new ArrayList<>();
         this.types = new ArrayList<>();
+        this.isDirty = null;
     }
 
     // EFFECTS: Parses the given string expression into a clothing address.
@@ -26,6 +28,20 @@ public final class ClothingAddress {
         CAStateMachine parser = new CAStateMachine();
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
         return out.getAddress();
+    }
+
+    // EFFECTS: Returns whether it is searching for clean or dirty
+    //          clothing. True or false correspond to their values,
+    //          but null means there is no search preference.
+    public Boolean getIsDirty() {
+        return this.isDirty;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets whether to search for dirty clothing, clean
+    //          or no preference.
+    public void setIsDirty(Boolean isDirty) {
+        this.isDirty = isDirty;
     }
 
     // Effects: Returns the brands this address matches
