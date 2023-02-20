@@ -4,6 +4,7 @@ import model.Account;
 import model.AccountManager;
 import model.Closet;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -16,9 +17,9 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
 
     // EFFECTS: Runs the Virtual Closet console application
     public VirtualClosetConsoleApp() {
-        super(new Scanner(System.in));
+        super(new DynamicScanner(new Scanner(System.in)));
         this.run();
-        this.getInput().close();
+        this.getInput().getScanner().close();
     }
 
     // MODIFIES: this
@@ -190,7 +191,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
             // This assertion is guaranteed by the check to active.hasCloset; this is to suppress the warning
             // and ensure the correct behavior of active.hasCloset
             assert active.getCloset(closetName).isPresent() : "Active account did not have the required closet!";
-            new ClosetModeConsole(this.getInput(), active.getCloset(closetName).get());
+            ClosetModeConsole c = new ClosetModeConsole(this.getInput(),
+                    active.getCloset(closetName).get());
         } else {
             System.out.println("\tCloset \"" + closetName + "\" does not exist.");
         }
@@ -258,8 +260,20 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         this.accountManager::hasActiveAccount,
                         "No active account!",
                         "Enters closet mode for the given closet.",
-                        "open closet")
+                        "open closet"),
                 // TODO: Enter catalogue mode
+
+                // TODO: For debugging, remove later
+                new ConsoleCommand(() -> {
+                    String cmds = String.join("\n",
+                            List.of("create account",
+                                    "Callum",
+                                    "create closet",
+                                    "c1",
+                                    "open closet",
+                                    "c1")) + "\n";
+                    this.getInput().addScanner(new Scanner(cmds));
+                }, "", "dbg")
         );
     }
 }

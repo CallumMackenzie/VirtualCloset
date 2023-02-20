@@ -75,9 +75,4 @@ public final class ConsoleCommand {
         return String.join(", ", this.validCommands);
     }
 
-    // EFFECTS: Returns the description for this command.
-    public String getDescription() {
-        return this.description;
-    }
-
 }

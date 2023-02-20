@@ -15,9 +15,9 @@ public class Clothing {
     private String brand;
     private Size size;
     private boolean dirty;
+    private String material;
 
     private List<Color> colors;
-    private String material;
     private Image image;
 
     // EFFECTS: Constructs a new piece of clothing

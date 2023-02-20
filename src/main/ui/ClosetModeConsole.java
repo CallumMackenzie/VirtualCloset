@@ -11,7 +11,6 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ public final class ClosetModeConsole extends CommandSystem {
 
     // EFFECTS: Creates a new closet mode console with the given
     //          input stream and closet.
-    public ClosetModeConsole(Scanner input, Closet closet) {
+    public ClosetModeConsole(DynamicScanner input, Closet closet) {
         super(input);
         this.closet = closet;
         this.run();
@@ -39,10 +38,9 @@ public final class ClosetModeConsole extends CommandSystem {
 
     // EFFECTS: Formats a list of enum types in the given enum class to a string.
     private static <T extends Enum<T>> String formatEnumTypes(Class<T> enumClass) {
-        return "Types: "
-                + Arrays.stream(enumClass.getEnumConstants())
+        return Arrays.stream(enumClass.getEnumConstants())
                 .map(Object::toString)
-                .collect(Collectors.joining("\n\t - "));
+                .collect(Collectors.joining(", "));
     }
 
     // MODIFIES: this
@@ -123,12 +121,12 @@ public final class ClosetModeConsole extends CommandSystem {
                                     Boolean dirty,
                                     Image image) {
         // TODO: Add color
-        if (Objects.isNull(types = this.parseStringList("\tEnter clothing types", types))
-                || Objects.isNull(size = this.parseEnumType("\tEnter size or type \"exit\": ", Size.class, size))
+        if (Objects.isNull(types = this.parseStringList("clothing types", types))
+                || Objects.isNull(size = this.parseEnumType("size", Size.class, size))
                 || Objects.isNull(brand = this.parseString("brand", brand))
                 || Objects.isNull(material = this.parseString("material", material))
                 || Objects.isNull(styles
-                = this.parseStringList("\tEnter a list of styles (ex. \"street, skate\")", styles))
+                = this.parseStringList("styles (ex. \"street, skate\")", styles))
                 || Objects.isNull(dirty = this.parseBoolean("\tEnter whether the clothing is dirty", dirty))) {
             System.out.println("Cancelled.");
             return null;
@@ -156,9 +154,14 @@ public final class ClosetModeConsole extends CommandSystem {
     //          is not null, returns it.
     private <T extends Enum<T>> T parseEnumType(String prompt, Class<T> enumClass, T type) {
         return ifNull(type, () -> {
-            String typeInput = this.getInputTrimOnly(formatEnumTypes(enumClass)
-                    + "\n" + prompt);
-            T val = EnumListCapture.stringToEnumLoose(enumClass, typeInput.trim());
+            String typeInput = this.getInputTrimOnly(
+                    "\tTypes: "
+                            + formatEnumTypes(enumClass)
+                            + "\n\tEnter " + prompt + " or type \"exit\": ");
+            if (typeInput.equalsIgnoreCase("exit")) {
+                return null;
+            }
+            T val = EnumListCapture.stringToEnumLoose(enumClass, typeInput);
             if (val == null) {
                 System.out.println("Input \"" + typeInput + "\" did not match any given value.");
             }
@@ -183,7 +186,7 @@ public final class ClosetModeConsole extends CommandSystem {
     //          and returns it. Otherwise, returns the input list.
     private List<String> parseStringList(String prompt, List<String> types) {
         return ifNull(types, () -> {
-            String typesInput = this.getInput(prompt + " or type \"exit\": ")
+            String typesInput = this.getInput("\tEnter " + prompt + " or type \"exit\": ")
                     .toLowerCase();
             if (typesInput.equalsIgnoreCase("exit")) {
                 return null;
@@ -212,7 +215,8 @@ public final class ClosetModeConsole extends CommandSystem {
                         "list types"),
                 new ConsoleCommand(this::clothingAddressSearch,
                         "Search closet by clothing address.",
-                        "search"));
+                        "search")
+        );
     }
 
 }
