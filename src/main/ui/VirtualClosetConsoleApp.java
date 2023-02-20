@@ -187,6 +187,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         String closetName = this.getInput("\tEnter closet name: ");
         Account active = this.accountManager.getActiveAccount().get();
         if (active.hasCloset(closetName)) {
+            // This assertion is guaranteed by the check to active.hasCloset; this is to suppress the warning
+            // and ensure the correct behavior of active.hasCloset
             assert active.getCloset(closetName).isPresent() : "Active account did not have the required closet!";
             new ClosetModeConsole(this.getInput(), active.getCloset(closetName).get());
         } else {
