@@ -21,7 +21,7 @@ class BooleanCaptureTest {
     }
 
     @Test
-    void testProcessPastFound() throws UnexpectedInputException {
+    void testProcessPastFound() throws UnexpectedBoolInputException {
         assertTrue(this.bc1.foundBoolean("true"));
         assertTrue(this.bc1.foundBoolean("xyz"));
         assertTrue(this.bc2.foundBoolean("nope"));
@@ -36,14 +36,14 @@ class BooleanCaptureTest {
     }
 
     @Test
-    void testConsumeWhitespace() throws UnexpectedInputException {
+    void testConsumeWhitespace() throws UnexpectedBoolInputException {
         assertFalse(bc1.foundBoolean("\t  tru"));
         assertTrue(bc1.foundBoolean('e'));
         assertTrue(bc1.getBoolCaptured());
     }
 
     @Test
-    void foundBoolean() throws UnexpectedInputException {
+    void foundBoolean() throws UnexpectedBoolInputException {
         assertFalse(bc1.foundBoolean("fals"));
         assertTrue(bc1.foundBoolean('e'));
         assertFalse(bc1.getBoolCaptured());
@@ -55,9 +55,9 @@ class BooleanCaptureTest {
 
     @Test
     void testIncorrectInput() {
-        assertThrows(UnexpectedInputException.class,
+        assertThrows(UnexpectedBoolInputException.class,
                 () -> bc1.foundBoolean('z'));
-        assertThrows(UnexpectedInputException.class,
+        assertThrows(UnexpectedBoolInputException.class,
                 () -> bc2.foundBoolean('t'));
     }
 }

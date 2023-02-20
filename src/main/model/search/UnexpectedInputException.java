@@ -4,7 +4,7 @@ package model.search;
 public class UnexpectedInputException extends ClothingAddressParseException {
     // EFFECTS: Creates a new unexpected input exception with the given
     //          message.
-    public UnexpectedInputException(String msg) {
-        super(msg);
+    public UnexpectedInputException(CAStateMachine.State errorState, String msg) {
+        super(errorState, msg);
     }
 }

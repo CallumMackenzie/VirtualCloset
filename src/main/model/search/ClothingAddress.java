@@ -27,6 +27,21 @@ public final class ClothingAddress {
     public static ClothingAddress of(String expr) throws ClothingAddressParseException {
         CAStateMachine parser = new CAStateMachine();
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
+        final String listEndDelimMissingMsg = "(is there a \"" + CAStateMachine.LIST_END_STR + "\" present?)";
+        if (out instanceof CAStateMachine.StringListCaptureState) {
+            throw new IncorrectEndStateException(out,
+                    "Unfinished string list in expression! " + listEndDelimMissingMsg);
+        } else if (out instanceof CAStateMachine.EnumListCaptureState) {
+            throw new IncorrectEndStateException(out,
+                    "Unfinished enum list in expression! " + listEndDelimMissingMsg);
+        } else if (out instanceof CAStateMachine.BooleanCaptureState) {
+            throw new IncorrectEndStateException(out, "Unfinished boolean value in expression!");
+        } else if (out instanceof CAStateMachine.CapturingState) {
+            CAStateMachine.CapturingState o = (CAStateMachine.CapturingState) out;
+            if (o.isMatching()) {
+                throw new IncorrectEndStateException(out, "Incomplete key capture expression!");
+            }
+        }
         return out.getAddress();
     }
 

@@ -29,4 +29,9 @@ class WhitespaceConsumer {
         }
         return false;
     }
+
+    // EFFECTS: Returns whether this is still consuming whitespace
+    public boolean isConsuming() {
+        return !this.startToken;
+    }
 }

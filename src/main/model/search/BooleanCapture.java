@@ -28,7 +28,7 @@ public class BooleanCapture {
     // MODIFIES: this
     // EFFECTS: Processes the full input stream of characters,
     //          returning true if a boolean was found.
-    public boolean foundBoolean(String in) throws UnexpectedInputException {
+    public boolean foundBoolean(String in) throws UnexpectedBoolInputException {
         for (char c : in.toCharArray()) {
             if (this.foundBoolean(c)) {
                 return true;
@@ -40,7 +40,7 @@ public class BooleanCapture {
     // MODIFIES: this
     // EFFECTS: Parses the char input and checks if there has been a match
     //          to a true/false key, returning true if this is the case.
-    public boolean foundBoolean(char input) throws UnexpectedInputException {
+    public boolean foundBoolean(char input) throws UnexpectedBoolInputException {
         if (!this.hasFoundBool
                 && !this.whitespaceConsumer.shouldConsumeWhitespace(input)) {
             KeyStringSearcher.MatchState foundTrue = this.trueSearcher.tryFindKey(input);
@@ -52,7 +52,7 @@ public class BooleanCapture {
                 this.boolCaptured = foundTrue.wasMatch();
             } else if (foundTrue.wasNoMatch()
                     && foundFalse.wasNoMatch()) {
-                throw new UnexpectedInputException("Expected a boolean value of \""
+                throw new UnexpectedBoolInputException("Expected a boolean value of \""
                         + this.getTrueKey() + "\" or \""
                         + this.getFalseKey() + "\".");
             }

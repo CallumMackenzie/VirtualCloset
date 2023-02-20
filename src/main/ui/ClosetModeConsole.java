@@ -62,24 +62,17 @@ public final class ClosetModeConsole extends CommandSystem {
     //          from the user
     private void clothingAddressSearch() {
         String input = this.getInput("Enter clothing address expression: ");
-        ClothingAddress address = null;
         try {
-            address = ClothingAddress.of(input);
-        } catch (UnexpectedInputException e) {
-            System.out.println("\tMalformed search expression: " + e.getMessage());
-            return;
-        } catch (NoSuchKeyException e) {
-            System.out.println("\t" + e.getMessage());
-            return;
+            ClothingAddress address = ClothingAddress.of(input);
+            List<Clothing> clothing = this.closet.findClothing(address);
+            if (clothing.isEmpty()) {
+                System.out.println("\tNo clothing matched the given expression.");
+            } else {
+                System.out.println("Matches: \n" + clothing);
+            }
         } catch (ClothingAddressParseException e) {
-            // TODO
-            throw new RuntimeException(e);
-        }
-        List<Clothing> clothing = this.closet.findClothing(address);
-        if (clothing.isEmpty()) {
-            System.out.println("\tNo clothing matched the given expression.");
-        } else {
-            System.out.println("Matches: \n" + clothing);
+            System.out.println("\t" + e.getMessage()
+                    + " Occurred at: \"" + e.getErrorState().getStateCaptured() + "\".");
         }
     }
 

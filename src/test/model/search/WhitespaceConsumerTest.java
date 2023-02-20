@@ -14,6 +14,7 @@ class WhitespaceConsumerTest {
         assertFalse(c.shouldConsumeWhitespace(' '));
         c.reset();
         assertTrue(c.shouldConsumeWhitespace(' '));
+        assertTrue(c.isConsuming());
     }
 
     @Test
@@ -25,5 +26,17 @@ class WhitespaceConsumerTest {
         assertFalse(c.shouldConsumeWhitespace('\t'));
         assertFalse(c.shouldConsumeWhitespace(' '));
         assertFalse(c.shouldConsumeWhitespace('c'));
+    }
+
+    @Test
+    void testIsConsuming() {
+        WhitespaceConsumer c = new WhitespaceConsumer();
+        assertTrue(c.isConsuming());
+        c.shouldConsumeWhitespace(' ');
+        assertTrue(c.isConsuming());
+        c.shouldConsumeWhitespace('\t');
+        assertTrue(c.isConsuming());
+        c.shouldConsumeWhitespace('c');
+        assertFalse(c.isConsuming());
     }
 }

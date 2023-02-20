@@ -122,13 +122,12 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureSizeNull() throws ClothingAddressParseException {
+    void testCaptureSizeUnknown() {
         String in = CAStateMachine.SIZE_CAPTURE_STR
                 + EQUALITY_STR
                 + "djaisjdosajdsad" + LIST_END_STR;
-        ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
-        assertEquals(1, o.getSizes().size());
-        assertNull(o.getSizes().get(0));
+        assertThrows(UnexpectedInputException.class,
+                () -> sm.processInput(in.toCharArray()));
     }
 
     @Test

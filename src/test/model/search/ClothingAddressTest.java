@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestTemplate;
 
 import java.util.List;
 
+import static model.search.CAStateMachine.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClothingAddressTest {
@@ -44,11 +45,11 @@ class ClothingAddressTest {
     void ofBrandsOnlyTest() throws ClothingAddressParseException {
         ClothingAddress ca = ClothingAddress.of(
                 CAStateMachine.BRAND_CAPTURE_STR
-                        + CAStateMachine.EQUALITY_STR
+                        + EQUALITY_STR
                         + "adidas"
-                        + CAStateMachine.LIST_SEPARATOR_STR
+                        + LIST_SEPARATOR_STR
                         + "nike"
-                        + CAStateMachine.LIST_END_STR
+                        + LIST_END_STR
         );
         assertEquals(2, ca.getBrands().size());
         assertTrue(ca.getBrands().containsAll(List.of("nike", "adidas")));
@@ -57,20 +58,10 @@ class ClothingAddressTest {
     @Test
     void ofMultipleParamsTest() throws ClothingAddressParseException {
         ClothingAddress ca = ClothingAddress.of(
-                CAStateMachine.SIZE_CAPTURE_STR
-                        + CAStateMachine.EQUALITY_STR
-                        + Size.XXL
-                        + CAStateMachine.LIST_END_STR
-                        + CAStateMachine.TYPE_CAPTURE_STR
-                        + CAStateMachine.EQUALITY_STR
-                        + "pants"
-                        + CAStateMachine.LIST_END_STR
-                        + CAStateMachine.STYLE_CAPTURE_STR
-                        + CAStateMachine.EQUALITY_STR
-                        + "casual"
-                        + CAStateMachine.LIST_SEPARATOR_STR
-                        + "formal"
-                        + CAStateMachine.LIST_END_STR
+                SIZE_CAPTURE_STR + EQUALITY_STR + Size.XXL + LIST_END_STR
+                        + TYPE_CAPTURE_STR + EQUALITY_STR + "pants" + LIST_END_STR
+                        + STYLE_CAPTURE_STR + EQUALITY_STR + "casual" + LIST_SEPARATOR_STR
+                        + "formal" + LIST_END_STR
         );
         assertEquals(1, ca.getSizes().size());
         assertEquals(Size.XXL, ca.getSizes().get(0));
@@ -78,5 +69,27 @@ class ClothingAddressTest {
         assertEquals("pants", ca.getTypes().get(0));
         assertEquals(2, ca.getStyles().size());
         assertTrue(ca.getStyles().containsAll(List.of("casual", "formal")));
+    }
+
+    @Test
+    void testOfIncorrectEndState() {
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(BRAND_CAPTURE_STR + EQUALITY_STR
+                        + "adidas" + LIST_SEPARATOR_STR));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(TYPE_CAPTURE_STR + EQUALITY_STR));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(STYLE_CAPTURE_STR + EQUALITY_STR
+                        + "casual"));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(SIZE_CAPTURE_STR + EQUALITY_STR
+                        + Size.XXL + LIST_SEPARATOR_STR + Size.S));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of("a"));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(IS_DIRTY_CAPTURE_STR + EQUALITY_STR
+                        + "y"));
+        assertThrows(IncorrectEndStateException.class,
+                () -> ClothingAddress.of(IS_DIRTY_CAPTURE_STR + EQUALITY_STR));
     }
 }

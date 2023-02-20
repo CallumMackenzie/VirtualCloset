@@ -26,8 +26,9 @@ public class CAStateMachine
     // EFFECTS: Retrieves the next state given the current internal
     //          state.
     @Override
-    public State nextState(State in, char input) throws ClothingAddressParseException {
-        return in.process(input);
+    public State nextState(State in, char input)
+            throws ClothingAddressParseException {
+        return in.next(input);
     }
 
     // EFFECTS: Creates a new clothing address state machine
@@ -43,6 +44,7 @@ public class CAStateMachine
     public abstract class State {
 
         private final ClothingAddress address;
+        private final StringBuilder stateCaptured;
 
         // EFFECTS: Creates a new state from the current. If the previous
         //          base has no clothing address (null value), creates a new
@@ -54,6 +56,7 @@ public class CAStateMachine
                 this.address = Objects.requireNonNullElseGet(getState().address,
                         ClothingAddress::new);
             }
+            this.stateCaptured = new StringBuilder();
         }
 
         // EFFECTS: Returns the clothing address constructed by
@@ -62,9 +65,20 @@ public class CAStateMachine
             return this.address;
         }
 
+        // EFFECTS: Returns the string processed by this specific state.
+        public String getStateCaptured() {
+            return this.stateCaptured.toString();
+        }
+
+        public final State next(char input)
+                throws ClothingAddressParseException {
+            this.stateCaptured.append(input);
+            return this.process(input);
+        }
+
         // MODIFIES: this
         // EFFECTS: Processes the given input, producing a new state.
-        public abstract State process(char input)
+        protected abstract State process(char input)
                 throws ClothingAddressParseException;
     }
 
@@ -82,6 +96,13 @@ public class CAStateMachine
             this.whitespaceConsumer = new WhitespaceConsumer();
             this.equalityStrSearcher = new KeyStringSearcher(EQUALITY_STR,
                     this.captured::append);
+        }
+
+        // EFFECTS: Returns whether this is in the process of matching
+        //          or is dormant.
+        public boolean isMatching() {
+            return this.equalityStrSearcher.isMatching()
+                    || captured.length() != 0;
         }
 
         // MODIFIES: this
@@ -127,7 +148,7 @@ public class CAStateMachine
                             getAddress()::setIsDirty);
                 // TODO
                 default:
-                    throw new NoSuchKeyException(key);
+                    throw new NoSuchKeyException(this, key);
             }
         }
     }
@@ -184,9 +205,13 @@ public class CAStateMachine
         // MODIFIES: this
         // EFFECTS: Processes the next character and returns the next state.
         @Override
-        public State process(char input) {
+        public State process(char input) throws ClothingAddressParseException {
             if (this.enumListCapture.isListFinished(input)) {
-                this.onCapture.accept(this.enumListCapture.getTokensCaptured());
+                List<T> captured = this.enumListCapture.getTokensCaptured();
+                if (captured.contains(null)) {
+                    throw new UnexpectedInputException(this, "Enum value did not match!");
+                }
+                this.onCapture.accept(captured);
                 return new CapturingState();
             }
             return this;
@@ -214,9 +239,13 @@ public class CAStateMachine
         @Override
         public State process(char input)
                 throws ClothingAddressParseException {
-            if (this.booleanCapture.foundBoolean(input)) {
-                this.onCapture.accept(this.booleanCapture.getBoolCaptured());
-                return new CapturingState();
+            try {
+                if (this.booleanCapture.foundBoolean(input)) {
+                    this.onCapture.accept(this.booleanCapture.getBoolCaptured());
+                    return new CapturingState();
+                }
+            } catch (UnexpectedBoolInputException e) {
+                throw new UnexpectedInputException(this, e.getMessage());
             }
             return this;
         }
