@@ -128,29 +128,4 @@ public class Clothing {
                 + "\n\tdirty: " + this.dirty
                 + "\n}";
     }
-
-    // EFFECTS: Compares equality with the other given object.
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Clothing clothing = (Clothing) o;
-        return dirty == clothing.dirty
-                && types.equals(clothing.types)
-                && styles.equals(clothing.styles)
-                && brand.equals(clothing.brand)
-                && size == clothing.size
-                && material.equals(clothing.material)
-                && Objects.equals(image, clothing.image);
-    }
-
-    // EFFECTS: Produces a hash code for this piece of clothing
-    @Override
-    public int hashCode() {
-        return Objects.hash(dirty, types, styles, brand, size, material, image);
-    }
 }
