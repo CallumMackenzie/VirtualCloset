@@ -106,7 +106,7 @@ public final class ClosetModeConsole extends CommandSystem {
     private void createClothing() {
         String input = this.getInput("\tEnter a clothing type to create: ")
                 .toLowerCase();
-        Clothing newClothing = this.createClothing(List.of(input),
+        Clothing newClothing = this.createClothing(Arrays.asList(input),
                 null, null, null, null, null,
                 null);
         if (Objects.isNull(newClothing)) {
@@ -135,7 +135,7 @@ public final class ClosetModeConsole extends CommandSystem {
             System.out.println("Cancelled.");
             return null;
         }
-        return new Clothing(types, size, brand, material, styles, List.of(), dirty, image);
+        return new Clothing(types, size, brand, material, styles, Arrays.asList(), dirty, image);
     }
 
     // EFFECTS: If the input boolean is not null, returns it. Prompts the user

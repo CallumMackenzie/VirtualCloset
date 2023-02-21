@@ -1,9 +1,6 @@
 package ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 import java.util.stream.Collectors;
 
 // A command system with a list of commands to process
@@ -117,7 +114,7 @@ public abstract class CommandSystem {
     // MODIFIES: this
     // EFFECTS: Adds all given commands to the command system
     protected void addCommands(ConsoleCommand... cmds) {
-        this.commands.addAll(List.of(cmds));
+        this.commands.addAll(Arrays.asList(cmds));
     }
 
     // EFFECTS: Processes the given string with the set commands

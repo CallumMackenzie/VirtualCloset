@@ -3,6 +3,7 @@ package model.search;
 import model.Size;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static model.search.CAStateMachine.*;
@@ -32,7 +33,7 @@ class ClothingAddressTest {
                         + LIST_END_STR
         );
         assertEquals(2, ca.getBrands().size());
-        assertTrue(ca.getBrands().containsAll(List.of("nike", "adidas")));
+        assertTrue(ca.getBrands().containsAll(Arrays.asList("nike", "adidas")));
     }
 
     @Test
@@ -49,7 +50,7 @@ class ClothingAddressTest {
         assertEquals(1, ca.getTypes().size());
         assertEquals("pants", ca.getTypes().get(0));
         assertEquals(2, ca.getStyles().size());
-        assertTrue(ca.getStyles().containsAll(List.of("casual", "formal")));
+        assertTrue(ca.getStyles().containsAll(Arrays.asList("casual", "formal")));
         assertEquals(1, ca.getMaterials().size());
         assertEquals("silk", ca.getMaterials().get(0));
     }

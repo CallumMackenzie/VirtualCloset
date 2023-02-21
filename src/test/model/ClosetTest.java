@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,12 +19,12 @@ public class ClosetTest {
     @BeforeEach
     void setup() {
         this.closet1 = new Closet("C1");
-        this.shirt1 = new Clothing(List.of("shirt"),
+        this.shirt1 = new Clothing(Arrays.asList("shirt"),
                 Size.XL,
                 "Adidas",
                 "Silk",
                 new ArrayList<>(),
-                List.of(Color.BLUE),
+                Arrays.asList(Color.BLUE),
                 true,
                 null);
     }
@@ -40,12 +41,12 @@ public class ClosetTest {
         assertEquals(this.closet1.getClothing().size(), 1);
         assertEquals(this.closet1.getClothing().get(0), shirt1);
 
-        Clothing c2 = new Clothing(List.of("shirt"),
+        Clothing c2 = new Clothing(Arrays.asList("shirt"),
                 Size.S,
                 "Nike",
                 "Cotton",
                 new ArrayList<>(),
-                List.of(Color.RED),
+                Arrays.asList(Color.RED),
                 true, null);
         this.closet1.addClothing(c2);
 

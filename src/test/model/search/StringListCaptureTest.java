@@ -2,6 +2,7 @@ package model.search;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ class StringListCaptureTest {
                 & sc.isListFinished('i'));
         assertTrue(sc.isListFinished('x'));
         assertEquals(3, sc.getTokensCaptured().size());
-        assertTrue(sc.getTokensCaptured().containsAll(List.of("f", "t", "i")));
+        assertTrue(sc.getTokensCaptured().containsAll(Arrays.asList("f", "t", "i")));
     }
 
     @Test
@@ -56,7 +57,7 @@ class StringListCaptureTest {
                 .noneMatch(x -> sc.isListFinished((char) x)));
         assertTrue(sc.isListFinished('.'));
         assertEquals(4, sc.getTokensCaptured().size());
-        assertTrue(sc.getTokensCaptured().containsAll(List.of("ab", "pq", "rs", "a")));
+        assertTrue(sc.getTokensCaptured().containsAll(Arrays.asList("ab", "pq", "rs", "a")));
     }
 
     @Test

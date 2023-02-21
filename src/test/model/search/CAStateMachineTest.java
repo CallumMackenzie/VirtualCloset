@@ -4,6 +4,7 @@ import model.Size;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static model.search.CAStateMachine.*;
@@ -71,7 +72,7 @@ class CAStateMachineTest {
         CAStateMachine.State out = sm.processInput(in.toCharArray());
         assertTrue(out instanceof CAStateMachine.CapturingState);
         assertEquals(4, out.getAddress().getBrands().size());
-        assertTrue(out.getAddress().getBrands().containsAll(List.of("BRAND A",
+        assertTrue(out.getAddress().getBrands().containsAll(Arrays.asList("BRAND A",
                 "BRAND B",
                 "BRAND C",
                 "BRAND D")));
@@ -93,7 +94,7 @@ class CAStateMachineTest {
                 + "nike" + LIST_END_STR;
         ClothingAddress out = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(2, out.getBrands().size());
-        assertTrue(out.getBrands().containsAll(List.of("adidas", "nike")));
+        assertTrue(out.getBrands().containsAll(Arrays.asList("adidas", "nike")));
         assertEquals(1, out.getStyles().size());
         assertEquals("casual", out.getStyles().get(0));
     }
@@ -117,7 +118,7 @@ class CAStateMachineTest {
                 + LIST_END_STR;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(2, o.getSizes().size());
-        assertTrue(o.getSizes().containsAll(List.of(Size.XL, Size.XXL)));
+        assertTrue(o.getSizes().containsAll(Arrays.asList(Size.XL, Size.XXL)));
     }
 
     @Test
@@ -195,7 +196,7 @@ class CAStateMachineTest {
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         // BRANDS
         assertEquals(2, o.getBrands().size());
-        assertTrue(o.getBrands().containsAll(List.of("lululemon", "adidas")));
+        assertTrue(o.getBrands().containsAll(Arrays.asList("lululemon", "adidas")));
         // IS DIRTY
         assertFalse(o.getIsDirty());
         // STYLE
@@ -206,7 +207,7 @@ class CAStateMachineTest {
         assertEquals("shirt", o.getTypes().get(0));
         // SIZE
         assertEquals(2, o.getSizes().size());
-        assertTrue(o.getSizes().containsAll(List.of(Size.XXL, Size.S)));
+        assertTrue(o.getSizes().containsAll(Arrays.asList(Size.XXL, Size.S)));
         // MATERIAL
         assertEquals(1, o.getMaterials().size());
         assertEquals("cotton", o.getMaterials().get(0));

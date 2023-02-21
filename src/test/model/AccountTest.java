@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,11 +33,11 @@ public class AccountTest {
         assertTrue(result);
         assertEquals(this.ac1.getName(), "Eric");
 
-        result = this.ac1.setName("ABC", List.of(ac1));
+        result = this.ac1.setName("ABC", Arrays.asList(ac1));
         assertTrue(result);
         assertEquals(this.ac1.getName(), "ABC");
 
-        result = this.ac1.setName("Jake", List.of(ac2));
+        result = this.ac1.setName("Jake", Arrays.asList(ac2));
         assertFalse(result);
         assertEquals(this.ac1.getName(), "ABC");
     }

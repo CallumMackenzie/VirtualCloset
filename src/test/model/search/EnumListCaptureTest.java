@@ -3,6 +3,7 @@ package model.search;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,7 +48,7 @@ class EnumListCaptureTest {
                 .noneMatch(x -> this.strict.isListFinished((char) x)));
         assertTrue(this.strict.isListFinished(';'));
         assertEquals(4, this.strict.getTokensCaptured().size());
-        assertTrue(this.strict.getTokensCaptured().containsAll(List.of(
+        assertTrue(this.strict.getTokensCaptured().containsAll(Arrays.asList(
                 TestEnum.VALUE_A, TestEnum.valueA, TestEnum.Value_a
         )));
         assertEquals(2, this.strict.getTokensCaptured()
@@ -60,7 +61,7 @@ class EnumListCaptureTest {
                 .noneMatch(x -> this.loose.isListFinished((char) x)));
         assertTrue(this.loose.isListFinished('.'));
         assertEquals(4, this.loose.getTokensCaptured().size());
-        assertTrue(this.loose.getTokensCaptured().containsAll(List.of(
+        assertTrue(this.loose.getTokensCaptured().containsAll(Arrays.asList(
                 TestEnum.VALUE_A, TestEnum.valueA
         )));
         assertEquals(3, this.loose.getTokensCaptured()

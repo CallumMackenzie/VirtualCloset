@@ -4,6 +4,7 @@ import model.Account;
 import model.AccountManager;
 import model.Closet;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -266,7 +267,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                 // TODO: For debugging, remove later
                 new ConsoleCommand(() -> {
                     String cmds = String.join("\n",
-                            List.of("create account",
+                            Arrays.asList("create account",
                                     "Callum",
                                     "create closet",
                                     "c1",

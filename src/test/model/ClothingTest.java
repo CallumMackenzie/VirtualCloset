@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,12 +15,12 @@ public class ClothingTest {
 
     @BeforeEach
     void createClothing() {
-        this.cl = new Clothing(List.of("pants"),
+        this.cl = new Clothing(Arrays.asList("pants"),
                 Size.XL,
                 "Adidas",
                 "Polyester",
-                List.of("Casual"),
-                List.of(Color.ORANGE),
+                Arrays.asList("Casual"),
+                Arrays.asList(Color.ORANGE),
                 false,
                 null);
     }
@@ -43,7 +43,7 @@ public class ClothingTest {
         this.cl.setBrand("Nike");
         this.cl.setDirty(true);
         this.cl.setSize(Size.S);
-        this.cl.setColors(List.of(Color.ORANGE));
+        this.cl.setColors(Arrays.asList(Color.ORANGE));
         this.cl.setMaterial("Silk");
         this.cl.setImage(new BufferedImage(1, 1,
                 BufferedImage.TYPE_BYTE_GRAY));
