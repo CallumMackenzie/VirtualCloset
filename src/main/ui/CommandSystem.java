@@ -11,6 +11,7 @@ public abstract class CommandSystem {
     private final List<ConsoleCommand> commands;
     private final DynamicScanner input;
     private boolean shouldRun;
+
     // EFFECTS: Creates a new command system.
     public CommandSystem(DynamicScanner input) {
         this.commands = new ArrayList<>();

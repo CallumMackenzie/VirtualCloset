@@ -8,8 +8,8 @@ import model.search.ClothingAddressParseException;
 import model.search.EnumListCapture;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
