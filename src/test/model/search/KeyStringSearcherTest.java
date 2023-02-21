@@ -50,13 +50,9 @@ class KeyStringSearcherTest {
     void testTryFindKeySimple() {
         KeyStringSearcher s = new KeyStringSearcher("A", z -> {
         });
-
-        assertEquals(KeyStringSearcher.MatchState.NO_MATCH,
-                s.tryFindKey('Z'));
-        assertEquals(KeyStringSearcher.MatchState.MATCH,
-                s.tryFindKey('A'));
-        assertEquals(KeyStringSearcher.MatchState.MATCH,
-                s.tryFindKey('B'));
+        assertTrue(s.tryFindKey('Z').wasNoMatch());
+        assertTrue(s.tryFindKey('A').wasMatch());
+        assertTrue(s.tryFindKey('B').wasMatch());
     }
 
     @Test
@@ -64,20 +60,15 @@ class KeyStringSearcherTest {
         Stack<String> capture = new Stack<>();
         KeyStringSearcher s = new KeyStringSearcher("AB", capture::push);
 
-        assertEquals(KeyStringSearcher.MatchState.NO_MATCH,
-                s.tryFindKey('B'));
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                s.tryFindKey('A'));
+        assertTrue(s.tryFindKey('B').wasNoMatch());
+        assertTrue(s.tryFindKey('A').wasPartialMatch());
         assertTrue(capture.isEmpty());
-        assertEquals(KeyStringSearcher.MatchState.NO_MATCH,
-                s.tryFindKey('C'));
+        assertTrue(s.tryFindKey('C').wasNoMatch());
         assertFalse(capture.isEmpty());
         assertEquals(1, capture.size());
         assertEquals("A", capture.pop());
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                s.tryFindKey('A'));
-        assertEquals(KeyStringSearcher.MatchState.MATCH,
-                s.tryFindKey('B'));
+        assertTrue(s.tryFindKey('A').wasPartialMatch());
+        assertTrue(s.tryFindKey('B').wasMatch());
         assertTrue(capture.isEmpty());
     }
 
@@ -86,18 +77,13 @@ class KeyStringSearcherTest {
         Stack<String> capture = new Stack<>();
         KeyStringSearcher searcher = new KeyStringSearcher("QQQ", capture::push);
 
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                searcher.tryFindKey('Q'));
-        assertEquals(KeyStringSearcher.MatchState.NO_MATCH,
-                searcher.tryFindKey('S'));
+        assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
+        assertTrue(searcher.tryFindKey('S').wasNoMatch());
         assertEquals(1, capture.size());
 
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                searcher.tryFindKey('Q'));
-        assertEquals(KeyStringSearcher.MatchState.PARTIAL_MATCH,
-                searcher.tryFindKey('Q'));
-        assertEquals(KeyStringSearcher.MatchState.MATCH,
-                searcher.tryFindKey('Q'));
+        assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
+        assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
+        assertTrue(searcher.tryFindKey('Q').wasMatch());
     }
 
     @Test
