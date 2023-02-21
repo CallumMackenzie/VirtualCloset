@@ -41,7 +41,7 @@ class BooleanCaptureTest {
     }
 
     @Test
-    void foundBoolean() throws UnexpectedBoolInputException {
+    void testFoundBoolean() throws UnexpectedBoolInputException {
         assertFalse(bc1.foundBoolean("fals"));
         assertTrue(bc1.foundBoolean('e'));
         assertFalse(bc1.getBoolCaptured());
@@ -52,10 +52,27 @@ class BooleanCaptureTest {
     }
 
     @Test
+    void testFoundBooleanFull() throws UnexpectedBoolInputException {
+        assertTrue(bc1.foundBoolean("false"));
+        assertTrue(bc1.foundBoolean("adksd"));
+
+        assertTrue(bc2.foundBoolean("yes"));
+        assertTrue(bc2.foundBoolean("daksjd"));
+    }
+
+    @Test
     void testIncorrectInput() {
         assertThrows(UnexpectedBoolInputException.class,
                 () -> bc1.foundBoolean('z'));
         assertThrows(UnexpectedBoolInputException.class,
                 () -> bc2.foundBoolean('t'));
+    }
+
+    @Test
+    void testIncorrectInputPartway() {
+        assertThrows(UnexpectedBoolInputException.class,
+                () -> bc1.foundBoolean("tre"));
+        assertThrows(UnexpectedBoolInputException.class,
+                () -> bc2.foundBoolean("neads"));
     }
 }

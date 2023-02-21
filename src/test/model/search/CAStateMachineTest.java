@@ -148,6 +148,33 @@ class CAStateMachineTest {
     }
 
     @Test
+    void testCaptureIsDirtyInvalid() {
+        String in = IS_DIRTY_CAPTURE_STR
+                + EQUALITY_STR + "ab";
+        UnexpectedInputException ex = assertThrows(UnexpectedInputException.class,
+                () -> sm.processInput(in.toCharArray()));
+        assertTrue(ex.getErrorState() instanceof CAStateMachine.BooleanCaptureState);
+    }
+
+    @Test
+    void testStateCapturedEmpty() throws ClothingAddressParseException {
+        String in = MATERIAL_CAPTURE_STR
+                + EQUALITY_STR + "abcd" + LIST_END_STR;
+        CAStateMachine.State out = sm.processInput(in.toCharArray());
+        assertTrue(out.getStateCaptured().isEmpty());
+    }
+
+    @Test
+    void testStateCapturedFull() throws ClothingAddressParseException {
+        CAStateMachine.State out = sm
+                .processInput(MATERIAL_CAPTURE_STR.toCharArray());
+        assertEquals(MATERIAL_CAPTURE_STR, out.getStateCaptured());
+        String input2 = EQUALITY_STR + "ABCD";
+        CAStateMachine.State out2 = sm.processInput(input2.toCharArray());
+        assertEquals("ABCD", out2.getStateCaptured());
+    }
+
+    @Test
     void testCaptureAll() throws ClothingAddressParseException {
         String in = "\t   \t\t"
                 // BRANDS
@@ -162,7 +189,9 @@ class CAStateMachineTest {
                 // SIZE
                 + SIZE_CAPTURE_STR + EQUALITY_STR + Size.XXL
                 + LIST_SEPARATOR_STR + Size.S
-                + LIST_END_STR;
+                + LIST_END_STR
+                // MATERIAL
+                + MATERIAL_CAPTURE_STR + EQUALITY_STR + "cotton" + LIST_END_STR;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         // BRANDS
         assertEquals(2, o.getBrands().size());
@@ -178,5 +207,8 @@ class CAStateMachineTest {
         // SIZE
         assertEquals(2, o.getSizes().size());
         assertTrue(o.getSizes().containsAll(List.of(Size.XXL, Size.S)));
+        // MATERIAL
+        assertEquals(1, o.getMaterials().size());
+        assertEquals("cotton", o.getMaterials().get(0));
     }
 }
