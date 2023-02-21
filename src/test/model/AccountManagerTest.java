@@ -64,7 +64,7 @@ public class AccountManagerTest {
     void testGetActiveAccount() {
         this.acm.addAccount(eric);
         this.acm.addAccount(jake);
-        assertTrue(this.acm.getActiveAccount().isEmpty());
+        assertFalse(this.acm.getActiveAccount().isPresent());
         this.acm.setActiveAccount("Eric");
         assertTrue(this.acm.getActiveAccount().isPresent());
         assertEquals(this.acm.getActiveAccount().get(), eric);
@@ -86,6 +86,7 @@ public class AccountManagerTest {
 
         this.acm.setActiveAccount("Jake");
         assertFalse(this.acm.setActiveAccountName("Eric"));
+        assertTrue(this.acm.getActiveAccount().isPresent());
         assertEquals(this.acm.getActiveAccount().get().getName(), "Jake");
 
         assertTrue(this.acm.setActiveAccountName("Sam"));

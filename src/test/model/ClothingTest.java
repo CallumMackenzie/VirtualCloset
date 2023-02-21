@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,12 +15,12 @@ public class ClothingTest {
 
     @BeforeEach
     void createClothing() {
-        this.cl = new Clothing(Arrays.asList("pants"),
+        this.cl = new Clothing(Collections.singletonList("pants"),
                 Size.XL,
                 "Adidas",
                 "Polyester",
-                Arrays.asList("Casual"),
-                Arrays.asList(Color.ORANGE),
+                Collections.singletonList("Casual"),
+                Collections.singletonList(Color.ORANGE),
                 false,
                 null);
     }
@@ -28,12 +28,14 @@ public class ClothingTest {
     @Test
     void testConstructor() {
         assertEquals(1, this.cl.getTypes().size());
-        assertEquals("pants", this.cl.getTypes().toArray(String[]::new)[0]);
+        assertEquals("pants", this.cl.getTypes().stream()
+                .findFirst().orElse(null));
         assertEquals(Size.XL, this.cl.getSize());
         assertEquals("Adidas", this.cl.getBrand());
         assertEquals("Polyester", this.cl.getMaterial());
         assertEquals(1, this.cl.getStyles().size());
-        assertEquals("Casual", this.cl.getStyles().toArray(String[]::new)[0]);
+        assertEquals("Casual", this.cl.getStyles().stream()
+                .findFirst().orElse(null));
         assertFalse(this.cl.isDirty());
         assertNull(this.cl.getImage());
     }
@@ -43,7 +45,7 @@ public class ClothingTest {
         this.cl.setBrand("Nike");
         this.cl.setDirty(true);
         this.cl.setSize(Size.S);
-        this.cl.setColors(Arrays.asList(Color.ORANGE));
+        this.cl.setColors(Collections.singletonList(Color.ORANGE));
         this.cl.setMaterial("Silk");
         this.cl.setImage(new BufferedImage(1, 1,
                 BufferedImage.TYPE_BYTE_GRAY));

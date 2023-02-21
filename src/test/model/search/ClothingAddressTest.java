@@ -4,7 +4,6 @@ import model.Size;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static model.search.CAStateMachine.*;
 import static org.junit.jupiter.api.Assertions.*;

@@ -11,7 +11,7 @@ class StateMachineTest {
 
     @BeforeEach
     void createStateMachine() {
-        this.sm = new StateMachine<>("A") {
+        this.sm = new StateMachine<String, Throwable>("A") {
             @Override
             public String nextState(String in, char input) {
                 return in + input;

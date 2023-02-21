@@ -4,8 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,11 +32,11 @@ public class AccountTest {
         assertTrue(result);
         assertEquals(this.ac1.getName(), "Eric");
 
-        result = this.ac1.setName("ABC", Arrays.asList(ac1));
+        result = this.ac1.setName("ABC", Collections.singletonList(ac1));
         assertTrue(result);
         assertEquals(this.ac1.getName(), "ABC");
 
-        result = this.ac1.setName("Jake", Arrays.asList(ac2));
+        result = this.ac1.setName("Jake", Collections.singletonList(ac2));
         assertFalse(result);
         assertEquals(this.ac1.getName(), "ABC");
     }
@@ -77,7 +76,7 @@ public class AccountTest {
 
     @Test
     void testGetCloset() {
-        assertTrue(this.ac2.getCloset("A").isEmpty());
+        assertFalse(this.ac2.getCloset("A").isPresent());
         this.ac2.addCloset("A");
         this.ac2.addCloset("B");
         assertTrue(this.ac2.getCloset("A").isPresent());
