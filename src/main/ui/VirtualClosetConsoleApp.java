@@ -191,26 +191,68 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
             // This assertion is guaranteed by the check to active.hasCloset; this is to suppress the warning
             // and ensure the correct behavior of active.hasCloset
             assert active.getCloset(closetName).isPresent() : "Active account did not have the required closet!";
-            ClosetModeConsole c = new ClosetModeConsole(this.getInput(),
+            new ClosetModeConsole(this.getInput(),
                     active.getCloset(closetName).get());
         } else {
             System.out.println("\tCloset \"" + closetName + "\" does not exist.");
         }
     }
 
+    // REQUIRES: this.initCommands has not been called already
     // MODIFIES: this
     // EFFECTS: Initializes the list of commands with the given
     //          class state.
-    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void initCommands() {
-        this.addCommands(
-                new ConsoleCommand(this::exit,
+        this.initBasicCommands();
+        this.initAccountCommands();
+        this.initActiveAccountCommands();
+        this.initClosetCommands();
+        // TODO: Enter catalogue mode
+        // TODO: For debugging, remove later
+        this.initDebugCommands();
+    }
+
+    // REQUIRES: this.initBasicCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up commands for basic commands such as help, exit, etc
+    private void initBasicCommands() {
+        this.addCommands(new ConsoleCommand(this::exit,
                         "Exits the application.",
                         "quit", "q"),
                 new ConsoleCommand(this::help,
                         "Displays general information about how to use Virtual Closet.",
-                        "help"),
-                new ConsoleCommand(this::listAccounts,
+                        "help"));
+    }
+
+    // REQUIRES: this.initActiveAccountCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up commands for active accounts such as renaming,
+    //          setting active, removing active, etc
+    private void initActiveAccountCommands() {
+        this.addCommands(new ConsoleCommand(this::setActiveAccount, () ->
+                        !this.accountManager.getAccounts().isEmpty(),
+                        "No accounts!",
+                        "Sets the active account for which to perform closet commands for.",
+                        "set active account", "set active"),
+                new ConsoleCommand(this.accountManager::removeActiveAccount,
+                        this.accountManager::hasActiveAccount,
+                        "No active account!",
+                        "Sets there to be no active account.",
+                        "remove active"),
+                new ConsoleCommand(this::renameActive,
+                        this.accountManager::hasActiveAccount,
+                        "No active account!",
+                        "Renames the active account if another account does not "
+                                + "presently have the same name.",
+                        "rename active"));
+    }
+
+    // REQUIRES: this.initAccountCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up commands for accounts such as listing, creating,
+    //          and removing
+    private void initAccountCommands() {
+        this.addCommands(new ConsoleCommand(this::listAccounts,
                         "Lists the names of all accounts in the account manager.",
                         "list accounts"),
                 new ConsoleCommand(this::createAccount,
@@ -220,22 +262,18 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         () -> !this.accountManager.getAccounts().isEmpty(),
                         "No accounts!",
                         "Removes an account based on the info provided.",
-                        "remove account"),
-                new ConsoleCommand(this::setActiveAccount,
-                        () -> !this.accountManager.getAccounts().isEmpty(),
-                        "No accounts!",
-                        "Sets the active account for which to perform closet commands for.",
-                        "set active account", "set active"),
-                new ConsoleCommand(this.accountManager::removeActiveAccount,
+                        "remove account"));
+    }
+
+    // REQUIRES: this.initClosetCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up closet commands for creating, removing,
+    //          opening, etc. closets
+    private void initClosetCommands() {
+        this.addCommands(new ConsoleCommand(this::createCloset,
                         this.accountManager::hasActiveAccount,
                         "No active account!",
-                        "Sets there to be no active account.",
-                        "remove active"),
-                new ConsoleCommand(this::createCloset,
-                        this.accountManager::hasActiveAccount,
-                        "No active account!",
-                        "Creates a new closet for the current active account with the "
-                                + "given name.",
+                        "Creates a new closet for the current active account with the given name.",
                         "create closet"),
                 new ConsoleCommand(this::removeCloset,
                         this.accountManager::hasActiveAccount,
@@ -250,38 +288,34 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         "No active account, or no closets!",
                         "Lists the closets for the given active account.",
                         "list closets"),
-                new ConsoleCommand(this::renameActive,
-                        this.accountManager::hasActiveAccount,
-                        "No active account!",
-                        "Renames the active account if another account does not "
-                                + "presently have the same name.",
-                        "rename active"),
                 new ConsoleCommand(this::openCloset,
                         this.accountManager::hasActiveAccount,
                         "No active account!",
                         "Enters closet mode for the given closet.",
-                        "open closet"),
-                // TODO: Enter catalogue mode
+                        "open closet"));
+    }
 
-                // TODO: For debugging, remove later
-                new ConsoleCommand(() -> {
-                    String cmds = String.join("\n",
-                            Arrays.asList("create account",
-                                    "Callum",
-                                    "create closet",
-                                    "c1",
-                                    "open closet",
-                                    "c1",
-                                    "new", "pants", "xl", "adidas", "cotton", "casual, sweatpants", "no",
-                                    "new", "shirt", "l", "uniqlo", "synthetic", "casual, smooth, oversize", "no",
-                                    "new", "pants", "xl", "under armor", "cotton", "casual, sweatpants", "yes",
-                                    "new", "pants", "xl", "uniqlo", "cotton", "semicasual, cargos", "no",
-                                    "new", "shirt", "l", "under armor", "polyester", "gym, workout, casual", "no",
-                                    "new", "shorts", "xl", "youngla", "cotton", "gym, workout", "no",
-                                    "new", "sweater", "xl", "ubc", "cotton blend", "casual, outdoor", "no",
-                                    "help")) + "\n";
-                    this.getInput().addScanner(new Scanner(cmds));
-                }, "", "dbg")
-        );
+    // REQUIRES: this.initDebugCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up debug commands for user testing purposes
+    private void initDebugCommands() {
+        this.addCommands(new ConsoleCommand(() -> {
+            String commands = String.join("\n",
+                    Arrays.asList("create account",
+                            "Callum",
+                            "create closet",
+                            "c1",
+                            "open closet",
+                            "c1",
+                            "new", "pants", "xl", "adidas", "cotton", "casual, sweatpants", "no",
+                            "new", "shirt", "l", "uniqlo", "synthetic", "casual, smooth, oversize", "no",
+                            "new", "pants", "xl", "under armor", "cotton", "casual, sweatpants", "yes",
+                            "new", "pants", "xl", "uniqlo", "cotton", "semi-casual, cargos", "no",
+                            "new", "shirt", "l", "under armor", "polyester", "gym, workout, casual", "no",
+                            "new", "shorts", "xl", "youngla", "cotton", "gym, workout", "no",
+                            "new", "sweater", "xl", "ubc", "cotton blend", "casual, outdoor", "no",
+                            "help")) + "\n";
+            this.getInput().addScanner(new Scanner(commands));
+        }, "", "dbg"));
     }
 }

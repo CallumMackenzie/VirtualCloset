@@ -8,10 +8,8 @@ import model.search.ClothingAddressParseException;
 import model.search.EnumListCapture;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -106,7 +104,7 @@ public final class ClosetModeConsole extends CommandSystem {
     private void createClothing() {
         String input = this.getInput("\tEnter a clothing type to create: ")
                 .toLowerCase();
-        Clothing newClothing = this.createClothing(Arrays.asList(input),
+        Clothing newClothing = this.createClothing(Collections.singletonList(input),
                 null, null, null, null, null,
                 null);
         if (Objects.isNull(newClothing)) {
@@ -135,7 +133,7 @@ public final class ClosetModeConsole extends CommandSystem {
             System.out.println("Cancelled.");
             return null;
         }
-        return new Clothing(types, size, brand, material, styles, Arrays.asList(), dirty, image);
+        return new Clothing(types, size, brand, material, styles, new ArrayList<>(), dirty, image);
     }
 
     // EFFECTS: If the input boolean is not null, returns it. Prompts the user
@@ -203,10 +201,24 @@ public final class ClosetModeConsole extends CommandSystem {
 
     // MODIFIES: this
     // EFFECTS: Sets up the commands for this console interface.
-    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private void initCommands() {
-        this.addCommands(
-                new ConsoleCommand(this::exit,
+        this.initBasicCommands();
+        this.initSearchCommands();
+        this.initListCommands();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets up search commands
+    private void initSearchCommands() {
+        this.addCommands(new ConsoleCommand(this::clothingAddressSearch,
+                "Search closet by clothing address.",
+                "search"));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets up basic commands like exit, help, new clothing
+    private void initBasicCommands() {
+        this.addCommands(new ConsoleCommand(this::exit,
                         "Exits closet mode for \"" + this.closet.getName() + "\".",
                         "exit"),
                 new ConsoleCommand(this::help,
@@ -214,8 +226,14 @@ public final class ClosetModeConsole extends CommandSystem {
                         "help", "h"),
                 new ConsoleCommand(this::createClothing,
                         "Creates a new piece of clothing.",
-                        "create clothing", "new"),
-                new ConsoleCommand(() -> this.printClosetStringList("Types",
+                        "create clothing", "new"));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets up listing commands such as listing clothing types,
+    //          brands, etc present in the closet
+    private void initListCommands() {
+        this.addCommands(new ConsoleCommand(() -> this.printClosetStringList("Types",
                         this.closet.getTypes()),
                         "Lists the types of clothing in this closet.",
                         "list types"),
@@ -226,11 +244,6 @@ public final class ClosetModeConsole extends CommandSystem {
                 new ConsoleCommand(() -> this.printClosetStringList("Styles",
                         this.closet.getStyles()),
                         "Lists the styles of clothing in this closet.",
-                        "list styles"),
-                new ConsoleCommand(this::clothingAddressSearch,
-                        "Search closet by clothing address.",
-                        "search")
-        );
+                        "list styles"));
     }
-
 }
