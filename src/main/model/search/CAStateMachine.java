@@ -3,7 +3,6 @@ package model.search;
 import model.Size;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 // A clothing address state machine for parsing a clothing address
@@ -51,11 +50,11 @@ public class CAStateMachine
         //          base has no clothing address (null value), creates a new
         //          one for this state.
         public State() {
-            if (getState() == null) {
+            if (getState() == null
+                    || getState().getAddress() == null) {
                 this.address = new ClothingAddress();
             } else {
-                this.address = Objects.requireNonNullElseGet(getState().address,
-                        ClothingAddress::new);
+                this.address = getState().getAddress();
             }
             this.stateCaptured = new StringBuilder();
         }

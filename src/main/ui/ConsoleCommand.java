@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 
@@ -22,7 +24,8 @@ public final class ConsoleCommand {
                           String inactiveMessage,
                           String description,
                           String... validCommands) {
-        this.validCommands = Set.of(validCommands);
+        this.validCommands = new HashSet<>();
+        this.validCommands.addAll(Arrays.asList(validCommands));
         this.responseFn = responseFn;
         this.description = description;
         this.inactiveMessage = inactiveMessage;
