@@ -60,6 +60,8 @@ public class OutfitCreationConsole extends CommandSystem {
                                 + " most closely matching the search params given.",
                         "add", "add clothing"),
                 new ConsoleCommand(this::removeClothingIndexed,
+                        () -> !this.outfit.getClothing().isEmpty(),
+                        "No clothing in outfit!",
                         "Removes selected clothing from this outfit.",
                         "remove", "remove clothing")
         );
@@ -107,7 +109,7 @@ public class OutfitCreationConsole extends CommandSystem {
         System.out.println(formatIndexed(clothing));
         int idx = this.forceGetIntInput("\tEnter index of clothing to remove: ",
                 () -> System.out.println("\tInput was not a number!"));
-        if (idx < 0 || idx > clothing.size()) {
+        if (idx < 0 || idx >= clothing.size()) {
             System.out.println("\tIndex out of range. Exiting.");
         } else {
             Clothing toRemove = clothing.get(idx);

@@ -4,7 +4,6 @@ import model.Account;
 import model.AccountManager;
 import model.Closet;
 
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -312,21 +311,37 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Sets up debug commands for user testing purposes
     private void initDebugCommands() {
         this.addCommands(new ConsoleCommand(() -> {
+            String c1 = String.join("\n",
+                    "new",
+                    "add type", "pants",
+                    "set size", "xl",
+                    "set brand", "adidas",
+                    "set material",
+                    "cotton",
+                    "exit", "y");
+            String c2 = String.join("\n",
+                    "new",
+                    "add type", "shirt",
+                    "set size", "l",
+                    "set brand", "uniqlo",
+                    "set material", "polyester & cotton",
+                    "add style", "casual",
+                    "exit", "y");
+            String c3 = String.join("\n",
+                    "new",
+                    "add type", "sweater",
+                    "set size", "xl",
+                    "set brand", "UBC",
+                    "add style", "casual",
+                    "exit", "y");
+
             String commands = String.join("\n",
-                    Arrays.asList("create account",
-                            "Callum",
-                            "create closet",
-                            "c1",
-                            "open closet",
-                            "c1",
-                            "new", "pants", "xl", "adidas", "cotton", "casual, sweatpants", "no",
-                            "new", "shirt", "l", "uniqlo", "synthetic", "casual, smooth, oversize", "no",
-                            "new", "pants", "xl", "under armor", "cotton", "casual, sweatpants", "yes",
-                            "new", "pants", "xl", "uniqlo", "cotton", "semi-casual, cargos", "no",
-                            "new", "shirt", "l", "under armor", "polyester", "gym, workout, casual", "no",
-                            "new", "shorts", "xl", "youngla", "cotton", "gym, workout", "no",
-                            "new", "sweater", "xl", "ubc", "cotton blend", "casual, outdoor", "no",
-                            "help")) + "\n";
+                    "create account",
+                    "Callum",
+                    "create closet",
+                    "c1",
+                    "open closet",
+                    "c1", c1, c2, c3) + "\n";
             this.getInput().addScanner(new Scanner(commands));
         }, "", "dbg"));
     }
