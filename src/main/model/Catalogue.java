@@ -27,6 +27,12 @@ public class Catalogue {
     }
 
     // MODIFIES: this
+    // EFFECTS: Removes outfits matching the given name
+    public void removeAllWithName(String name) {
+        this.outfits.removeIf(x -> x.getName().equalsIgnoreCase(name));
+    }
+
+    // MODIFIES: this
     // EFFECTS: Adds the given outfit to the catalogue.
     public void addOutfit(Outfit outfit) {
         this.outfits.add(outfit);

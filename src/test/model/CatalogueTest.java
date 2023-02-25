@@ -40,6 +40,16 @@ class CatalogueTest {
     }
 
     @Test
+    void testRemoveAllWithName() {
+        this.catalogue.addOutfit(new Outfit("b", new ArrayList<>()));
+        this.catalogue.addOutfit(new Outfit("C", new ArrayList<>()));
+        this.catalogue.addOutfit(new Outfit("B", new ArrayList<>()));
+        this.catalogue.removeAllWithName("b");
+        assertEquals(1, this.catalogue.getOutfits().size());
+        assertEquals("C", this.catalogue.getOutfits().get(0).getName());
+    }
+
+    @Test
     void testAddOutfit() {
         Outfit o = new Outfit("a", new ArrayList<>());
         this.catalogue.addOutfit(o);

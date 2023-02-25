@@ -74,7 +74,12 @@ public class CatalogueModeConsole extends CommandSystem {
                         () -> !this.catalogue.getOutfits().isEmpty(),
                         "No outfits in this closet!",
                         "Enters edit mode for the named outfit.",
-                        "modify named")
+                        "modify named"),
+                new ConsoleCommand(this::removeByName,
+                        () -> !this.catalogue.getOutfits().isEmpty(),
+                        "No outfits in this closet!",
+                        "Removes all outfits with the given name (case insensitive)",
+                        "remove by name", "remove named")
         );
     }
 
@@ -104,10 +109,21 @@ public class CatalogueModeConsole extends CommandSystem {
         if (matched.isEmpty()) {
             System.out.println("\tNo outfits match the name \"" + name + "\".");
         } else if (matched.size() > 1) {
-            System.out.println("\tMore than one outfit is named \"" + name + "\". Please rename one.");
+            System.out.println("\tMore than one outfit is named \"" + name + "\". "
+                    + "Select the index of which one to modify: \n"
+                    + matched.stream().map(Outfit::toString)
+                    .collect(Collectors.joining("\n")));
         } else {
             new OutfitCreationConsole(this.getInput(), matched.get(0));
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Removes all clothing with the given name
+    private void removeByName() {
+        String name = this.getInput("\tEnter name of clothing to remove: ");
+        this.catalogue.removeAllWithName(name);
+        System.out.println("\tRemoved all with name \"" + name + "\".");
     }
 
     // MODIFIES: this
