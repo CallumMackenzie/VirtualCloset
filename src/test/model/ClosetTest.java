@@ -5,7 +5,6 @@ import model.search.ClothingAddressParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,8 +24,8 @@ public class ClosetTest {
                 Size.XL,
                 "Adidas",
                 "Silk",
-                new ArrayList<>(),
-                Collections.singletonList(Color.BLUE),
+                Collections.singletonList("casual"),
+                Collections.singletonList("blue"),
                 true,
                 null);
     }
@@ -53,7 +52,7 @@ public class ClosetTest {
                 "Nike",
                 "Cotton",
                 new ArrayList<>(),
-                Collections.singletonList(Color.RED),
+                Collections.singletonList("red"),
                 true, null);
         this.closet1.addClothing(c2);
 
@@ -117,26 +116,45 @@ public class ClosetTest {
         this.closet1.addClothing(shirt1);
         assertTrue(this.closet1.getSizes().contains(shirt1.getSize()));
         assertEquals(1, this.closet1.getSizes().size());
+        this.closet1.removeClothing(shirt1);
+        assertTrue(this.closet1.getSizes().isEmpty());
     }
 
     @Test
     void testGetTypes() {
         this.closet1.addClothing(shirt1);
-        assertTrue(this.closet1.getTypes().contains("shirt"));
+        assertTrue(this.closet1.getTypes()
+                .containsAll(shirt1.getTypes()));
         assertEquals(1, this.closet1.getTypes().size());
+        this.closet1.removeClothing(shirt1);
+        assertTrue(this.closet1.getTypes().isEmpty());
     }
 
     @Test
     void testGetBrands() {
         this.closet1.addClothing(shirt1);
-        assertTrue(this.closet1.getBrands().stream()
-                .anyMatch(b -> b.equalsIgnoreCase("Adidas")));
+        assertTrue(this.closet1.getBrands().contains(shirt1.getBrand()));
+        this.closet1.removeClothing(shirt1);
+        assertTrue(this.closet1.getBrands().isEmpty());
     }
 
     @Test
     void testGetStyles() {
         this.closet1.addClothing(shirt1);
-        assertEquals(0, this.closet1.getStyles().size());
+        assertEquals(1, this.closet1.getStyles().size());
+        assertTrue(this.closet1.getStyles().containsAll(shirt1.getStyles()));
+        this.closet1.removeClothing(shirt1);
+        assertTrue(this.closet1.getStyles().isEmpty());
+    }
+
+    @Test
+    void testGetColors() {
+        this.closet1.addClothing(shirt1);
+        assertEquals(1, this.closet1.getColors().size());
+        assertTrue(this.closet1.getColors()
+                .containsAll(shirt1.getColors()));
+        this.closet1.removeClothing(shirt1);
+        assertTrue(this.closet1.getColors().isEmpty());
     }
 
 }

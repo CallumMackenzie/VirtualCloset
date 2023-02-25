@@ -15,6 +15,7 @@ public class CAStateMachineBuilder {
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
     public static final String COUNT_STR = "count";
+    public static final String COLOR_STR = "color";
 
     private String styleKey;
     private String brandKey;
@@ -28,6 +29,7 @@ public class CAStateMachineBuilder {
     private String listSeparatorSymbol;
     private String listEndSymbol;
     private String countKey;
+    private String colorKey;
 
     // EFFECTS: Creates a default CAStateMachine
     public static CAStateMachine buildDefault() {
@@ -49,6 +51,7 @@ public class CAStateMachineBuilder {
         this.listSeparatorSymbol = LIST_SEPARATOR_STR;
         this.listEndSymbol = LIST_END_STR;
         this.countKey = COUNT_STR;
+        this.colorKey = COLOR_STR;
     }
 
     // EFFECTS: Returns a new CAStateMachine with the fields of this
@@ -65,7 +68,8 @@ public class CAStateMachineBuilder {
                 equalitySymbol,
                 listSeparatorSymbol,
                 listEndSymbol,
-                countKey);
+                countKey,
+                colorKey);
     }
 
     // MODIFIES: this
@@ -149,6 +153,13 @@ public class CAStateMachineBuilder {
     // EFFECTS: Sets the countKey to the given, and returns this
     public CAStateMachineBuilder countKey(String v) {
         this.countKey = v;
+        return this;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets the colorKey to the given, and returns this
+    public CAStateMachineBuilder colorKey(String v) {
+        this.colorKey = v;
         return this;
     }
 

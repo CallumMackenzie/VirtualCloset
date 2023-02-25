@@ -17,6 +17,7 @@ public class Closet {
     private final Map<Size, List<Clothing>> sizeMap;
     private final Map<Boolean, List<Clothing>> dirtyMap;
     private final Map<String, List<Clothing>> materialsMap;
+    private final Map<String, List<Clothing>> colorMap;
 
     // EFFECTS: Constructs a new closet with no clothing
     public Closet(String name) {
@@ -29,6 +30,7 @@ public class Closet {
         this.sizeMap = new HashMap<>();
         this.dirtyMap = new HashMap<>();
         this.materialsMap = new HashMap<>();
+        this.colorMap = new HashMap<>();
     }
 
     // MODIFIES: matchCountMap
@@ -74,7 +76,11 @@ public class Closet {
                                            V element) {
         keys.forEach(e -> {
             if (categoryMap.containsKey(e)) {
-                categoryMap.get(e).remove(element);
+                List<V> vals = categoryMap.get(e);
+                vals.remove(element);
+                if (vals.isEmpty()) {
+                    categoryMap.remove(e);
+                }
             }
         });
     }
@@ -92,6 +98,7 @@ public class Closet {
             countMapMatches(this.dirtyMap, Collections.singletonList(address.getIsDirty()), matchMap);
         }
         countMapMatches(this.materialsMap, address.getMaterials(), matchMap);
+        countMapMatches(this.colorMap, address.getColors(), matchMap);
 
         return matchMap.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
@@ -130,6 +137,11 @@ public class Closet {
         return this.sizeMap.keySet();
     }
 
+    // EFFECTS: Returns the colors present in this closet
+    public Set<String> getColors() {
+        return this.colorMap.keySet();
+    }
+
     // MODIFIES: this
     // EFFECTS: Removes the clothing from this closet if it is currently tracked.
     public void removeClothing(Clothing clothing) {
@@ -141,6 +153,7 @@ public class Closet {
         removeByKey(this.sizeMap, Collections.singletonList(clothing.getSize()), clothing);
         removeByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
         removeByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
+        removeByKey(this.colorMap, clothing.getColors(), clothing);
     }
 
     // MODIFIES: this
@@ -154,5 +167,6 @@ public class Closet {
         congregateByKey(this.sizeMap, Collections.singletonList(clothing.getSize()), clothing);
         congregateByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
         congregateByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
+        congregateByKey(this.colorMap, clothing.getColors(), clothing);
     }
 }

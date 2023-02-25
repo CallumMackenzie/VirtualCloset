@@ -20,6 +20,7 @@ class ClothingAddressTest {
         assertNull(ca.getIsDirty());
         assertTrue(ca.getMaterials().isEmpty());
         assertEquals(Integer.MAX_VALUE, ca.getMatchCount());
+        assertTrue(ca.getColors().isEmpty());
     }
 
     @Test
@@ -80,5 +81,17 @@ class ClothingAddressTest {
                 COUNT_STR + EQUALITY_STR + "21" + LIST_END_STR
         );
         assertEquals(21, ca.getMatchCount());
+    }
+
+    @Test
+    void testCaptureColor() throws ClothingAddressParseException {
+        ClothingAddress ca = ClothingAddress.of(
+                COLOR_STR + EQUALITY_STR + "orange" +
+                        LIST_SEPARATOR_STR + "red" + LIST_END_STR
+        );
+        assertEquals(2, ca.getColors().size());
+        assertTrue(ca.getColors().containsAll(
+                Arrays.asList("red", "orange")
+        ));
     }
 }

@@ -17,7 +17,7 @@ public class Clothing {
     private boolean dirty;
     private String material;
 
-    private final List<Color> colors;
+    private final List<String> colors;
     private Image image;
 
     // EFFECTS: Constructs a new piece of clothing
@@ -26,7 +26,7 @@ public class Clothing {
                     String brand,
                     String material,
                     List<String> styles,
-                    List<Color> colors,
+                    List<String> colors,
                     boolean dirty,
                     Image image) {
         this.types = types.stream()
@@ -107,7 +107,7 @@ public class Clothing {
     }
 
     // EFFECTS: Returns the colors for this piece of clothing.
-    public List<Color> getColors() {
+    public List<String> getColors() {
         return this.colors;
     }
 
@@ -118,6 +118,7 @@ public class Clothing {
                 + "\n\tbrand: " + this.brand
                 + "\n\tsize: " + this.size
                 + "\n\tmaterial: " + this.material
+                + "\n\tcolors: " + String.join(", ", this.colors)
                 + "\n\tstyles: " + String.join(", ", this.styles)
                 + "\n\tdirty: " + this.dirty
                 + "\n}";

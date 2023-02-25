@@ -3,7 +3,6 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +22,7 @@ class OutfitTest {
                 "adidas",
                 "polyester",
                 Collections.singletonList("casual"),
-                Collections.singletonList(Color.ORANGE),
+                Collections.singletonList("orange"),
                 false,
                 null);
         this.pants = new Clothing(Collections.singletonList("sweatpants"),
@@ -31,7 +30,7 @@ class OutfitTest {
                 "under armor",
                 "cotton",
                 Collections.singletonList("casual"),
-                Collections.singletonList(Color.GRAY),
+                Collections.singletonList("gray"),
                 false,
                 null);
         this.outfit = new Outfit("a", Arrays.asList(shirt, pants));
@@ -62,7 +61,7 @@ class OutfitTest {
                 "nike",
                 "cotton",
                 Collections.singletonList("casual"),
-                Collections.singletonList(Color.BLUE),
+                Collections.singletonList("blue"),
                 false,
                 null);
         this.outfit.addClothing(sweater);

@@ -21,6 +21,7 @@ public class CAStateMachine
     public final String isDirtyKey;
     public final String materialKey;
     public final String countKey;
+    public final String colorKey;
 
     public final String trueSymbol;
     public final String falseSymbol;
@@ -43,7 +44,8 @@ public class CAStateMachine
                           String equalitySymbol,
                           String listSeparatorSymbol,
                           String listEndSymbol,
-                          String countKey) {
+                          String countKey,
+                          String colorKey) {
         super(null);
 
         this.styleKey = styleKey;
@@ -58,6 +60,7 @@ public class CAStateMachine
         this.listSeparatorSymbol = listSeparatorSymbol;
         this.listEndSymbol = listEndSymbol;
         this.countKey = countKey;
+        this.colorKey = colorKey;
 
         this.setState(new CapturingState());
     }
@@ -149,8 +152,9 @@ public class CAStateMachine
                     put(materialKey, () -> new StringListCaptureState(
                             getAddress().getMaterials()::addAll));
                     put(countKey, () -> new IntegerCaptureState(
-                            getAddress()::setMatchCount
-                    ));
+                            getAddress()::setMatchCount));
+                    put(colorKey, () -> new StringListCaptureState(
+                            getAddress().getColors()::addAll));
                 }
             };
         }

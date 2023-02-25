@@ -13,6 +13,7 @@ public final class ClothingAddress {
     private final List<String> styles;
     private final List<String> types;
     private final List<String> materials;
+    private final List<String> colors;
     private Boolean isDirty;
     private int matchCount;
 
@@ -24,6 +25,7 @@ public final class ClothingAddress {
         this.styles = new ArrayList<>();
         this.types = new ArrayList<>();
         this.materials = new ArrayList<>();
+        this.colors = new ArrayList<>();
         this.isDirty = null;
         this.matchCount = Integer.MAX_VALUE;
     }
@@ -101,6 +103,11 @@ public final class ClothingAddress {
     // EFFECTS: Returns the match count for this address
     public int getMatchCount() {
         return this.matchCount;
+    }
+
+    // EFFECTS: Returns the list of colors this address matches
+    public List<String> getColors() {
+        return this.colors;
     }
 
     // MODIFIES: this

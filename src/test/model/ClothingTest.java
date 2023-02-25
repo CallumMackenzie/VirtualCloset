@@ -3,7 +3,6 @@ package model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
@@ -20,7 +19,7 @@ public class ClothingTest {
                 "Adidas",
                 "Polyester",
                 Collections.singletonList("Casual"),
-                Collections.singletonList(Color.ORANGE),
+                Collections.singletonList("orange"),
                 false,
                 null);
     }
@@ -52,7 +51,7 @@ public class ClothingTest {
         assertTrue(this.cl.isDirty());
         assertEquals(Size.S, this.cl.getSize());
         assertEquals(1, this.cl.getColors().size());
-        assertEquals(Color.ORANGE, this.cl.getColors().get(0));
+        assertEquals("orange", this.cl.getColors().get(0));
         assertEquals("Silk", this.cl.getMaterial());
         assertNotNull(this.cl.getImage());
     }
@@ -60,13 +59,14 @@ public class ClothingTest {
     @Test
     void testToString() {
         assertEquals(this.cl.toString(),
-                "[pants] {" +
-                        "\n\tbrand: Adidas" +
-                        "\n\tsize: XL" +
-                        "\n\tmaterial: Polyester" +
-                        "\n\tstyles: Casual" +
-                        "\n\tdirty: false" +
-                        "\n}");
+                "[pants] {"
+                        + "\n\tbrand: Adidas"
+                        + "\n\tsize: XL"
+                        + "\n\tmaterial: Polyester"
+                        + "\n\tcolors: orange"
+                        + "\n\tstyles: Casual"
+                        + "\n\tdirty: false"
+                        + "\n}");
     }
 
 }

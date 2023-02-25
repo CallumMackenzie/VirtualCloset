@@ -21,6 +21,8 @@ class CAStateMachineBuilderTest {
         assertEquals(EQUALITY_STR, def.equalitySymbol);
         assertEquals(LIST_SEPARATOR_STR, def.listSeparatorSymbol);
         assertEquals(LIST_END_STR, def.listEndSymbol);
+        assertEquals(COUNT_STR, def.countKey);
+        assertEquals(COLOR_STR, def.colorKey);
     }
 
     @Test
@@ -139,5 +141,14 @@ class CAStateMachineBuilderTest {
                 .countKey(newVal)
                 .build();
         assertEquals(newVal, sm.countKey);
+    }
+
+    @Test
+    void testColorKey() {
+        String newVal = "123213";
+        CAStateMachine sm = new CAStateMachineBuilder()
+                .colorKey(newVal)
+                .build();
+        assertEquals(newVal, sm.colorKey);
     }
 }
