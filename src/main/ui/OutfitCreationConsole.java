@@ -1,20 +1,29 @@
 package ui;
 
+import model.Account;
+import model.Closet;
 import model.Clothing;
 import model.Outfit;
+import model.search.ClothingAddress;
+import model.search.ClothingAddressParseException;
 
 import java.util.List;
+import java.util.Optional;
 
 // An interface to create outfits
 public class OutfitCreationConsole extends CommandSystem {
 
+    private final Account account;
     private final Outfit outfit;
 
     // EFFECTS: Creates a new outfit creation console from the given outfit
     //          and dynamic scanner.
-    public OutfitCreationConsole(DynamicScanner ds, Outfit o) {
+    public OutfitCreationConsole(DynamicScanner ds,
+                                 Account account,
+                                 Outfit o) {
         super(ds);
         this.outfit = o;
+        this.account = account;
         this.run();
     }
 
@@ -43,11 +52,13 @@ public class OutfitCreationConsole extends CommandSystem {
                 new ConsoleCommand(this::setOutfitName,
                         "Sets the name of this outfit.",
                         "set name", "name"),
-
                 new ConsoleCommand(this::listOutfitClothing,
                         "Lists the clothing in this outfit.",
-                        "list", "clothing")
-                // TODO: Add clothing command
+                        "list", "clothing"),
+                new ConsoleCommand(this::addClothingByClosestMatch,
+                        "Adds user-provided clothing from the given closet"
+                                + " most closely matching the search params given.",
+                        "add", "add clothing")
                 // TODO: Remove clothing command
         );
     }
@@ -75,6 +86,33 @@ public class OutfitCreationConsole extends CommandSystem {
     }
 
     // MODIFIES: this
+    // EFFECTS: Adds the user-provided clothing to the outfit
+    private void addClothingByClosestMatch() {
+        String closetName = this.getInput("\tEnter name of closet to search: ");
+        Optional<Closet> closet = this.account.getCloset(closetName);
+        if (!closet.isPresent()) {
+            System.out.println("\tCloset \"" + closetName + "\" does not exist.");
+        } else {
+            String searchExpression = this.getInput("\tEnter search expression: ");
+            try {
+                ClothingAddress address = ClothingAddress.of(searchExpression);
+                List<Clothing> clothing = closet.get().findClothing(address);
+                if (clothing.isEmpty()) {
+                    System.out.println("\tNo matches for the given expression!");
+                } else {
+                    System.out.println(formatIndexed(clothing));
+                    int idx = this.forceGetIntInput(
+                            "\tSelect index of clothing to add: ",
+                            () -> System.out.println("\tInput was not a number!"));
+                    this.addClothingAtIndex(clothing, idx);
+                }
+            } catch (ClothingAddressParseException e) {
+                System.out.println("\t" + e.getMessage());
+            }
+        }
+    }
+
+    // MODIFIES: this
     // EFFECTS: Sets the outfit name to the user input value
     private void setOutfitName() {
         String newName = this.getInput("\tEnter new outfit name: ");
@@ -91,5 +129,31 @@ public class OutfitCreationConsole extends CommandSystem {
         } else {
             System.out.println(clothing);
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Adds the clothing at index i to the outfit if it is in
+    //          a valid range of the given clothing list. Prints a message
+    //          for the user regarding events which occurred.
+    private void addClothingAtIndex(List<Clothing> clothing, int idx) {
+        if (idx < 0 || idx >= clothing.size()) {
+            System.out.println("\tNumber out of index range. Exiting.");
+        } else {
+            this.outfit.addClothing(clothing.get(idx));
+            System.out.println("\tAdded clothing to outfit: \n"
+                    + clothing.get(idx));
+        }
+    }
+
+    // EFFECTS: Returns the given list in an indexed string representation
+    private static <T> String formatIndexed(List<T> in) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < in.size(); ++i) {
+            sb.append(i)
+                    .append(": ")
+                    .append(in.get(i).toString())
+                    .append("\n");
+        }
+        return sb.toString();
     }
 }

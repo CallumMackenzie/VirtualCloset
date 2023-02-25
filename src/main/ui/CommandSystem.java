@@ -72,6 +72,29 @@ public abstract class CommandSystem {
                 .toLowerCase();
     }
 
+    // EFFECTS: Repeates getIntInput with the given prompt until a valid
+    //          output is returned, running the error function every time
+    //          it does not produce a valid output.
+    protected Integer forceGetIntInput(String prompt, Runnable errorFn) {
+        Integer idx;
+        while ((idx = this.getIntInput(prompt)) == null) {
+            errorFn.run();
+        }
+        return idx;
+    }
+
+    // EFFECTS: Prompts input with the given string, formats it,
+    //          and attempts to parse it to an int, otherwise returns
+    //          null.
+    protected Integer getIntInput(String prompt) {
+        String str = this.getInput(prompt);
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     // EFFECTS: Prompts input with the given string, and trims it.
     protected String getInputTrimOnly(String prompt) {
         System.out.print(prompt);

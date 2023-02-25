@@ -1,5 +1,6 @@
 package ui;
 
+import model.Account;
 import model.Catalogue;
 import model.Outfit;
 
@@ -10,14 +11,16 @@ import java.util.stream.Collectors;
 // A console interface for a catalogue mode
 public class CatalogueModeConsole extends CommandSystem {
 
+    private final Account account;
     private final Catalogue catalogue;
 
     // EFFECTS: Creates a new catalogue console interface for the given
     //          catalogue and input system.
     public CatalogueModeConsole(DynamicScanner dynamicScanner,
-                                Catalogue catalogue) {
+                                Account account) {
         super(dynamicScanner);
-        this.catalogue = catalogue;
+        this.catalogue = account.getCatalogue();
+        this.account = account;
         this.run();
     }
 
@@ -95,7 +98,8 @@ public class CatalogueModeConsole extends CommandSystem {
                     + matched.stream().map(Outfit::toString)
                     .collect(Collectors.joining("\n")));
         } else {
-            new OutfitCreationConsole(this.getInput(), matched.get(0));
+            new OutfitCreationConsole(this.getInput(),
+                    this.account, matched.get(0));
         }
     }
 
@@ -111,6 +115,6 @@ public class CatalogueModeConsole extends CommandSystem {
     // EFFECTS: Enters outfit edit mode
     private void modifyOutfit(Outfit o) {
         System.out.println("\tEntering outfit creation mode.");
-        new OutfitCreationConsole(this.getInput(), o);
+        new OutfitCreationConsole(this.getInput(), this.account, o);
     }
 }

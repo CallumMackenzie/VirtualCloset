@@ -205,7 +205,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     private void openCatalogue() {
         assert this.accountManager.getActiveAccount().isPresent() : "No active account!";
         Account active = this.accountManager.getActiveAccount().get();
-        new CatalogueModeConsole(this.getInput(), active.getCatalogue());
+        new CatalogueModeConsole(this.getInput(), active);
     }
 
     // REQUIRES: this.initCommands has not been called already
