@@ -45,7 +45,6 @@ public class ClothingTest {
         this.cl.setBrand("Nike");
         this.cl.setDirty(true);
         this.cl.setSize(Size.S);
-        this.cl.setColors(Collections.singletonList(Color.ORANGE));
         this.cl.setMaterial("Silk");
         this.cl.setImage(new BufferedImage(1, 1,
                 BufferedImage.TYPE_BYTE_GRAY));

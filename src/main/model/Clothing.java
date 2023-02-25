@@ -17,7 +17,7 @@ public class Clothing {
     private boolean dirty;
     private String material;
 
-    private List<Color> colors;
+    private final List<Color> colors;
     private Image image;
 
     // EFFECTS: Constructs a new piece of clothing
@@ -109,12 +109,6 @@ public class Clothing {
     // EFFECTS: Returns the colors for this piece of clothing.
     public List<Color> getColors() {
         return this.colors;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Sets the colors for this piece of clothing.
-    public void setColors(List<Color> colors) {
-        this.colors = colors;
     }
 
     // EFFECTS: Returns a string representation of this object
