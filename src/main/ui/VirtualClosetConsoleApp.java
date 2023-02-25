@@ -48,7 +48,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // MODIFIES: this
     // EFFECTS: Marks the application to be closed when ready,
     //          and prints a message for the user to see.
-    private void exit() {
+    @Override
+    protected void stop() {
         super.stop();
         System.out.println("Closing application ...");
     }
@@ -211,26 +212,17 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // MODIFIES: this
     // EFFECTS: Initializes the list of commands with the given
     //          class state.
-    private void initCommands() {
-        this.initBasicCommands();
+    @Override
+    protected void initCommands() {
+        this.initBasicCommands(
+                "Displays general information about how to use Virtual Closet.",
+                "Exits the application.", "quit");
         this.initAccountCommands();
         this.initActiveAccountCommands();
         this.initClosetCommands();
         this.initCatalogueCommands();
         // TODO: For debugging, remove later
         this.initDebugCommands();
-    }
-
-    // REQUIRES: this.initBasicCommands has not been called already
-    // MODIFIES: this
-    // EFFECTS: Sets up commands for basic commands such as help, exit, etc
-    private void initBasicCommands() {
-        this.addCommands(new ConsoleCommand(this::exit,
-                        "Exits the application.",
-                        "quit", "q"),
-                new ConsoleCommand(this::help,
-                        "Displays general information about how to use Virtual Closet.",
-                        "help"));
     }
 
     // REQUIRES: this.initActiveAccountCommands has not been called already

@@ -27,34 +27,15 @@ public class CatalogueModeConsole extends CommandSystem {
         return this.getInput("Enter a catalogue command (ex. \"help\"): ");
     }
 
-    // MODIFIES: this
-    // EFFECTS: Initializes the console interface
-    @Override
-    protected void init() {
-        this.setShouldRun(true);
-        this.initCommands();
-    }
-
     // REQUIRES: this.initCommands has not been called yet
     // MODIFIES: this
     // EFFECTS: Initializes catalogue commands
-    private void initCommands() {
-        this.initBasicCommands();
+    @Override
+    protected void initCommands() {
+        this.initBasicCommands("Lists the catalogue commands.",
+                "Exits catalogue mode.",
+                "exit");
         this.initOutfitCommands();
-    }
-
-    // REQUIRES: this.initBasicCommands has not been called
-    // MODIFIES: this
-    // EFFECTS: Initializes basic commands
-    private void initBasicCommands() {
-        this.addCommands(
-                new ConsoleCommand(this::help,
-                        "Prints a list of commands.",
-                        "help"),
-                new ConsoleCommand(this::stop,
-                        "Exits catalogue mode.",
-                        "exit")
-        );
     }
 
     // REQUIRES: this.initOutfitCommands has not been called

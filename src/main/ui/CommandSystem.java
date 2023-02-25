@@ -22,9 +22,28 @@ public abstract class CommandSystem {
     // EFFECTS: Prompts the user for a command and returns it
     protected abstract String promptInput();
 
-    // EFFECTS: Initializes the command system. Ensure shouldRun is set
-    //          to true, or the command system will immediately exit.
-    protected abstract void init();
+    // EFFECTS: Initializes the command system, with should run as true.
+    //          Calls initCommands.
+    protected void init() {
+        this.setShouldRun(true);
+        this.initCommands();
+    }
+
+    // REQUIRES: this.initCommands has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes commands for this command system
+    protected abstract void initCommands();
+
+    // REQUIRES: this.initBasicCommands has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes basic commands stop and help, and adds them
+    protected void initBasicCommands(String helpDesc,
+                                     String stopDesc, String stopKeyword) {
+        this.addCommands(
+                new ConsoleCommand(this::help, helpDesc, "help"),
+                new ConsoleCommand(this::stop, stopDesc, stopKeyword)
+        );
+    }
 
     // MODIFIES: this
     // EFFECTS: Sets shouldRun to the desired value

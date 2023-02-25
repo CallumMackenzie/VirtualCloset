@@ -25,33 +25,44 @@ public class OutfitCreationConsole extends CommandSystem {
                 + this.outfit.getName() + "\": ");
     }
 
-    // MODIFIES: this
-    // EFFECTS: Initializes the outfit creation interface
-    @Override
-    protected void init() {
-        this.setShouldRun(true);
-        this.initCommands();
-    }
-
     // REQUIRES: this.initCommands has not been called
     // MODIFIES: this
     // EFFECTS: Initializes commands
-    private void initCommands() {
+    @Override
+    protected void initCommands() {
+        this.initBasicCommands("Lists commands for the outfit creation console.",
+                "Exits outfit creation mode.", "exit");
+        this.initOutfitCommands();
+    }
+
+    // REQUIRES: this.initOutfitCommands has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes outfit commands
+    private void initOutfitCommands() {
         this.addCommands(
-                new ConsoleCommand(this::help,
-                        "Lists commands for this system.",
-                        "help"),
                 new ConsoleCommand(this::setOutfitName,
                         "Sets the name of this outfit.",
                         "set name", "name"),
-                new ConsoleCommand(this::stop,
-                        "Exits outfit edit mode.",
-                        "exit"),
+
                 new ConsoleCommand(this::listOutfitClothing,
                         "Lists the clothing in this outfit.",
                         "list", "clothing")
                 // TODO: Add clothing command
                 // TODO: Remove clothing command
+        );
+    }
+
+    // REQUIRES: this.initBasicCommands has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes basic commands
+    private void initBasicCommands() {
+        this.addCommands(
+                new ConsoleCommand(this::help,
+                        "Lists commands for this system.",
+                        "help"),
+                new ConsoleCommand(this::stop,
+                        "Exits outfit edit mode.",
+                        "exit")
         );
     }
 
