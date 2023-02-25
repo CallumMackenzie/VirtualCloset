@@ -198,6 +198,16 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
+    // REQUIRES: this.accountManager must have an active acccount
+    // MODIFIES: this
+    // EFFECTS: Enters catalogue mode
+    private void openCatalogue() {
+        assert this.accountManager.getActiveAccount().isPresent() : "No active account!";
+        Account active = this.accountManager.getActiveAccount().get();
+        new CatalogueModeConsole(this.getInput(),
+                active.getCatalogue());
+    }
+
     // REQUIRES: this.initCommands has not been called already
     // MODIFIES: this
     // EFFECTS: Initializes the list of commands with the given
@@ -207,7 +217,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         this.initAccountCommands();
         this.initActiveAccountCommands();
         this.initClosetCommands();
-        // TODO: Enter catalogue mode
+        this.initCatalogueCommands();
         // TODO: For debugging, remove later
         this.initDebugCommands();
     }
@@ -293,6 +303,17 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         "No active account!",
                         "Enters closet mode for the given closet.",
                         "open closet"));
+    }
+
+    // REQUIRES: this.initCatalogueCommands has not been called already
+    // MODIFIES: this
+    // EFFECTS: Sets up catalogue commands
+    private void initCatalogueCommands() {
+        this.addCommands(new ConsoleCommand(this::openCatalogue,
+                this.accountManager::hasActiveAccount,
+                "No active account!",
+                "Opens the catalogue for the active user.",
+                "catalogue"));
     }
 
     // REQUIRES: this.initDebugCommands has not been called already
