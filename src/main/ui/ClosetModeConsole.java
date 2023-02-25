@@ -5,12 +5,8 @@ import model.Clothing;
 import model.Size;
 import model.search.ClothingAddress;
 import model.search.ClothingAddressParseException;
-import model.search.EnumListCapture;
 
-import java.awt.*;
-import java.util.List;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 // A console command system for a single closet
@@ -24,22 +20,6 @@ public final class ClosetModeConsole extends CommandSystem {
         super(input);
         this.closet = closet;
         this.run();
-    }
-
-    // EFFECTS: Returns t if it is not null, otherwise invokes and
-    //          returns the value of the supplier ifNull.
-    private static <T> T ifNull(T t, Supplier<T> ifNull) {
-        if (Objects.isNull(t)) {
-            return ifNull.get();
-        }
-        return t;
-    }
-
-    // EFFECTS: Formats a list of enum types in the given enum class to a string.
-    private static <T extends Enum<T>> String formatEnumTypes(Class<T> enumClass) {
-        return Arrays.stream(enumClass.getEnumConstants())
-                .map(Object::toString)
-                .collect(Collectors.joining(", "));
     }
 
     // MODIFIES: this
@@ -102,101 +82,16 @@ public final class ClosetModeConsole extends CommandSystem {
     // MODIFIES: this
     // EFFECTS: Guides the user through a clothing creation process.
     private void createClothing() {
-        String input = this.getInput("\tEnter a clothing type to create: ")
-                .toLowerCase();
-        Clothing newClothing = this.createClothing(Collections.singletonList(input),
-                null, null, null, null, null,
+        Clothing newClothing = new Clothing(new ArrayList<>(),
+                Size.UNKNOWN,
+                "",
+                "",
+                new ArrayList<>(),
+                new ArrayList<>(),
+                false,
                 null);
-        if (Objects.isNull(newClothing)) {
-            return;
-        }
+        new ClothingCreationConsole(getInput(), newClothing);
         this.closet.addClothing(newClothing);
-    }
-
-    // EFFECTS: Guides user through a clothing creation process and returns.
-    //          Requests any null items from the user.
-    private Clothing createClothing(List<String> types,
-                                    Size size,
-                                    String brand,
-                                    String material,
-                                    List<String> styles,
-                                    Boolean dirty,
-                                    Image image) {
-        // TODO: Add color
-        if (Objects.isNull(types = this.parseStringList("clothing types", types))
-                || Objects.isNull(size = this.parseEnumType("size", Size.class, size))
-                || Objects.isNull(brand = this.parseString("brand", brand))
-                || Objects.isNull(material = this.parseString("material", material))
-                || Objects.isNull(styles
-                = this.parseStringList("styles (ex. \"street, skate\")", styles))
-                || Objects.isNull(dirty = this.parseBoolean("\tEnter whether the clothing is dirty", dirty))) {
-            System.out.println("Cancelled.");
-            return null;
-        }
-        return new Clothing(types, size, brand, material, styles, new ArrayList<>(), dirty, image);
-    }
-
-    // EFFECTS: If the input boolean is not null, returns it. Prompts the user
-    //          for some boolean input and returns true or false depending on
-    //          the user input.
-    private Boolean parseBoolean(String prompt, Boolean bool) {
-        return ifNull(bool, () -> {
-            String in = this.getInput(prompt + ", \"yes\" or \"no\": ");
-            if (in.equalsIgnoreCase("yes")) {
-                return true;
-            } else if (in.equalsIgnoreCase("no")) {
-                return false;
-            }
-            return null;
-        });
-    }
-
-    // EFFECTS: Prompts the user for an enum input, parses it from a string, and returns the
-    //          enum value. If there is no corresponding value, returns null. If the input type
-    //          is not null, returns it.
-    private <T extends Enum<T>> T parseEnumType(String prompt, Class<T> enumClass, T type) {
-        return ifNull(type, () -> {
-            String typeInput = this.getInputTrimOnly(
-                    "\tTypes: "
-                            + formatEnumTypes(enumClass)
-                            + "\n\tEnter " + prompt + " or type \"exit\": ");
-            if (typeInput.equalsIgnoreCase("exit")) {
-                return null;
-            }
-            T val = EnumListCapture.stringToEnumLoose(enumClass, typeInput);
-            if (val == null) {
-                System.out.println("Input \"" + typeInput + "\" did not match any given value.");
-            }
-            return val;
-        });
-    }
-
-    // EFFECTS: If the given string is null, prompts the user for a string
-    //          input and returns it unless the string is "exit", in which
-    //          case returns null. If the given string is not null, returns it.
-    private String parseString(String prompt, String s) {
-        return ifNull(s, () -> {
-            String str = this.getInput("\tEnter " + prompt + " or \"exit\": ");
-            if (str.equalsIgnoreCase("exit")) {
-                return null;
-            }
-            return str;
-        });
-    }
-
-    // EFFECTS: If the given list types is null, prompts the user for a list of strings
-    //          and returns it. Otherwise, returns the input list.
-    private List<String> parseStringList(String prompt, List<String> types) {
-        return ifNull(types, () -> {
-            String typesInput = this.getInput("\tEnter " + prompt + " or type \"exit\": ")
-                    .toLowerCase();
-            if (typesInput.equalsIgnoreCase("exit")) {
-                return null;
-            }
-            return Arrays.stream(typesInput.split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toList());
-        });
     }
 
     // REQUIRES: this.initCommands has not been called

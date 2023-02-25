@@ -58,22 +58,10 @@ public class OutfitCreationConsole extends CommandSystem {
                 new ConsoleCommand(this::addClothingByClosestMatch,
                         "Adds user-provided clothing from the given closet"
                                 + " most closely matching the search params given.",
-                        "add", "add clothing")
-                // TODO: Remove clothing command
-        );
-    }
-
-    // REQUIRES: this.initBasicCommands has not been called
-    // MODIFIES: this
-    // EFFECTS: Initializes basic commands
-    private void initBasicCommands() {
-        this.addCommands(
-                new ConsoleCommand(this::help,
-                        "Lists commands for this system.",
-                        "help"),
-                new ConsoleCommand(this::stop,
-                        "Exits outfit edit mode.",
-                        "exit")
+                        "add", "add clothing"),
+                new ConsoleCommand(this::removeClothingIndexed,
+                        "Removes selected clothing from this outfit.",
+                        "remove", "remove clothing")
         );
     }
 
@@ -109,6 +97,22 @@ public class OutfitCreationConsole extends CommandSystem {
             } catch (ClothingAddressParseException e) {
                 System.out.println("\t" + e.getMessage());
             }
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Removes the clothing at the given index from the outfit.
+    private void removeClothingIndexed() {
+        List<Clothing> clothing = this.outfit.getClothing();
+        System.out.println(formatIndexed(clothing));
+        int idx = this.forceGetIntInput("\tEnter index of clothing to remove: ",
+                () -> System.out.println("\tInput was not a number!"));
+        if (idx < 0 || idx > clothing.size()) {
+            System.out.println("\tIndex out of range. Exiting.");
+        } else {
+            Clothing toRemove = clothing.get(idx);
+            this.outfit.removeClothing(toRemove);
+            System.out.println("\tRemoved clothing.");
         }
     }
 
@@ -151,8 +155,10 @@ public class OutfitCreationConsole extends CommandSystem {
         for (int i = 0; i < in.size(); ++i) {
             sb.append(i)
                     .append(": ")
-                    .append(in.get(i).toString())
-                    .append("\n");
+                    .append(in.get(i).toString());
+            if (i + 1 != in.size()) {
+                sb.append('\n');
+            }
         }
         return sb.toString();
     }

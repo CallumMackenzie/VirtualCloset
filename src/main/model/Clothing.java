@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class Clothing {
 
     private final List<String> styles;
-    private final Collection<String> types;
+    private final List<String> types;
     private String brand;
     private Size size;
     private boolean dirty;
@@ -75,7 +75,7 @@ public class Clothing {
 
     // MODIFIES: this
     // EFFECTS: Sets the size of this clothing
-    void setSize(Size size) {
+    public void setSize(Size size) {
         this.size = size;
     }
 
@@ -97,12 +97,12 @@ public class Clothing {
 
     // MODIFIES: this
     // EFFECTS: Sets the material for this clothing
-    void setMaterial(String material) {
+    public void setMaterial(String material) {
         this.material = material;
     }
 
     // EFFECTS: Returns the types of this clothing
-    public Collection<String> getTypes() {
+    public List<String> getTypes() {
         return types;
     }
 
