@@ -136,6 +136,10 @@ public final class ClosetModeConsole extends CommandSystem {
                         this.closet.getSizes()),
                         "Lists the sizes of clothing in this closet.",
                         "list sizes", "sizes"),
+                new ConsoleCommand(() -> this.printClosetStringList("Colors",
+                        this.closet.getColors()),
+                        "Lists the colors of clothing in this closet.",
+                        "list colors", "colors"),
                 new ConsoleCommand(this::createClothing,
                         "Creates a new piece of clothing.",
                         "create clothing", "new"));

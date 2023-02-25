@@ -88,6 +88,12 @@ public class ClothingCreationConsole extends CommandSystem {
                 new ConsoleCommand(this.createStringListAddFn(this.clothing::getStyles, "styles"),
                         "Adds a style to this article of clothing (ex. \"casual\").",
                         "add style"),
+                new ConsoleCommand(this.createStringListAddFn(this.clothing::getColors, "colors"),
+                        "Adds a color to this article of clothing (ex. \"orange\").",
+                        "add color"),
+                new ConsoleCommand(this.createStringListRemoveFn(this.clothing::getColors, "colors"),
+                        "Removes a color from this article of clothing (ex. \"blue\").",
+                        "remove color"),
                 new ConsoleCommand(this.createStringListRemoveFn(this.clothing::getStyles, "styles"),
                         "Removes a style from this article of clothing (ex. \"athletic\").",
                         "remove style")
