@@ -26,11 +26,13 @@ public final class ClothingAddress {
         this.isDirty = null;
     }
 
-    // EFFECTS: Parses the given string expression into a clothing address.
-    public static ClothingAddress of(String expr) throws ClothingAddressParseException {
-        CAStateMachine parser = new CAStateMachine();
+    // MODIFIES: parser
+    // EFFECTS: Parses the given string expression into a clothing address
+    //          with the given state machine.
+    public static ClothingAddress of(CAStateMachine parser, String expr)
+            throws ClothingAddressParseException {
         CAStateMachine.State out = parser.processInput(expr.toCharArray());
-        final String listEndDelimMissingMsg = "(is there a \"" + CAStateMachine.LIST_END_STR + "\" present?)";
+        final String listEndDelimMissingMsg = "(is there a \"" + parser.listEndSymbol + "\" present?)";
         if (out instanceof CAStateMachine.StringListCaptureState) {
             throw new IncorrectEndStateException(out,
                     "Unfinished string list in expression! " + listEndDelimMissingMsg);
@@ -46,6 +48,13 @@ public final class ClothingAddress {
             }
         }
         return out.getAddress();
+    }
+
+    // EFFECTS: Parses the given string expression into a clothing address with the
+    //          default CAStateMachine given by CAStateMachineBuilder.buildDefault().
+    public static ClothingAddress of(String expr) throws ClothingAddressParseException {
+        return of(CAStateMachineBuilder.buildDefault(),
+                expr);
     }
 
     // EFFECTS: Returns whether it is searching for clean or dirty

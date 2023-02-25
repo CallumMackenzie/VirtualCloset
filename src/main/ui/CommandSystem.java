@@ -89,7 +89,7 @@ public abstract class CommandSystem {
     // across instances, as well as multiple internal scanners.
     public static class DynamicScanner {
 
-        private Stack<Scanner> scanners;
+        private final Stack<Scanner> scanners;
 
         // EFFECTS: Creates a new dynamic scanner with the given
         //          scanner input.

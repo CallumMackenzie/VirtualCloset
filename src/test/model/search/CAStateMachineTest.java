@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static model.search.CAStateMachine.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CAStateMachineTest {
@@ -15,45 +14,39 @@ class CAStateMachineTest {
 
     @BeforeEach
     void createStateMachine() {
-        this.sm = new CAStateMachine();
+        this.sm = CAStateMachineBuilder.buildDefault();
     }
 
     @Test
     void testUnknownKey() {
-        String in = "UNINDWID" + EQUALITY_STR
-                + "DKSDKDS";
+        String in = "UNINDWID" + sm.equalitySymbol + "DKSDKDS";
         assertThrows(NoSuchKeyException.class, () -> sm.processInput(in.toCharArray()));
     }
 
     @Test
     void testCaptureBrandSimple() throws ClothingAddressParseException {
-        String in = BRAND_CAPTURE_STR + EQUALITY_STR;
+        String in = sm.brandKey + sm.equalitySymbol;
         assertTrue(sm.processInput(in.toCharArray())
                 instanceof CAStateMachine.StringListCaptureState);
     }
 
     @Test
     void testCaptureBrandWhitespaceBefore() throws ClothingAddressParseException {
-        String in = "\t  \t " + BRAND_CAPTURE_STR
-                + EQUALITY_STR;
+        String in = "\t  \t " + sm.brandKey + sm.equalitySymbol;
         assertTrue(sm.processInput(in.toCharArray())
                 instanceof CAStateMachine.StringListCaptureState);
     }
 
     @Test
     void testCaptureBrandWhitespaceBetween() throws ClothingAddressParseException {
-        String in = BRAND_CAPTURE_STR
-                + " \t  \t" + EQUALITY_STR;
+        String in = sm.brandKey + " \t  \t" + sm.equalitySymbol;
         assertTrue(sm.processInput(in.toCharArray())
                 instanceof CAStateMachine.StringListCaptureState);
     }
 
     @Test
     void testCaptureBrandSingleListItem() throws ClothingAddressParseException {
-        String in = BRAND_CAPTURE_STR
-                + EQUALITY_STR
-                + "BRAND A"
-                + LIST_END_STR;
+        String in = sm.brandKey + sm.equalitySymbol + "BRAND A" + sm.listEndSymbol;
         CAStateMachine.State out = sm.processInput(in.toCharArray());
         assertTrue(out instanceof CAStateMachine.CapturingState);
         assertEquals(1, out.getAddress().getBrands().size());
@@ -62,12 +55,12 @@ class CAStateMachineTest {
 
     @Test
     void testCaptureBrandMultipleItems() throws ClothingAddressParseException {
-        String in = BRAND_CAPTURE_STR
-                + EQUALITY_STR
-                + "BRAND A" + LIST_SEPARATOR_STR
-                + "BRAND B" + LIST_SEPARATOR_STR
-                + "BRAND C" + LIST_SEPARATOR_STR
-                + "BRAND D" + LIST_END_STR;
+        String in = sm.brandKey
+                + sm.equalitySymbol
+                + "BRAND A" + sm.listSeparatorSymbol
+                + "BRAND B" + sm.listSeparatorSymbol
+                + "BRAND C" + sm.listSeparatorSymbol
+                + "BRAND D" + sm.listEndSymbol;
         CAStateMachine.State out = sm.processInput(in.toCharArray());
         assertTrue(out instanceof CAStateMachine.CapturingState);
         assertEquals(4, out.getAddress().getBrands().size());
@@ -85,12 +78,12 @@ class CAStateMachineTest {
 
     @Test
     void testCaptureBrandStyle() throws ClothingAddressParseException {
-        String in = CAStateMachine.STYLE_CAPTURE_STR
-                + EQUALITY_STR
-                + "casual" + LIST_END_STR
-                + BRAND_CAPTURE_STR + EQUALITY_STR
-                + "adidas" + LIST_SEPARATOR_STR
-                + "nike" + LIST_END_STR;
+        String in = sm.styleKey
+                + sm.equalitySymbol
+                + "casual" + sm.listEndSymbol
+                + sm.brandKey + sm.equalitySymbol
+                + "adidas" + sm.listSeparatorSymbol
+                + "nike" + sm.listEndSymbol;
         ClothingAddress out = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(2, out.getBrands().size());
         assertTrue(out.getBrands().containsAll(Arrays.asList("adidas", "nike")));
@@ -100,9 +93,9 @@ class CAStateMachineTest {
 
     @Test
     void testCaptureType() throws ClothingAddressParseException {
-        String in = CAStateMachine.TYPE_CAPTURE_STR
-                + EQUALITY_STR
-                + "pants" + LIST_END_STR;
+        String in = sm.typeKey
+                + sm.equalitySymbol
+                + "pants" + sm.listEndSymbol;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(1, o.getTypes().size());
         assertEquals("pants", o.getTypes().get(0));
@@ -110,11 +103,11 @@ class CAStateMachineTest {
 
     @Test
     void testCaptureSize() throws ClothingAddressParseException {
-        String in = CAStateMachine.SIZE_CAPTURE_STR
-                + EQUALITY_STR
-                + Size.XL + LIST_SEPARATOR_STR
+        String in = sm.sizeKey
+                + sm.equalitySymbol
+                + Size.XL + sm.listSeparatorSymbol
                 + Size.XXL.toString().toLowerCase()
-                + LIST_END_STR;
+                + sm.listEndSymbol;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(2, o.getSizes().size());
         assertTrue(o.getSizes().containsAll(Arrays.asList(Size.XL, Size.XXL)));
@@ -122,35 +115,31 @@ class CAStateMachineTest {
 
     @Test
     void testCaptureSizeUnknown() {
-        String in = CAStateMachine.SIZE_CAPTURE_STR
-                + EQUALITY_STR
-                + "djaisjdosajdsad" + LIST_END_STR;
+        String in = sm.sizeKey + sm.equalitySymbol
+                + "djaisjdosajdsad" + sm.listEndSymbol;
         assertThrows(UnexpectedInputException.class,
                 () -> sm.processInput(in.toCharArray()));
     }
 
     @Test
     void testCaptureIsDirtyTrue() throws ClothingAddressParseException {
-        String in = IS_DIRTY_CAPTURE_STR
-                + EQUALITY_STR + "  \t "
-                + TRUE_STR;
+        String in = sm.isDirtyKey + sm.equalitySymbol + "  \t "
+                + sm.trueSymbol;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(true, o.getIsDirty());
     }
 
     @Test
     void testCaptureIsDirtyFalse() throws ClothingAddressParseException {
-        String in = IS_DIRTY_CAPTURE_STR
-                + EQUALITY_STR + "  \t "
-                + FALSE_STR;
+        String in = sm.isDirtyKey + sm.equalitySymbol + "  \t "
+                + sm.falseSymbol;
         ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
         assertEquals(false, o.getIsDirty());
     }
 
     @Test
     void testCaptureIsDirtyInvalid() {
-        String in = IS_DIRTY_CAPTURE_STR
-                + EQUALITY_STR + "ab";
+        String in = sm.isDirtyKey + sm.equalitySymbol + "ab";
         UnexpectedInputException ex = assertThrows(UnexpectedInputException.class,
                 () -> sm.processInput(in.toCharArray()));
         assertTrue(ex.getErrorState() instanceof CAStateMachine.BooleanCaptureState);
@@ -158,8 +147,7 @@ class CAStateMachineTest {
 
     @Test
     void testStateCapturedEmpty() throws ClothingAddressParseException {
-        String in = MATERIAL_CAPTURE_STR
-                + EQUALITY_STR + "abcd" + LIST_END_STR;
+        String in = sm.materialKey + sm.equalitySymbol + "abcd" + sm.listEndSymbol;
         CAStateMachine.State out = sm.processInput(in.toCharArray());
         assertTrue(out.getStateCaptured().isEmpty());
     }
@@ -167,35 +155,41 @@ class CAStateMachineTest {
     @Test
     void testStateCapturedFull() throws ClothingAddressParseException {
         CAStateMachine.State out = sm
-                .processInput(MATERIAL_CAPTURE_STR.toCharArray());
-        assertEquals(MATERIAL_CAPTURE_STR, out.getStateCaptured());
-        String input2 = EQUALITY_STR + "ABCD";
+                .processInput(sm.materialKey.toCharArray());
+        assertEquals(sm.materialKey, out.getStateCaptured());
+        String input2 = sm.equalitySymbol + "ABCD";
         CAStateMachine.State out2 = sm.processInput(input2.toCharArray());
         assertEquals("ABCD", out2.getStateCaptured());
     }
 
-    @Test
-    void testCaptureAll() throws ClothingAddressParseException {
+    void testCaptureAllWith(CAStateMachine sm) {
         String in = "\t   \t\t"
                 // BRANDS
-                + BRAND_CAPTURE_STR + EQUALITY_STR + "adidas"
-                + LIST_SEPARATOR_STR + "lululemon" + LIST_END_STR
+                + sm.brandKey + sm.equalitySymbol + "adidas"
+                + sm.listSeparatorSymbol + "lululemon" + sm.listEndSymbol
                 // IS DIRTY
-                + IS_DIRTY_CAPTURE_STR + EQUALITY_STR + FALSE_STR + " "
+                + sm.isDirtyKey + sm.equalitySymbol + sm.falseSymbol + " "
                 // STYLE
-                + STYLE_CAPTURE_STR + EQUALITY_STR + "casual" + LIST_END_STR
+                + sm.styleKey + sm.equalitySymbol + "casual" + sm.listEndSymbol
                 // TYPE
-                + TYPE_CAPTURE_STR + EQUALITY_STR + "shirt" + LIST_END_STR
+                + sm.typeKey + sm.equalitySymbol + "shirt" + sm.listEndSymbol
                 // SIZE
-                + SIZE_CAPTURE_STR + EQUALITY_STR + Size.XXL
-                + LIST_SEPARATOR_STR + Size.S
-                + LIST_END_STR
+                + sm.sizeKey + sm.equalitySymbol + Size.XXL
+                + sm.listSeparatorSymbol + Size.S
+                + sm.listEndSymbol
                 // MATERIAL
-                + MATERIAL_CAPTURE_STR + EQUALITY_STR + "cotton" + LIST_END_STR;
-        ClothingAddress o = sm.processInput(in.toCharArray()).getAddress();
+                + sm.materialKey + sm.equalitySymbol + "cotton" + sm.listEndSymbol;
+        ClothingAddress o = null;
+        try {
+            o = sm.processInput(in.toCharArray()).getAddress();
+        } catch (ClothingAddressParseException e) {
+            fail("Unexpected exception: " + e);
+        }
+        assertNotNull(o);
         // BRANDS
         assertEquals(2, o.getBrands().size());
-        assertTrue(o.getBrands().containsAll(Arrays.asList("lululemon", "adidas")));
+        assertTrue(o.getBrands().containsAll(Arrays.asList("lululemon", "adidas")),
+                o.getBrands().toString());
         // IS DIRTY
         assertFalse(o.getIsDirty());
         // STYLE
@@ -206,9 +200,31 @@ class CAStateMachineTest {
         assertEquals("shirt", o.getTypes().get(0));
         // SIZE
         assertEquals(2, o.getSizes().size());
-        assertTrue(o.getSizes().containsAll(Arrays.asList(Size.XXL, Size.S)));
+        assertTrue(o.getSizes().containsAll(Arrays.asList(Size.XXL, Size.S)),
+                o.getSizes().toString());
         // MATERIAL
         assertEquals(1, o.getMaterials().size());
         assertEquals("cotton", o.getMaterials().get(0));
+    }
+
+    @Test
+    void testCaptureAllDiffKeys() {
+        CAStateMachine c = new CAStateMachineBuilder()
+                .equalitySymbol("djsakdkd")
+                .listSeparatorSymbol("21313njdasn")
+                .listEndSymbol("asdknsad")
+                .brandKey("xjksad")
+                .styleKey("adjskd")
+                .typeKey("ppwqe")
+                .sizeKey("sdjssa")
+                .materialKey("jdwijdqwjiqd")
+                .isDirtyKey("djaskd")
+                .build();
+        this.testCaptureAllWith(c);
+    }
+
+    @Test
+    void testCaptureAll() {
+        this.testCaptureAllWith(sm);
     }
 }

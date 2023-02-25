@@ -9,7 +9,7 @@ public class BooleanCapture {
     private boolean hasFoundBool;
     private boolean boolCaptured;
 
-    // REQUIRES: trueKey != falseKey
+    // REQUIRES: trueKey and falseKey cannot contain each other
     // EFFECTS: Creates a new boolean capture object to find a boolean
     //          matching either the true key or false key, while consuming
     //          leading whitespace.
@@ -17,12 +17,8 @@ public class BooleanCapture {
                           String falseKey) {
         this.hasFoundBool = false;
         this.whitespaceConsumer = new WhitespaceConsumer();
-        this.trueSearcher = new KeyStringSearcher(trueKey,
-                c -> {
-                });
-        this.falseSearcher = new KeyStringSearcher(falseKey,
-                x -> {
-                });
+        this.trueSearcher = new KeyStringSearcher(trueKey);
+        this.falseSearcher = new KeyStringSearcher(falseKey);
     }
 
     // MODIFIES: this
@@ -50,8 +46,8 @@ public class BooleanCapture {
                 // Assume foundTrue and foundFalse are not both true
                 // due to constructor precondition.
                 this.boolCaptured = foundTrue.wasMatch();
-            } else if (foundTrue.wasNoMatch()
-                    && foundFalse.wasNoMatch()) {
+            } else if (foundTrue.matchError()
+                    && foundFalse.matchError()) {
                 throw new UnexpectedBoolInputException("Expected a boolean value of \""
                         + this.getTrueKey() + "\" or \""
                         + this.getFalseKey() + "\".");

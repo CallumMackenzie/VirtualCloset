@@ -1,14 +1,17 @@
 package model;
 
+import model.search.ClothingAddress;
+import model.search.ClothingAddressParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static model.search.CAStateMachineBuilder.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ClosetTest {
 
@@ -18,12 +21,12 @@ public class ClosetTest {
     @BeforeEach
     void setup() {
         this.closet1 = new Closet("C1");
-        this.shirt1 = new Clothing(Arrays.asList("shirt"),
+        this.shirt1 = new Clothing(Collections.singletonList("shirt"),
                 Size.XL,
                 "Adidas",
                 "Silk",
                 new ArrayList<>(),
-                Arrays.asList(Color.BLUE),
+                Collections.singletonList(Color.BLUE),
                 true,
                 null);
     }
@@ -40,17 +43,35 @@ public class ClosetTest {
         assertEquals(this.closet1.getClothing().size(), 1);
         assertEquals(this.closet1.getClothing().get(0), shirt1);
 
-        Clothing c2 = new Clothing(Arrays.asList("shirt"),
+        Clothing c2 = new Clothing(Collections.singletonList("shirt"),
                 Size.S,
                 "Nike",
                 "Cotton",
                 new ArrayList<>(),
-                Arrays.asList(Color.RED),
+                Collections.singletonList(Color.RED),
                 true, null);
         this.closet1.addClothing(c2);
 
         assertEquals(this.closet1.getClothing().size(), 2);
         assertEquals(this.closet1.getClothing().get(1), c2);
+    }
+
+    @Test
+    void testRemoveClothing() {
+        this.closet1.addClothing(shirt1);
+        this.closet1.removeClothing(shirt1);
+        assertFalse(this.closet1.getClothing().contains(shirt1));
+    }
+
+    @Test
+    void testFindClothing() throws ClothingAddressParseException {
+        this.closet1.addClothing(shirt1);
+        List<Clothing> result = this.closet1.findClothing(ClothingAddress.of(
+                BRAND_CAPTURE_STR + EQUALITY_STR + this.shirt1.getBrand()
+                        + LIST_END_STR
+        ));
+        assertEquals(1, result.size(), result.toString());
+        assertEquals(this.shirt1, result.get(0), result.get(0).toString());
     }
 
     @Test

@@ -2,54 +2,122 @@ package model.search;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Stack;
-
+import static model.search.KeyStringSearcher.MatchState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class KeyStringSearcherTest {
 
     @Test
     void testConstructor() {
-        KeyStringSearcher searcher = new KeyStringSearcher("123", s -> {
-        });
+        KeyStringSearcher searcher = new KeyStringSearcher("123");
         assertEquals("123", searcher.getKey());
-        searcher = new KeyStringSearcher("4", s -> {
-        });
+        searcher = new KeyStringSearcher("4");
         assertEquals("4", searcher.getKey());
+        assertEquals("", searcher.getPartialMatch());
+        assertEquals(-1, searcher.getCurrentKeyIndex());
+    }
+
+    @Test
+    void testMatchStateMatch() {
+        assertTrue(MATCH.wasMatch());
+        assertFalse(MATCH.wasPartialMatch());
+        assertFalse(MATCH.wasNoMatch());
+        assertFalse(MATCH.wasMatchRestarted());
+        assertFalse(MATCH.wasMatchBroken());
+        assertFalse(MATCH.releasedCapturedInput());
+        assertFalse(MATCH.matchError());
+    }
+
+    @Test
+    void testMatchStatePartialMatchBroken() {
+        assertFalse(MATCH_BROKEN.wasMatch());
+        assertFalse(MATCH_BROKEN.wasPartialMatch());
+        assertFalse(MATCH_BROKEN.wasNoMatch());
+        assertFalse(MATCH_BROKEN.wasMatchRestarted());
+        assertTrue(MATCH_BROKEN.wasMatchBroken());
+        assertTrue(MATCH_BROKEN.releasedCapturedInput());
+        assertTrue(MATCH_BROKEN.matchError());
+    }
+
+    @Test
+    void testMatchStatePartialMatch() {
+        assertFalse(PARTIAL_MATCH.wasMatch());
+        assertTrue(PARTIAL_MATCH.wasPartialMatch());
+        assertFalse(PARTIAL_MATCH.wasNoMatch());
+        assertFalse(PARTIAL_MATCH.wasMatchRestarted());
+        assertFalse(PARTIAL_MATCH.wasMatchBroken());
+        assertFalse(PARTIAL_MATCH.releasedCapturedInput());
+        assertFalse(PARTIAL_MATCH.matchError());
+    }
+
+    @Test
+    void testMatchStateNoMatch() {
+        assertFalse(NO_MATCH.wasMatch());
+        assertFalse(NO_MATCH.wasPartialMatch());
+        assertTrue(NO_MATCH.wasNoMatch());
+        assertFalse(NO_MATCH.wasMatchRestarted());
+        assertFalse(NO_MATCH.wasMatchBroken());
+        assertFalse(NO_MATCH.releasedCapturedInput());
+        assertTrue(NO_MATCH.matchError());
+    }
+
+    @Test
+    void testMatchStatePartialMatchRestarted() {
+        assertFalse(MATCH_RESTARTED.wasMatch());
+        assertFalse(MATCH_RESTARTED.wasPartialMatch());
+        assertFalse(MATCH_RESTARTED.wasNoMatch());
+        assertTrue(MATCH_RESTARTED.wasMatchRestarted());
+        assertFalse(MATCH_RESTARTED.wasMatchBroken());
+        assertTrue(MATCH_RESTARTED.releasedCapturedInput());
+        assertTrue(MATCH_RESTARTED.matchError());
     }
 
     @Test
     void testIsMatching() {
-        KeyStringSearcher s = new KeyStringSearcher("1234", z -> {
-        });
-        assertFalse(s.isMatching());
+        KeyStringSearcher s = new KeyStringSearcher("1234");
         s.tryFindKey('1');
+        assertEquals(0, s.getCurrentKeyIndex());
         assertTrue(s.isMatching());
         s.tryFindKey('b');
+        assertEquals(-1, s.getCurrentKeyIndex());
         assertFalse(s.isMatching());
+        s.tryFindKey('1');
+        s.tryFindKey('2');
+        s.tryFindKey('3');
+        assertEquals(2, s.getCurrentKeyIndex());
+        assertTrue(s.isMatching());
     }
 
     @Test
     void testReset() {
-        KeyStringSearcher searcher = new KeyStringSearcher("ABC", s -> {
-        });
+        KeyStringSearcher searcher = new KeyStringSearcher("ABC");
+        searcher.reset();
+        assertFalse(searcher.isMatching());
+        assertEquals(-1, searcher.getCurrentKeyIndex());
+
+        assertTrue(searcher.tryFindKey('A').wasPartialMatch());
+        assertTrue(searcher.tryFindKey('A').wasMatchRestarted());
+        assertTrue(searcher.isMatching());
+        assertEquals(0, searcher.getCurrentKeyIndex());
+        assertEquals("A", searcher.getPartialMatch());
+        searcher.reset();
+        assertEquals(-1, searcher.getCurrentKeyIndex());
+        assertFalse(searcher.isMatching());
+        assertEquals("", searcher.getPartialMatch());
+
         searcher.tryFindKey('A');
+        searcher.tryFindKey('B');
         assertTrue(searcher.isMatching());
         searcher.reset();
         assertFalse(searcher.isMatching());
 
-        searcher.tryFindKey('A');
-        searcher.tryFindKey('B');
-        searcher.reset();
-
-        assertNotEquals(KeyStringSearcher.MatchState.MATCH,
+        assertNotEquals(MATCH,
                 searcher.tryFindKey('C'));
     }
 
     @Test
     void testTryFindKeySimple() {
-        KeyStringSearcher s = new KeyStringSearcher("A", z -> {
-        });
+        KeyStringSearcher s = new KeyStringSearcher("A");
         assertTrue(s.tryFindKey('Z').wasNoMatch());
         assertTrue(s.tryFindKey('A').wasMatch());
         assertTrue(s.tryFindKey('B').wasMatch());
@@ -57,29 +125,26 @@ class KeyStringSearcherTest {
 
     @Test
     void testTryFindKeyLen2() {
-        Stack<String> capture = new Stack<>();
-        KeyStringSearcher s = new KeyStringSearcher("AB", capture::push);
+        KeyStringSearcher s = new KeyStringSearcher("AB");
 
         assertTrue(s.tryFindKey('B').wasNoMatch());
         assertTrue(s.tryFindKey('A').wasPartialMatch());
-        assertTrue(capture.isEmpty());
+        assertTrue(s.tryFindKey('C').wasMatchBroken());
         assertTrue(s.tryFindKey('C').wasNoMatch());
-        assertFalse(capture.isEmpty());
-        assertEquals(1, capture.size());
-        assertEquals("A", capture.pop());
+        assertTrue(s.tryFindKey('A').wasPartialMatch());
+        assertTrue(s.tryFindKey('A').wasMatchRestarted());
+        assertTrue(s.tryFindKey('P').wasMatchBroken());
+
         assertTrue(s.tryFindKey('A').wasPartialMatch());
         assertTrue(s.tryFindKey('B').wasMatch());
-        assertTrue(capture.isEmpty());
     }
 
     @Test
     void testTryFindKeyLen3() {
-        Stack<String> capture = new Stack<>();
-        KeyStringSearcher searcher = new KeyStringSearcher("QQQ", capture::push);
+        KeyStringSearcher searcher = new KeyStringSearcher("QQQ");
 
         assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
-        assertTrue(searcher.tryFindKey('S').wasNoMatch());
-        assertEquals(1, capture.size());
+        assertTrue(searcher.tryFindKey('S').wasMatchBroken());
 
         assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
         assertTrue(searcher.tryFindKey('Q').wasPartialMatch());
@@ -88,11 +153,40 @@ class KeyStringSearcherTest {
 
     @Test
     void testTryFindKeyBrokenByStartChar() {
-        Stack<String> capture = new Stack<>();
-        KeyStringSearcher s = new KeyStringSearcher("A;", capture::push);
+        KeyStringSearcher s = new KeyStringSearcher("A;");
         assertTrue(s.tryFindKey('A').wasPartialMatch());
+        assertEquals("A", s.getPartialMatch());
+        assertTrue(s.tryFindKey('A').wasMatchRestarted());
+        assertEquals("A", s.getPartialMatch());
+        assertTrue(s.tryFindKey('A').wasMatchRestarted());
+        assertEquals("A", s.getPartialMatch());
+        assertTrue(s.tryFindKey('D').wasMatchBroken());
+        assertEquals("A", s.getPartialMatch());
+    }
+
+    @Test
+    void testTryFindKeyLong() {
+        KeyStringSearcher s = new KeyStringSearcher("ABDJSDJAND");
+        assertTrue(s.tryFindKey('B').wasNoMatch());
         assertTrue(s.tryFindKey('A').wasPartialMatch());
-        assertEquals(1, capture.size());
-        assertEquals("A", capture.pop());
+        assertEquals("A", s.getPartialMatch());
+        assertTrue(s.tryFindKey('B').wasPartialMatch());
+        assertEquals("AB", s.getPartialMatch());
+        assertTrue(s.tryFindKey('D').wasPartialMatch());
+        assertEquals("ABD", s.getPartialMatch());
+        assertTrue(s.tryFindKey('D').wasMatchBroken());
+        assertEquals("ABD", s.getPartialMatch());
+        assertTrue(s.tryFindKey('D').wasNoMatch());
+        for (char c : "ABDJSDJAN".toCharArray()) {
+            assertTrue(s.tryFindKey(c).wasPartialMatch());
+        }
+        assertTrue(s.tryFindKey('Z').wasMatchBroken());
+        assertEquals("ABDJSDJAN", s.getPartialMatch());
+
+        for (char c : "ABDJSDJAN".toCharArray()) {
+            assertTrue(s.tryFindKey(c).wasPartialMatch());
+        }
+        assertTrue(s.tryFindKey('A').wasMatchRestarted());
+        assertEquals("ABDJSDJAN", s.getPartialMatch());
     }
 }

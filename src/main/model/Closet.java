@@ -89,7 +89,7 @@ public class Closet {
         countMapMatches(this.typeMap, address.getTypes(), matchMap);
         countMapMatches(this.sizeMap, address.getSizes(), matchMap);
         if (address.getIsDirty() != null) {
-            countMapMatches(this.dirtyMap, Arrays.asList(address.getIsDirty()), matchMap);
+            countMapMatches(this.dirtyMap, Collections.singletonList(address.getIsDirty()), matchMap);
         }
         countMapMatches(this.materialsMap, address.getMaterials(), matchMap);
 
@@ -130,11 +130,11 @@ public class Closet {
         this.clothing.remove(clothing);
 
         removeByKey(this.styleMap, clothing.getStyles(), clothing);
-        removeByKey(this.brandMap, Arrays.asList(clothing.getBrand()), clothing);
+        removeByKey(this.brandMap, Collections.singletonList(clothing.getBrand()), clothing);
         removeByKey(this.typeMap, clothing.getTypes(), clothing);
-        removeByKey(this.sizeMap, Arrays.asList(clothing.getSize()), clothing);
-        removeByKey(this.dirtyMap, Arrays.asList(clothing.isDirty()), clothing);
-        removeByKey(this.materialsMap, Arrays.asList(clothing.getMaterial()), clothing);
+        removeByKey(this.sizeMap, Collections.singletonList(clothing.getSize()), clothing);
+        removeByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
+        removeByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
     }
 
     // MODIFIES: this
@@ -143,10 +143,10 @@ public class Closet {
         this.clothing.add(clothing);
 
         congregateByKey(this.styleMap, clothing.getStyles(), clothing);
-        congregateByKey(this.brandMap, Arrays.asList(clothing.getBrand()), clothing);
+        congregateByKey(this.brandMap, Collections.singletonList(clothing.getBrand()), clothing);
         congregateByKey(this.typeMap, clothing.getTypes(), clothing);
-        congregateByKey(this.sizeMap, Arrays.asList(clothing.getSize()), clothing);
-        congregateByKey(this.dirtyMap, Arrays.asList(clothing.isDirty()), clothing);
-        congregateByKey(this.materialsMap, Arrays.asList(clothing.getMaterial()), clothing);
+        congregateByKey(this.sizeMap, Collections.singletonList(clothing.getSize()), clothing);
+        congregateByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
+        congregateByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
     }
 }

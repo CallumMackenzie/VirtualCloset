@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static model.search.CAStateMachine.*;
+import static model.search.CAStateMachineBuilder.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClothingAddressTest {
@@ -24,12 +24,9 @@ class ClothingAddressTest {
     @Test
     void ofBrandsOnlyTest() throws ClothingAddressParseException {
         ClothingAddress ca = ClothingAddress.of(
-                CAStateMachine.BRAND_CAPTURE_STR
-                        + EQUALITY_STR
-                        + "adidas"
-                        + LIST_SEPARATOR_STR
-                        + "nike"
-                        + LIST_END_STR
+                BRAND_CAPTURE_STR + EQUALITY_STR
+                        + "adidas" + LIST_SEPARATOR_STR
+                        + "nike" + LIST_END_STR
         );
         assertEquals(2, ca.getBrands().size());
         assertTrue(ca.getBrands().containsAll(Arrays.asList("nike", "adidas")));
