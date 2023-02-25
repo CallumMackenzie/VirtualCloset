@@ -27,9 +27,9 @@ can be saved using an application like Virtual Closet.
 As a user, I want to be able to ...
 
 - create & remove accounts
-- create & remove closets
+- create & remove closets from accounts
 - add & remove clothing from my closets
 - search through closets
-- create outfits from clothing
-- save outfits to my catalogue
+- create & remove outfits out of clothing
+- modify outfits
 - search my catalogue
