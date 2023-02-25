@@ -69,7 +69,12 @@ public class CatalogueModeConsole extends CommandSystem {
                         () -> !this.catalogue.getOutfits().isEmpty(),
                         "No outfits in this closet!",
                         "Lists names of all outfits in this catalogue.",
-                        "list names", "names")
+                        "list names", "names"),
+                new ConsoleCommand(this::modifyNamedOutfit,
+                        () -> !this.catalogue.getOutfits().isEmpty(),
+                        "No outfits in this closet!",
+                        "Enters edit mode for the named outfit.",
+                        "modify named")
         );
     }
 
@@ -91,14 +96,22 @@ public class CatalogueModeConsole extends CommandSystem {
                 .collect(Collectors.joining("\n\t- ")));
     }
 
-    // EFFECTS: Prints an info message for the user
-    @Override
-    protected void help() {
-        super.help();
+    // MODIFIES: this
+    // EFFECTS: Gets an outfit name and enters modification mode for it
+    private void modifyNamedOutfit() {
+        String name = this.getInput("\tEnter outfit name to modify: ");
+        List<Outfit> matched = this.catalogue.getOutfitsByName(name);
+        if (matched.isEmpty()) {
+            System.out.println("\tNo outfits match the name \"" + name + "\".");
+        } else if (matched.size() > 1) {
+            System.out.println("\tMore than one outfit is named \"" + name + "\". Please rename one.");
+        } else {
+            new OutfitCreationConsole(this.getInput(), matched.get(0));
+        }
     }
 
-    // EFFECTS: Enters outfit edit mode
     // MODIFIES: this
+    // EFFECTS: Enters outfit edit mode
     private void modifyOutfit(Outfit o) {
         System.out.println("\tEntering outfit creation mode.");
         new OutfitCreationConsole(this.getInput(), o);

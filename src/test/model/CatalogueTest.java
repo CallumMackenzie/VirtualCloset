@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,6 +21,22 @@ class CatalogueTest {
     @Test
     void testConstructor() {
         assertTrue(this.catalogue.getOutfits().isEmpty());
+    }
+
+    @Test
+    void testGetByName() {
+        assertTrue(this.catalogue.getOutfitsByName("A").isEmpty());
+
+        Outfit a = new Outfit("A", new ArrayList<>());
+        this.catalogue.addOutfit(a);
+        Outfit b = new Outfit("B", new ArrayList<>());
+        this.catalogue.addOutfit(b);
+        List<Outfit> os = this.catalogue.getOutfitsByName("a");
+        assertEquals(1, os.size());
+        assertEquals(a, os.get(0));
+        os = this.catalogue.getOutfitsByName("B");
+        assertEquals(1, os.size());
+        assertEquals(b, os.get(0));
     }
 
     @Test

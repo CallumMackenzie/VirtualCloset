@@ -21,7 +21,8 @@ public class OutfitCreationConsole extends CommandSystem {
     // EFFECTS: Prompts user for input and returns it
     @Override
     protected String promptInput() {
-        return getInput("Enter outfit creation command (ex \"help\"): ");
+        return getInput("Enter outfit creation command (ex \"help\") for \""
+                + this.outfit.getName() + "\": ");
     }
 
     // MODIFIES: this
@@ -37,6 +38,9 @@ public class OutfitCreationConsole extends CommandSystem {
     // EFFECTS: Initializes commands
     private void initCommands() {
         this.addCommands(
+                new ConsoleCommand(this::help,
+                        "Lists commands for this system.",
+                        "help"),
                 new ConsoleCommand(this::setOutfitName,
                         "Sets the name of this outfit.",
                         "set name", "name"),
@@ -49,6 +53,14 @@ public class OutfitCreationConsole extends CommandSystem {
                 // TODO: Add clothing command
                 // TODO: Remove clothing command
         );
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Prints a message and indicates this command system should exit
+    @Override
+    protected void stop() {
+        System.out.println("\tExiting outfit creation mode.");
+        super.stop();
     }
 
     // MODIFIES: this

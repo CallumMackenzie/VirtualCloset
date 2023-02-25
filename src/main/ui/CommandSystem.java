@@ -69,7 +69,12 @@ public abstract class CommandSystem {
 
     // EFFECTS: Processes the given string with the set commands
     protected void processCommand(String cmd) {
-        this.commands.forEach(c -> c.process(cmd));
+        for (ConsoleCommand c : this.commands) {
+            if (c.process(cmd)) {
+                return;
+            }
+        }
+        System.out.println("\tNo command matched the input \"" + cmd + "\".");
     }
 
     // EFFECTS: Prints a helpful blurb for each command

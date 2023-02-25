@@ -43,8 +43,9 @@ public final class ConsoleCommand {
     // EFFECTS: Executes the response function if the given command
     //          is in the valid command set. If the given command starts
     //          with a question mark, it provides the description for this
-    //          command if it matches the given.
-    public void process(String cmd) {
+    //          command if it matches the given. Returns true if this command
+    //          consumed the input.
+    public boolean process(String cmd) {
         boolean run = true;
         if (cmd.startsWith("?")) {
             cmd = cmd.substring(1);
@@ -54,13 +55,15 @@ public final class ConsoleCommand {
             if (run) {
                 if (!this.isActive()) {
                     System.out.println(this.inactiveMessage);
-                    return;
+                } else {
+                    this.responseFn.run();
                 }
-                this.responseFn.run();
             } else {
                 System.out.println(this.description);
             }
+            return true;
         }
+        return false;
     }
 
     // EFFECTS: Returns whether this command is active
