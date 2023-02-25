@@ -86,8 +86,8 @@ public class CatalogueModeConsole extends CommandSystem {
     // EFFECTS: Lists outfit names in closet
     private void listOutfitNames() {
         List<Outfit> outfits = this.catalogue.getOutfits();
-        System.out.println("\t- " +
-                outfits.stream().map(Outfit::getName)
+        System.out.println("\t- "
+                + outfits.stream().map(Outfit::getName)
                 .collect(Collectors.joining("\n\t- ")));
     }
 
