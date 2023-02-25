@@ -90,6 +90,14 @@ public class ClosetTest {
     }
 
     @Test
+    void testFindClothingNoneMatch() {
+        this.closet1.addClothing(shirt1);
+        ClothingAddress c = new ClothingAddress();
+        c.getBrands().add("abcd");
+        assertTrue(this.closet1.findClothing(c).isEmpty());
+    }
+
+    @Test
     void testFindClothingLimited() {
         this.closet1.addClothing(shirt1);
         ClothingAddress c1 = new ClothingAddress();
