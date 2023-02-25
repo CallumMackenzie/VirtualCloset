@@ -25,6 +25,16 @@ public class CatalogueModeConsole extends CommandSystem {
     // EFFECTS: Initializes the console interface
     @Override
     protected void init() {
+        this.setShouldRun(true);
+        this.initCommands();
+    }
+
+
+    // REQUIRES: this.initCommands has not been called yet
+    // MODIFIES: this
+    // EFFECTS: Initializes catalogue commands
+    private void initCommands() {
         // TODO
+        this.addCommands();
     }
 }

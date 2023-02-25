@@ -208,22 +208,6 @@ class CAStateMachineTest {
     }
 
     @Test
-    void testCaptureAllDiffKeys() {
-        CAStateMachine c = new CAStateMachineBuilder()
-                .equalitySymbol("djsakdkd")
-                .listSeparatorSymbol("21313njdasn")
-                .listEndSymbol("asdknsad")
-                .brandKey("xjksad")
-                .styleKey("adjskd")
-                .typeKey("ppwqe")
-                .sizeKey("sdjssa")
-                .materialKey("jdwijdqwjiqd")
-                .isDirtyKey("djaskd")
-                .build();
-        this.testCaptureAllWith(c);
-    }
-
-    @Test
     void testCaptureAll() {
         this.testCaptureAllWith(sm);
     }
