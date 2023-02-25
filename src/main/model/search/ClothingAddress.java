@@ -14,6 +14,7 @@ public final class ClothingAddress {
     private final List<String> types;
     private final List<String> materials;
     private Boolean isDirty;
+    private int matchCount;
 
     // EFFECTS: Creates a new clothing address with all empty lists
     //          and default values.
@@ -24,6 +25,7 @@ public final class ClothingAddress {
         this.types = new ArrayList<>();
         this.materials = new ArrayList<>();
         this.isDirty = null;
+        this.matchCount = Integer.MAX_VALUE;
     }
 
     // MODIFIES: parser
@@ -94,6 +96,17 @@ public final class ClothingAddress {
     // EFFECTS: Returns the materials this address matches
     public List<String> getMaterials() {
         return this.materials;
+    }
+
+    // EFFECTS: Returns the match count for this address
+    public int getMatchCount() {
+        return this.matchCount;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets the match count for this address
+    public void setMatchCount(int matchCount) {
+        this.matchCount = matchCount;
     }
 
 }

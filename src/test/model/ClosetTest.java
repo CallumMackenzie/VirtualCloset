@@ -75,6 +75,21 @@ public class ClosetTest {
     }
 
     @Test
+    void testFindClothingLimited() {
+        this.closet1.addClothing(shirt1);
+        ClothingAddress c1 = new ClothingAddress();
+        c1.getBrands().add(shirt1.getBrand());
+        c1.setMatchCount(0);
+        List<Clothing> result = this.closet1.findClothing(c1);
+        assertTrue(result.isEmpty());
+
+        c1.setMatchCount(1);
+        result = this.closet1.findClothing(c1);
+        assertEquals(1, result.size());
+        assertEquals(shirt1, result.get(0));
+    }
+
+    @Test
     void testGetTypes() {
         this.closet1.addClothing(shirt1);
         assertTrue(this.closet1.getTypes().contains("shirt"));

@@ -96,6 +96,7 @@ public class Closet {
         return matchMap.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
+                .limit(address.getMatchCount())
                 .collect(Collectors.toList());
     }
 

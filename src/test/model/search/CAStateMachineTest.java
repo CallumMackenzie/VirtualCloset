@@ -178,7 +178,9 @@ class CAStateMachineTest {
                 + sm.listSeparatorSymbol + Size.S
                 + sm.listEndSymbol
                 // MATERIAL
-                + sm.materialKey + sm.equalitySymbol + "cotton" + sm.listEndSymbol;
+                + sm.materialKey + sm.equalitySymbol + "cotton" + sm.listEndSymbol
+                // COUNT
+                + sm.countKey + sm.equalitySymbol + "33" + sm.listEndSymbol;
         ClothingAddress o = null;
         try {
             o = sm.processInput(in.toCharArray()).getAddress();
@@ -205,10 +207,22 @@ class CAStateMachineTest {
         // MATERIAL
         assertEquals(1, o.getMaterials().size());
         assertEquals("cotton", o.getMaterials().get(0));
+
+        // COUNT
+        assertEquals(33, o.getMatchCount());
     }
 
     @Test
     void testCaptureAll() {
         this.testCaptureAllWith(sm);
+    }
+
+    @Test
+    void testCountThrows() {
+        assertThrows(UnexpectedInputException.class,
+                () -> sm.processInput((
+                        sm.countKey + sm.equalitySymbol
+                                + "ndsad"
+                ).toCharArray()));
     }
 }

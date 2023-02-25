@@ -20,6 +20,7 @@ public class CAStateMachine
     public final String sizeKey;
     public final String isDirtyKey;
     public final String materialKey;
+    public final String countKey;
 
     public final String trueSymbol;
     public final String falseSymbol;
@@ -41,7 +42,8 @@ public class CAStateMachine
                           String falseSymbol,
                           String equalitySymbol,
                           String listSeparatorSymbol,
-                          String listEndSymbol) {
+                          String listEndSymbol,
+                          String countKey) {
         super(null);
 
         this.styleKey = styleKey;
@@ -55,6 +57,7 @@ public class CAStateMachine
         this.equalitySymbol = equalitySymbol;
         this.listSeparatorSymbol = listSeparatorSymbol;
         this.listEndSymbol = listEndSymbol;
+        this.countKey = countKey;
 
         this.setState(new CapturingState());
     }
@@ -117,6 +120,7 @@ public class CAStateMachine
         private final StringBuilder captured;
         private final KeyStringSearcher equalityStrSearcher;
         private final WhitespaceConsumer whitespaceConsumer;
+        private Map<String, Supplier<State>> stateMap;
 
         // EFFECTS: Creates a new capturing state with the last state
         //          as the current one in this state machine.
@@ -124,6 +128,31 @@ public class CAStateMachine
             this.captured = new StringBuilder();
             this.whitespaceConsumer = new WhitespaceConsumer();
             this.equalityStrSearcher = new KeyStringSearcher(equalitySymbol);
+        }
+
+        // REQUIRES: this.initStateMap has not been called
+        // MODIFIES: this
+        // EFFECTS: Initializes this state map for the given keys
+        private void initStateMap() {
+            this.stateMap = new HashMap<String, Supplier<State>>() {
+                {
+                    put(brandKey, () -> new StringListCaptureState(
+                            getAddress().getBrands()::addAll));
+                    put(styleKey, () -> new StringListCaptureState(
+                            getAddress().getStyles()::addAll));
+                    put(typeKey, () -> new StringListCaptureState(
+                            getAddress().getTypes()::addAll));
+                    put(sizeKey, () -> new EnumListCaptureState<>(Size.class,
+                            getAddress().getSizes()::addAll));
+                    put(isDirtyKey, () -> new BooleanCaptureState(
+                            getAddress()::setIsDirty));
+                    put(materialKey, () -> new StringListCaptureState(
+                            getAddress().getMaterials()::addAll));
+                    put(countKey, () -> new IntegerCaptureState(
+                            getAddress()::setMatchCount
+                    ));
+                }
+            };
         }
 
         // EFFECTS: Returns whether this is in the process of matching
@@ -162,22 +191,9 @@ public class CAStateMachine
         //          null.
         private State nextStateFromCaptured() throws ClothingAddressParseException {
             String key = captured.toString().toLowerCase().trim();
-            Map<String, Supplier<State>> stateMap = new HashMap<String, Supplier<State>>() {
-                {
-                    put(brandKey, () -> new StringListCaptureState(
-                            getAddress().getBrands()::addAll));
-                    put(styleKey, () -> new StringListCaptureState(
-                            getAddress().getStyles()::addAll));
-                    put(typeKey, () -> new StringListCaptureState(
-                            getAddress().getTypes()::addAll));
-                    put(sizeKey, () -> new EnumListCaptureState<>(Size.class,
-                            getAddress().getSizes()::addAll));
-                    put(isDirtyKey, () -> new BooleanCaptureState(
-                            getAddress()::setIsDirty));
-                    put(materialKey, () -> new StringListCaptureState(
-                            getAddress().getMaterials()::addAll));
-                }
-            };
+            if (this.stateMap == null) {
+                this.initStateMap();
+            }
             if (stateMap.containsKey(key)) {
                 return stateMap.get(key).get();
             } else {
@@ -279,6 +295,35 @@ public class CAStateMachine
                 }
             } catch (UnexpectedBoolInputException e) {
                 throw new UnexpectedInputException(this, e.getMessage());
+            }
+            return this;
+        }
+    }
+
+    // Captures a single integer value, providing it to the consumer when it
+    // is captured.
+    public class IntegerCaptureState extends State {
+
+        private final Consumer<Integer> onCapture;
+        private final IntegerCapture integerCapture;
+
+        // EFFECTS: Creates a new integer capture state with the given capture function
+        public IntegerCaptureState(Consumer<Integer> onCapture) {
+            this.onCapture = onCapture;
+            this.integerCapture = new IntegerCapture(listEndSymbol);
+        }
+
+        // MODIFIES: this
+        // EFFECTS: Searches for an integer in the input and returns the next state.
+        @Override
+        protected State process(char input) throws ClothingAddressParseException {
+            try {
+                if (integerCapture.foundInteger(input)) {
+                    this.onCapture.accept(integerCapture.getIntegerCaptured());
+                    return new CapturingState();
+                }
+            } catch (NumberFormatException e) {
+                throw new UnexpectedInputException(this, "Expected an integer input.");
             }
             return this;
         }

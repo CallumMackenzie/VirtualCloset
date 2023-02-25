@@ -19,6 +19,7 @@ class ClothingAddressTest {
         assertTrue(ca.getTypes().isEmpty());
         assertNull(ca.getIsDirty());
         assertTrue(ca.getMaterials().isEmpty());
+        assertEquals(Integer.MAX_VALUE, ca.getMatchCount());
     }
 
     @Test
@@ -71,5 +72,13 @@ class ClothingAddressTest {
                         + "y"));
         assertThrows(IncorrectEndStateException.class,
                 () -> ClothingAddress.of(IS_DIRTY_CAPTURE_STR + EQUALITY_STR));
+    }
+
+    @Test
+    void testCaptureCount() throws ClothingAddressParseException {
+        ClothingAddress ca = ClothingAddress.of(
+                COUNT_STR + EQUALITY_STR + "21" + LIST_END_STR
+        );
+        assertEquals(21, ca.getMatchCount());
     }
 }

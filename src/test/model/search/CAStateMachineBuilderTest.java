@@ -131,4 +131,13 @@ class CAStateMachineBuilderTest {
                 .build();
         assertEquals(newVal, sm.listEndSymbol);
     }
+
+    @Test
+    void testCountKey() {
+        String newVal = "daskld";
+        CAStateMachine sm = new CAStateMachineBuilder()
+                .countKey(newVal)
+                .build();
+        assertEquals(newVal, sm.countKey);
+    }
 }

@@ -14,6 +14,7 @@ public class CAStateMachineBuilder {
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
+    public static final String COUNT_STR = "c";
 
     private String styleKey;
     private String brandKey;
@@ -26,6 +27,7 @@ public class CAStateMachineBuilder {
     private String equalitySymbol;
     private String listSeparatorSymbol;
     private String listEndSymbol;
+    private String countKey;
 
     // EFFECTS: Creates a default CAStateMachine
     public static CAStateMachine buildDefault() {
@@ -46,6 +48,7 @@ public class CAStateMachineBuilder {
         this.equalitySymbol = EQUALITY_STR;
         this.listSeparatorSymbol = LIST_SEPARATOR_STR;
         this.listEndSymbol = LIST_END_STR;
+        this.countKey = COUNT_STR;
     }
 
     // EFFECTS: Returns a new CAStateMachine with the fields of this
@@ -61,7 +64,8 @@ public class CAStateMachineBuilder {
                 falseSymbol,
                 equalitySymbol,
                 listSeparatorSymbol,
-                listEndSymbol);
+                listEndSymbol,
+                countKey);
     }
 
     // MODIFIES: this
@@ -141,5 +145,11 @@ public class CAStateMachineBuilder {
         return this;
     }
 
+    // MODIFIES: this
+    // EFFECTS: Sets the countKey to the given, and returns this
+    public CAStateMachineBuilder countKey(String v) {
+        this.countKey = v;
+        return this;
+    }
 
 }
