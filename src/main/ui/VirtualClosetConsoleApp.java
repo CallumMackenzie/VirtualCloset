@@ -49,7 +49,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Marks the application to be closed when ready,
     //          and prints a message for the user to see.
     private void exit() {
-        this.setShouldRun(false);
+        super.stop();
         System.out.println("Closing application ...");
     }
 
@@ -204,8 +204,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     private void openCatalogue() {
         assert this.accountManager.getActiveAccount().isPresent() : "No active account!";
         Account active = this.accountManager.getActiveAccount().get();
-        new CatalogueModeConsole(this.getInput(),
-                active.getCatalogue());
+        new CatalogueModeConsole(this.getInput(), active.getCatalogue());
     }
 
     // REQUIRES: this.initCommands has not been called already

@@ -4,17 +4,30 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-// An outfit with a list of clothing and a date last modified
+// An outfit with a list of clothing, a name, and a date last modified
 public class Outfit {
 
     private final List<Clothing> clothing;
+    private String name;
     private Instant lastModified;
 
     // EFFECTS: Creates a new article of clothing which has now
     //          as the last modified time.
-    public Outfit(List<Clothing> clothing) {
+    public Outfit(String name, List<Clothing> clothing) {
         this.clothing = new ArrayList<>(clothing);
+        this.name = name;
         this.lastModified = Instant.now();
+    }
+
+    // EFFECTS: Returns the name of this outfit
+    public String getName() {
+        return this.name;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets the name of this outfit
+    public void setName(String name) {
+        this.name = name;
     }
 
     // MODIFIES: this

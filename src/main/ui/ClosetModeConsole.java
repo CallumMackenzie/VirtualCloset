@@ -62,7 +62,7 @@ public final class ClosetModeConsole extends CommandSystem {
     // MODIFIES: this
     // EFFECTS: Sets this command system to close
     private void exit() {
-        this.setShouldRun(false);
+        super.stop();
         System.out.println("\tExiting closet mode for \""
                 + this.closet.getName() + "\".");
     }

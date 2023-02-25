@@ -85,6 +85,12 @@ public abstract class CommandSystem {
                 .collect(Collectors.joining(prefix)));
     }
 
+    // MODIFIES: this
+    // EFFECTS: Sets shouldRun to false
+    protected void stop() {
+        this.setShouldRun(false);
+    }
+
     // A provider for a scanner object which can have value set
     // across instances, as well as multiple internal scanners.
     public static class DynamicScanner {

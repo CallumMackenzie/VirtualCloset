@@ -34,7 +34,7 @@ class OutfitTest {
                 Collections.singletonList(Color.GRAY),
                 false,
                 null);
-        this.outfit = new Outfit(Arrays.asList(shirt, pants));
+        this.outfit = new Outfit("a", Arrays.asList(shirt, pants));
     }
 
     @Test
@@ -43,6 +43,13 @@ class OutfitTest {
         assertTrue(this.outfit.getClothing().containsAll(Arrays.asList(
                 shirt, pants
         )));
+        assertEquals("a", this.outfit.getName());
+    }
+
+    @Test
+    void testSetName() {
+        this.outfit.setName("b");
+        assertEquals("b", this.outfit.getName());
     }
 
     @Test

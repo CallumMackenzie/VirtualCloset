@@ -24,7 +24,7 @@ class CatalogueTest {
 
     @Test
     void testAddOutfit() {
-        Outfit o = new Outfit(new ArrayList<>());
+        Outfit o = new Outfit("a", new ArrayList<>());
         this.catalogue.addOutfit(o);
         assertEquals(1, this.catalogue.getOutfits().size());
         assertEquals(o, this.catalogue.getOutfits().get(0));
