@@ -24,7 +24,6 @@ class KeyStringSearcherTest {
         assertFalse(MATCH.wasNoMatch());
         assertFalse(MATCH.wasMatchRestarted());
         assertFalse(MATCH.wasMatchBroken());
-        assertFalse(MATCH.releasedCapturedInput());
         assertFalse(MATCH.matchError());
     }
 
@@ -35,7 +34,6 @@ class KeyStringSearcherTest {
         assertFalse(MATCH_BROKEN.wasNoMatch());
         assertFalse(MATCH_BROKEN.wasMatchRestarted());
         assertTrue(MATCH_BROKEN.wasMatchBroken());
-        assertTrue(MATCH_BROKEN.releasedCapturedInput());
         assertTrue(MATCH_BROKEN.matchError());
     }
 
@@ -46,7 +44,6 @@ class KeyStringSearcherTest {
         assertFalse(PARTIAL_MATCH.wasNoMatch());
         assertFalse(PARTIAL_MATCH.wasMatchRestarted());
         assertFalse(PARTIAL_MATCH.wasMatchBroken());
-        assertFalse(PARTIAL_MATCH.releasedCapturedInput());
         assertFalse(PARTIAL_MATCH.matchError());
     }
 
@@ -57,7 +54,6 @@ class KeyStringSearcherTest {
         assertTrue(NO_MATCH.wasNoMatch());
         assertFalse(NO_MATCH.wasMatchRestarted());
         assertFalse(NO_MATCH.wasMatchBroken());
-        assertFalse(NO_MATCH.releasedCapturedInput());
         assertTrue(NO_MATCH.matchError());
     }
 
@@ -68,7 +64,6 @@ class KeyStringSearcherTest {
         assertFalse(MATCH_RESTARTED.wasNoMatch());
         assertTrue(MATCH_RESTARTED.wasMatchRestarted());
         assertFalse(MATCH_RESTARTED.wasMatchBroken());
-        assertTrue(MATCH_RESTARTED.releasedCapturedInput());
         assertTrue(MATCH_RESTARTED.matchError());
     }
 

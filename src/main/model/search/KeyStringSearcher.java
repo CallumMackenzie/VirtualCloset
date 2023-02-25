@@ -123,14 +123,6 @@ class KeyStringSearcher {
             return this == MATCH_RESTARTED;
         }
 
-        // EFFECTS: Returns true if the key string searcher had
-        //          captured input to release following this as a return
-        //          value.
-        public boolean releasedCapturedInput() {
-            return this.wasMatchBroken()
-                    || this.wasMatchRestarted();
-        }
-
         // EFFECTS: Returns true if the value indicates a match
         //          error took place. Ie. NO_MATCH, MATCH_BROKEN,
         //          MATCH_RESTARTED.
