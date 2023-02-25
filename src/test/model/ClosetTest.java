@@ -33,7 +33,12 @@ public class ClosetTest {
 
     @Test
     void testConstructor() {
+        assertEquals("C1", this.closet1.getName());
         assertTrue(this.closet1.getClothing().isEmpty());
+        assertTrue(this.closet1.getSizes().isEmpty());
+        assertTrue(this.closet1.getBrands().isEmpty());
+        assertTrue(this.closet1.getTypes().isEmpty());
+        assertTrue(this.closet1.getStyles().isEmpty());
     }
 
     @Test
@@ -75,6 +80,16 @@ public class ClosetTest {
     }
 
     @Test
+    void testFindClothingDirty() {
+        this.closet1.addClothing(shirt1);
+        ClothingAddress c1 = new ClothingAddress();
+        c1.setIsDirty(shirt1.isDirty());
+        List<Clothing> result = this.closet1.findClothing(c1);
+        assertEquals(1, result.size());
+        assertEquals(shirt1, result.get(0));
+    }
+
+    @Test
     void testFindClothingLimited() {
         this.closet1.addClothing(shirt1);
         ClothingAddress c1 = new ClothingAddress();
@@ -90,10 +105,17 @@ public class ClosetTest {
     }
 
     @Test
+    void testGetSizes() {
+        this.closet1.addClothing(shirt1);
+        assertTrue(this.closet1.getSizes().contains(shirt1.getSize()));
+        assertEquals(1, this.closet1.getSizes().size());
+    }
+
+    @Test
     void testGetTypes() {
         this.closet1.addClothing(shirt1);
         assertTrue(this.closet1.getTypes().contains("shirt"));
-        assertEquals(this.closet1.getTypes().size(), 1);
+        assertEquals(1, this.closet1.getTypes().size());
     }
 
     @Test

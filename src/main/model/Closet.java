@@ -125,6 +125,11 @@ public class Closet {
         return this.styleMap.keySet();
     }
 
+    // EFFECTS: Returns the sizes present in this closet
+    public Set<Size> getSizes() {
+        return this.sizeMap.keySet();
+    }
+
     // MODIFIES: this
     // EFFECTS: Removes the clothing from this closet if it is currently tracked.
     public void removeClothing(Clothing clothing) {

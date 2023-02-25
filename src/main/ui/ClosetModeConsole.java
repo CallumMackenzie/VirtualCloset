@@ -6,7 +6,9 @@ import model.Size;
 import model.search.ClothingAddress;
 import model.search.ClothingAddressParseException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 // A console command system for a single closet
@@ -121,15 +123,19 @@ public final class ClosetModeConsole extends CommandSystem {
         this.addCommands(new ConsoleCommand(() -> this.printClosetStringList("Types",
                         this.closet.getTypes()),
                         "Lists the types of clothing in this closet.",
-                        "list types"),
+                        "list types", "types"),
                 new ConsoleCommand(() -> this.printClosetStringList("Brands",
                         this.closet.getBrands()),
                         "Lists the brands of clothing in this closet.",
-                        "list brands"),
+                        "list brands", "brands"),
                 new ConsoleCommand(() -> this.printClosetStringList("Styles",
                         this.closet.getStyles()),
                         "Lists the styles of clothing in this closet.",
-                        "list styles"),
+                        "list styles", "styles"),
+                new ConsoleCommand(() -> this.printClosetStringList("Sizes",
+                        this.closet.getSizes()),
+                        "Lists the sizes of clothing in this closet.",
+                        "list sizes", "sizes"),
                 new ConsoleCommand(this::createClothing,
                         "Creates a new piece of clothing.",
                         "create clothing", "new"));

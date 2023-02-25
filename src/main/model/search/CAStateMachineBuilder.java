@@ -14,7 +14,7 @@ public class CAStateMachineBuilder {
     public static final String EQUALITY_STR = "=";
     public static final String LIST_SEPARATOR_STR = ",";
     public static final String LIST_END_STR = ";";
-    public static final String COUNT_STR = "c";
+    public static final String COUNT_STR = "count";
 
     private String styleKey;
     private String brandKey;
