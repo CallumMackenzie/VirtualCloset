@@ -311,38 +311,40 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Sets up debug commands for user testing purposes
     private void initDebugCommands() {
         this.addCommands(new ConsoleCommand(() -> {
-            String c1 = String.join("\n",
-                    "new",
-                    "add type", "pants",
-                    "set size", "xl",
-                    "set brand", "adidas",
-                    "set material",
-                    "cotton",
-                    "exit", "y");
-            String c2 = String.join("\n",
-                    "new",
-                    "add type", "shirt",
-                    "set size", "l",
-                    "set brand", "uniqlo",
-                    "set material", "polyester & cotton",
-                    "add style", "casual",
-                    "exit", "y");
-            String c3 = String.join("\n",
-                    "new",
-                    "add type", "sweater",
-                    "set size", "xl",
-                    "set brand", "UBC",
-                    "add style", "casual",
-                    "exit", "y");
-
             String commands = String.join("\n",
                     "create account",
                     "Callum",
                     "create closet",
                     "c1",
                     "open closet",
-                    "c1", c1, c2, c3) + "\n";
+                    "c1", debugClothing()) + "\n";
             this.getInput().addScanner(new Scanner(commands));
         }, "", "dbg"));
+    }
+
+    // EFFECTS: Returns a string of commands to create a couple pieces
+    //          of clothing in closet mode.
+    private static String debugClothing() {
+        String c1 = String.join("\n", "new",
+                "add type", "pants",
+                "set size", "xl",
+                "set brand", "adidas",
+                "set material",
+                "cotton",
+                "exit", "y");
+        String c2 = String.join("\n", "new",
+                "add type", "shirt",
+                "set size", "l",
+                "set brand", "uniqlo",
+                "set material", "polyester & cotton",
+                "add style", "casual",
+                "exit", "y");
+        String c3 = String.join("\n", "new",
+                "add type", "sweater",
+                "set size", "xl",
+                "set brand", "UBC",
+                "add style", "casual",
+                "exit", "y");
+        return String.join("\n", c1, c2, c3);
     }
 }
