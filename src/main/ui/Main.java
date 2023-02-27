@@ -1,5 +1,7 @@
 package ui;
 
+import ui.console.VirtualClosetConsoleApp;
+
 // The application entry point
 public class Main {
     // EFFECTS: Starts a new virtual closet application instance.
