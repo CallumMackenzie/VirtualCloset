@@ -112,6 +112,23 @@ public class ClosetTest {
     }
 
     @Test
+    void testFindClothingByColor() {
+        this.closet1.addClothing(shirt1);
+        ClothingAddress c1 = new ClothingAddress();
+        c1.getColors().addAll(shirt1.getColors());
+        List<Clothing> result = this.closet1.findClothing(c1);
+        assertEquals(1, result.size());
+        assertEquals(shirt1, result.get(0));
+    }
+
+    @Test
+    void testFindClothingNoParams() {
+        this.closet1.addClothing(shirt1);
+        List<Clothing> res = this.closet1.findClothing(new ClothingAddress());
+        assertTrue(res.isEmpty());
+    }
+
+    @Test
     void testGetSizes() {
         this.closet1.addClothing(shirt1);
         assertTrue(this.closet1.getSizes().contains(shirt1.getSize()));

@@ -103,7 +103,7 @@ public class Closet {
         return matchMap.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
-                .limit(address.getMatchCount())
+                .skip(Math.max(0, matchMap.size() - address.getMatchCount()))
                 .collect(Collectors.toList());
     }
 

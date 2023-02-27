@@ -4,7 +4,6 @@ import model.Closet;
 import model.Clothing;
 import model.Size;
 import model.search.ClothingAddress;
-import model.search.ClothingAddressParseException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,18 +65,31 @@ public final class ClosetModeConsole extends CommandSystem {
     // EFFECTS: searches this closet with the clothing address parsed
     //          from the user
     private void clothingAddressSearch() {
-        String input = this.getInput("Enter clothing address expression: ");
-        try {
-            ClothingAddress address = ClothingAddress.of(input);
-            List<Clothing> clothing = this.closet.findClothing(address);
+        String input = this.getInput("\tEnter clothing address expression: ");
+        ClothingAddress ca = this.address(input);
+        if (ca != null) {
+            List<Clothing> clothing = this.closet.findClothing(ca);
             if (clothing.isEmpty()) {
                 System.out.println("\tNo clothing matched the given expression.");
             } else {
                 System.out.println("Matches: \n" + clothing);
             }
-        } catch (ClothingAddressParseException e) {
-            System.out.println("\t" + e.getMessage()
-                    + " Occurred at: \"" + e.getErrorState().getStateCaptured() + "\".");
+        }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Prompts the user to select clothing to edit from a search expression.
+    private void editClothing() {
+        ClothingAddress addr = this.address(this.getInput(
+                "\tEnter clothing address expression: "));
+        if (addr != null) {
+            List<Clothing> clothing = this.closet.findClothing(addr);
+            Clothing c = this.getClothingIndexed(clothing);
+            if (c != null) {
+                this.closet.removeClothing(c);
+                new ClothingCreationConsole(this.getInput(), c);
+                this.closet.addClothing(c);
+            }
         }
     }
 
@@ -133,15 +145,15 @@ public final class ClosetModeConsole extends CommandSystem {
                         "Lists the styles of clothing in this closet.",
                         "list styles", "styles"),
                 new ConsoleCommand(() -> this.printClosetStringList("Sizes",
-                        this.closet.getSizes()),
-                        "Lists the sizes of clothing in this closet.",
+                        this.closet.getSizes()), "Lists the sizes of clothing in this closet.",
                         "list sizes", "sizes"),
                 new ConsoleCommand(() -> this.printClosetStringList("Colors",
                         this.closet.getColors()),
                         "Lists the colors of clothing in this closet.",
                         "list colors", "colors"),
-                new ConsoleCommand(this::createClothing,
-                        "Creates a new piece of clothing.",
-                        "create clothing", "new"));
+                new ConsoleCommand(this::createClothing, "Creates a new piece of clothing.",
+                        "create clothing", "new"),
+                new ConsoleCommand(this::editClothing, "Edits a piece of clothing chosen by search.",
+                        "edit clothing", "edit"));
     }
 }

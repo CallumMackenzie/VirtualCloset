@@ -1,5 +1,9 @@
 package ui;
 
+import model.Clothing;
+import model.search.ClothingAddress;
+import model.search.ClothingAddressParseException;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -185,6 +189,48 @@ public abstract class CommandSystem {
         //          the highest priority.
         public void addScanner(Scanner scanner) {
             this.scanners.push(scanner);
+        }
+    }
+
+    // EFFECTS: Returns the given list in an indexed string representation
+    protected static <T> String formatIndexed(List<T> in) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < in.size(); ++i) {
+            sb.append(i)
+                    .append(": ")
+                    .append(in.get(i).toString());
+            if (i + 1 != in.size()) {
+                sb.append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Prompts the user to select an article of clothing from the list,
+    //          returning it if present. Otherwise, returns null.
+    protected Clothing getClothingIndexed(List<Clothing> clothing) {
+        System.out.println(formatIndexed(clothing));
+        int idx = this.forceGetIntInput("\tEnter index of clothing: ",
+                () -> System.out.println("\tInput was not a number!"));
+        if (idx < 0 || idx >= clothing.size()) {
+            System.out.println("\tIndex out of range. Exiting.");
+        } else {
+            return clothing.get(idx);
+        }
+        return null;
+    }
+
+    // EFFECTS: Prompts the user for a clothing address expression,
+    //          returning it if there are no errors. Otherwise, prints
+    //          the errors and returns null.
+    protected ClothingAddress address(String expr) {
+        try {
+            return ClothingAddress.of(expr);
+        } catch (ClothingAddressParseException e) {
+            System.out.println("\t" + e.getMessage()
+                    + " Occurred at \"" + e.getErrorState().getStateCaptured() + "\".");
+            return null;
         }
     }
 }
