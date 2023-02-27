@@ -33,3 +33,5 @@ As a user, I want to be able to ...
 - create & remove outfits out of clothing
 - modify outfits
 - search my catalogue
+- have my data loaded from disk when I start the program
+- have my data saved to disk as I use the program
