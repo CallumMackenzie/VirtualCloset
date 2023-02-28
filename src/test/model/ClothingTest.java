@@ -29,8 +29,7 @@ public class ClothingTest {
                 "Polyester",
                 Collections.singletonList("Casual"),
                 Collections.singletonList("orange"),
-                false,
-                null);
+                false);
     }
 
     Clothing copyCl() {
@@ -41,8 +40,7 @@ public class ClothingTest {
                 cl.getMaterial(),
                 cl.getStyles(),
                 cl.getColors(),
-                cl.isDirty(),
-                cl.getImage()
+                cl.isDirty()
         );
     }
 
@@ -58,7 +56,6 @@ public class ClothingTest {
         assertEquals("Casual", this.cl.getStyles().stream()
                 .findFirst().orElse(null));
         assertFalse(this.cl.isDirty());
-        assertNull(this.cl.getImage());
     }
 
     @Test
@@ -67,15 +64,12 @@ public class ClothingTest {
         this.cl.setDirty(true);
         this.cl.setSize(Size.S);
         this.cl.setMaterial("Silk");
-        this.cl.setImage(new BufferedImage(1, 1,
-                BufferedImage.TYPE_BYTE_GRAY));
         assertEquals("Nike", this.cl.getBrand());
         assertTrue(this.cl.isDirty());
         assertEquals(Size.S, this.cl.getSize());
         assertEquals(1, this.cl.getColors().size());
         assertEquals("orange", this.cl.getColors().get(0));
         assertEquals("Silk", this.cl.getMaterial());
-        assertNotNull(this.cl.getImage());
     }
 
     @Test

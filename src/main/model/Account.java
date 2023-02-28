@@ -2,7 +2,6 @@ package model;
 
 import org.json.JSONObject;
 import persistance.JsonBuilder;
-import persistance.JsonWriter;
 import persistance.Savable;
 
 import java.util.ArrayList;
@@ -12,6 +11,10 @@ import java.util.Optional;
 
 // A user account with a closet, clothing catalogue, and name
 public class Account implements Savable {
+
+    public static final String JSON_CATALOGUE_KEY = "catalogue";
+    public static final String JSON_CLOSETS_KEY = "closets";
+    public static final String JSON_NAME_KEY = "name";
 
     private final Catalogue catalogue;
     private final List<Closet> closets;
@@ -95,8 +98,8 @@ public class Account implements Savable {
     @Override
     public JSONObject toJson() {
         return new JsonBuilder()
-                .savable("catalogue", this.catalogue)
-                .savable("closets", this.closets)
-                .put("name", this.name);
+                .savable(JSON_CATALOGUE_KEY, this.catalogue)
+                .savable(JSON_CLOSETS_KEY, this.closets)
+                .put(JSON_NAME_KEY, this.name);
     }
 }

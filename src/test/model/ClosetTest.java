@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,8 +27,7 @@ public class ClosetTest {
                 "Silk",
                 Collections.singletonList("casual"),
                 Collections.singletonList("blue"),
-                true,
-                null);
+                true);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class ClosetTest {
                 "Cotton",
                 new ArrayList<>(),
                 Collections.singletonList("red"),
-                true, null);
+                true);
         this.closet1.addClothing(c2);
 
         assertEquals(this.closet1.getClothing().size(), 2);
@@ -172,6 +172,37 @@ public class ClosetTest {
                 .containsAll(shirt1.getColors()));
         this.closet1.removeClothing(shirt1);
         assertTrue(this.closet1.getColors().isEmpty());
+    }
+
+    @Test
+    void testAddClothingSorts() {
+        Clothing other = new Clothing(Collections.singletonList("shirt"),
+                Size.S,
+                "Adidas",
+                "Silk",
+                Collections.singletonList("casual"),
+                Collections.singletonList("blue"),
+                true);
+        this.closet1.addClothing(shirt1);
+        this.closet1.addClothing(other);
+        this.closet1.addClothing(shirt1);
+        this.closet1.addClothing(shirt1);
+        assertEquals(2, this.closet1.getSizes().size());
+        assertTrue(this.closet1.getSizes().containsAll(Arrays.asList(
+                Size.XL, Size.S
+        )));
+        assertEquals(2, this.closet1.getClothing().size());
+        assertEquals(1, this.closet1.getClothing().indexOf(shirt1));
+        Clothing other2 = new Clothing(Collections.singletonList("shirt"),
+                Size.M,
+                "Adidas",
+                "Silk",
+                Collections.singletonList("casual"),
+                Collections.singletonList("blue"),
+                true);
+        this.closet1.addClothing(other2);
+        assertEquals(3, this.closet1.getClothing().size());
+        assertEquals(1, this.closet1.getClothing().indexOf(other2));
     }
 
 }

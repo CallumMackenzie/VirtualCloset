@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,16 +24,14 @@ class OutfitTest {
                 "polyester",
                 Collections.singletonList("casual"),
                 Collections.singletonList("orange"),
-                false,
-                null);
+                false);
         this.pants = new Clothing(Collections.singletonList("sweatpants"),
                 Size.XL,
                 "under armor",
                 "cotton",
                 Collections.singletonList("casual"),
                 Collections.singletonList("gray"),
-                false,
-                null);
+                false);
         this.outfit = new Outfit("a", Arrays.asList(shirt, pants));
     }
 
@@ -62,8 +61,7 @@ class OutfitTest {
                 "cotton",
                 Collections.singletonList("casual"),
                 Collections.singletonList("blue"),
-                false,
-                null);
+                false);
         this.outfit.addClothing(sweater);
         assertEquals(3, this.outfit.getClothing().size());
         assertTrue(this.outfit.getClothing().contains(sweater));
@@ -82,6 +80,15 @@ class OutfitTest {
 
         assertFalse(this.outfit.removeClothing(this.pants));
         assertEquals(mod, this.outfit.getInstantLastModified());
+    }
+
+    @Test
+    void testToJson() {
+        JSONObject jso = this.outfit.toJson();
+        assertEquals(outfit.getName(), jso.getString(Outfit.JSON_NAME_KEY));
+        assertEquals(outfit.getInstantLastModified().getNano(),
+                jso.getLong(Outfit.JSON_LAST_MODIFIED_KEY));
+        // TODO: Test clothing
     }
 
 }

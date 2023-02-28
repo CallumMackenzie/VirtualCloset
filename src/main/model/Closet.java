@@ -72,7 +72,8 @@ public class Closet implements Savable {
             List<V> values = categoryMap.get(e);
             int idx = Collections.binarySearch(values, element);
             if (idx >= 0 && idx < values.size()) {
-                throw new RuntimeException("Index cannot be in valid range");
+                // Value is in list
+                return;
             }
             int insertionPoint = -idx - 1;
             values.add(insertionPoint, element);
@@ -174,7 +175,13 @@ public class Closet implements Savable {
     // MODIFIES: this
     // EFFECTS: Adds the given clothing to this closet
     public void addClothing(Clothing clothing) {
-        this.clothing.add(clothing);
+        int searchIdx = Collections.binarySearch(this.clothing, clothing);
+        if (searchIdx >= 0 && searchIdx < this.clothing.size()) {
+            // In list already
+            return;
+        }
+        int insertIdx = -searchIdx - 1;
+        this.clothing.add(insertIdx, clothing);
 
         congregateByKey(this.styleMap, clothing.getStyles(), clothing);
         congregateByKey(this.brandMap, Collections.singletonList(clothing.getBrand()), clothing);

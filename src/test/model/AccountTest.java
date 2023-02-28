@@ -1,5 +1,7 @@
 package model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -81,6 +83,15 @@ public class AccountTest {
         this.ac2.addCloset("B");
         assertTrue(this.ac2.getCloset("A").isPresent());
         assertEquals(this.ac2.getCloset("A").get().getName(), "A");
+    }
+
+    @Test
+    void testToJson() {
+        JSONObject jso = this.ac1.toJson();
+        assertEquals(ac1.getName(), jso.getString(Account.JSON_NAME_KEY));
+        assertNotNull(jso.getJSONObject(Account.JSON_CATALOGUE_KEY));
+        JSONArray jsa = jso.getJSONArray(Account.JSON_CLOSETS_KEY);
+        assertEquals(ac1.getClosets().size(), jsa.length());
     }
 
 }

@@ -31,7 +31,6 @@ public class Clothing implements Savable, Comparable<Clothing> {
     private String material;
 
     private final List<String> colors;
-    private Image image;
 
     // EFFECTS: Constructs a new piece of clothing
     public Clothing(Collection<String> types,
@@ -40,8 +39,7 @@ public class Clothing implements Savable, Comparable<Clothing> {
                     String material,
                     List<String> styles,
                     List<String> colors,
-                    boolean dirty,
-                    Image image) {
+                    boolean dirty) {
         this.types = types.stream()
                 .map(String::toLowerCase)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -50,7 +48,6 @@ public class Clothing implements Savable, Comparable<Clothing> {
         this.styles = new ArrayList<>(styles);
         this.brand = brand;
         this.size = size;
-        this.image = image;
         this.material = material;
     }
 
@@ -90,17 +87,6 @@ public class Clothing implements Savable, Comparable<Clothing> {
     // EFFECTS: Sets the size of this clothing
     public void setSize(Size size) {
         this.size = size;
-    }
-
-    // EFFECTS: Returns the image for this clothing
-    public Image getImage() {
-        return this.image;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Sets the image for this clothing
-    public void setImage(Image image) {
-        this.image = image;
     }
 
     // EFFECTS: Returns the material for this clothing

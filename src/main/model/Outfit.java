@@ -1,6 +1,7 @@
 package model;
 
 import org.json.JSONObject;
+import persistance.JsonBuilder;
 import persistance.Savable;
 
 import java.time.Instant;
@@ -9,6 +10,10 @@ import java.util.List;
 
 // An outfit with a list of clothing, a name, and a date last modified
 public class Outfit implements Savable {
+
+    public static final String JSON_CLOTHING_KEY = "clothing";
+    public static final String JSON_NAME_KEY = "name";
+    public static final String JSON_LAST_MODIFIED_KEY = "modified";
 
     private final List<Clothing> clothing;
     private String name;
@@ -67,7 +72,9 @@ public class Outfit implements Savable {
     // EFFECTS: Returns a JSON representation of this object
     @Override
     public JSONObject toJson() {
-        // TODO
-        return null;
+        // TODO: Clothing
+        return new JsonBuilder()
+                .put(JSON_NAME_KEY, this.name)
+                .put(JSON_LAST_MODIFIED_KEY, this.lastModified.getNano());
     }
 }

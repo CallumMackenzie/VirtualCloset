@@ -12,7 +12,7 @@ public class JsonWriter {
     }
 
     public void write(Savable am) {
-
+        
     }
 
 }

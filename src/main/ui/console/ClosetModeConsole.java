@@ -102,8 +102,7 @@ public final class ClosetModeConsole extends CommandSystem {
                 "",
                 new ArrayList<>(),
                 new ArrayList<>(),
-                false,
-                null);
+                false);
         new ClothingCreationConsole(getInput(), newClothing);
         this.closet.addClothing(newClothing);
     }

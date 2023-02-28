@@ -12,6 +12,8 @@ import java.util.Optional;
 // all accounts.
 public class AccountManager implements Savable {
 
+    public static final String JSON_ACCOUNTS_KEY = "accounts";
+
     private final List<Account> accounts;
     private Account activeAccount;
 
@@ -128,6 +130,6 @@ public class AccountManager implements Savable {
     @Override
     public JSONObject toJson() {
         return new JsonBuilder()
-                .savable("accounts", this.accounts);
+                .savable(JSON_ACCOUNTS_KEY, this.accounts);
     }
 }
