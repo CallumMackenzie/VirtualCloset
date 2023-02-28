@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static model.Clothing.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClothingTest {
@@ -106,7 +108,7 @@ public class ClothingTest {
 
     <T extends Comparable<T>>
     void testCompareToComparableListSize(List<T> newValue,
-                                     Function<Clothing, List<T>> getter) {
+                                         Function<Clothing, List<T>> getter) {
         Clothing same = copyCl();
         List<T> clList = getter.apply(cl);
         List<T> sameList = getter.apply(same);
@@ -131,9 +133,25 @@ public class ClothingTest {
     @Test
     void testToJson() {
         JSONObject jso = cl.toJson();
-        assertNotNull(jso.get("styles"));
-        assertNotNull(jso.get("types"));
-        assertNotNull(jso.get());
+        assertEquals(cl.getBrand(), jso.getString(JSON_BRAND_KEY));
+        assertEquals(cl.getSize(), jso.getEnum(Size.class, JSON_SIZE_KEY));
+        assertEquals(cl.isDirty(), jso.getBoolean(JSON_DIRTY_KEY));
+        assertEquals(cl.getMaterial(), jso.getString(JSON_MATERIAL_KEY));
+
+        JSONArray cArr = jso.getJSONArray(JSON_COLORS_KEY);
+        assertNotNull(cArr);
+        assertEquals(cl.getColors().size(), cArr.length());
+        assertTrue(cArr.toList().containsAll(cl.getColors()));
+
+        cArr = jso.getJSONArray(JSON_STYLES_KEY);
+        assertNotNull(cArr);
+        assertEquals(cl.getStyles().size(), cArr.length());
+        assertTrue(cArr.toList().containsAll(cl.getStyles()));
+
+        cArr = jso.getJSONArray(JSON_TYPES_KEY);
+        assertNotNull(cArr);
+        assertEquals(cl.getTypes().size(), cArr.length());
+        assertTrue(cArr.toList().containsAll(cl.getTypes()));
     }
 
 }

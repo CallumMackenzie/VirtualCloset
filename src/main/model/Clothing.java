@@ -16,7 +16,12 @@ import java.util.stream.Collectors;
 public class Clothing implements Savable, Comparable<Clothing> {
 
     public static final String JSON_STYLES_KEY = "styles";
-    public static final String JSON_TYPE_KEY = "types";
+    public static final String JSON_TYPES_KEY = "types";
+    public static final String JSON_BRAND_KEY = "brand";
+    public static final String JSON_SIZE_KEY = "size";
+    public static final String JSON_DIRTY_KEY = "dirty";
+    public static final String JSON_MATERIAL_KEY = "material";
+    public static final String JSON_COLORS_KEY = "colors";
 
     private final List<String> styles;
     private final List<String> types;
@@ -136,13 +141,13 @@ public class Clothing implements Savable, Comparable<Clothing> {
     @Override
     public JSONObject toJson() {
         return new JsonBuilder()
-                .put("styles", this.styles)
-                .put("types", this.types)
-                .put("brand", this.brand)
-                .put("size", this.size)
-                .put("dirty", this.dirty)
-                .put("material", this.material)
-                .put("colors", this.colors);
+                .put(JSON_STYLES_KEY, this.styles)
+                .put(JSON_TYPES_KEY, this.types)
+                .put(JSON_BRAND_KEY, this.brand)
+                .put(JSON_SIZE_KEY, this.size)
+                .put(JSON_DIRTY_KEY, this.dirty)
+                .put(JSON_MATERIAL_KEY, this.material)
+                .put(JSON_COLORS_KEY, this.colors);
     }
 
     // EFFECTS: Compares this clothing to the provided
