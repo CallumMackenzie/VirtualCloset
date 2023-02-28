@@ -1,18 +1,21 @@
 package model;
 
 import model.search.ClothingAddress;
+import org.json.JSONObject;
+import persistance.JsonBuilder;
+import persistance.Savable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 // A closet having a list of clothing and various categorizations
 // of said clothing
-public class Closet {
+public class Closet implements Savable {
 
     private final List<Clothing> clothing;
     private final String name;
     private final Map<String, List<Clothing>> styleMap;
-    private final HashMap<String, List<Clothing>> brandMap;
+    private final Map<String, List<Clothing>> brandMap;
     private final Map<String, List<Clothing>> typeMap;
     private final Map<Size, List<Clothing>> sizeMap;
     private final Map<Boolean, List<Clothing>> dirtyMap;
@@ -53,32 +56,44 @@ public class Closet {
         }
     }
 
+    // REQUIRES: element is not in the list contained in any key in categoryMap
     // MODIFIES: categoryMap
     // EFFECTS: Places element in the lists associated with each key in keys,
     //          and creates a new list first if it is not already present in
     //          the map.
-    private static <K, V> void congregateByKey(Map<K, List<V>> categoryMap,
-                                               Iterable<K> keys,
-                                               V element) {
+    private static <K, V extends Comparable<V>>
+    void congregateByKey(Map<K, List<V>> categoryMap,
+                         Iterable<K> keys,
+                         V element) {
         keys.forEach(e -> {
             if (!categoryMap.containsKey(e)) {
                 categoryMap.put(e, new ArrayList<>());
             }
-            categoryMap.get(e).add(element);
+            List<V> values = categoryMap.get(e);
+            int idx = Collections.binarySearch(values, element);
+            if (idx >= 0 && idx < values.size()) {
+                throw new RuntimeException("Index cannot be in valid range");
+            }
+            int insertionPoint = -idx - 1;
+            values.add(insertionPoint, element);
         });
     }
 
     // MODIFIES: categoryMap
     // EFFECTS: Removes the element provided from each key in the category map
     //          if present.
-    private static <K, V> void removeByKey(Map<K, List<V>> categoryMap,
-                                           Iterable<K> keys,
-                                           V element) {
+    private static <K, V extends Comparable<V>>
+    void removeByKey(Map<K, List<V>> categoryMap,
+                     Iterable<K> keys,
+                     V element) {
         keys.forEach(e -> {
             if (categoryMap.containsKey(e)) {
-                List<V> vals = categoryMap.get(e);
-                vals.remove(element);
-                if (vals.isEmpty()) {
+                List<V> values = categoryMap.get(e);
+                int idx = Collections.binarySearch(values, element);
+                if (idx >= 0 && idx < values.size()) {
+                    values.remove(idx);
+                }
+                if (values.isEmpty()) {
                     categoryMap.remove(e);
                 }
             }
@@ -168,5 +183,13 @@ public class Closet {
         congregateByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
         congregateByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
         congregateByKey(this.colorMap, clothing.getColors(), clothing);
+    }
+
+    // EFFECTS: Returns a JSON representation of this object
+    @Override
+    public JSONObject toJson() {
+        return new JsonBuilder()
+                .savable("clothing", this.clothing)
+                .put("name", this.name);
     }
 }

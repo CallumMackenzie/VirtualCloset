@@ -1,10 +1,17 @@
 package model;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +29,19 @@ public class ClothingTest {
                 Collections.singletonList("orange"),
                 false,
                 null);
+    }
+
+    Clothing copyCl() {
+        return new Clothing(
+                cl.getTypes(),
+                cl.getSize(),
+                cl.getBrand(),
+                cl.getMaterial(),
+                cl.getStyles(),
+                cl.getColors(),
+                cl.isDirty(),
+                cl.getImage()
+        );
     }
 
     @Test
@@ -67,6 +87,53 @@ public class ClothingTest {
                         + "\n\tstyles: Casual"
                         + "\n\tdirty: false"
                         + "\n}");
+    }
+
+    @Test
+    void testCompareToSameObj() {
+        assertEquals(0, this.cl.compareTo(this.cl));
+        assertEquals(0, this.cl.compareTo(copyCl()));
+    }
+
+    <T extends Comparable<T>>
+    void testCompareToDiffOneParam(T newValue,
+                                   Supplier<T> getter,
+                                   Consumer<Clothing> setter) {
+        Clothing same = copyCl();
+        setter.accept(same);
+        assertEquals(getter.get().compareTo(newValue), cl.compareTo(same));
+    }
+
+    <T extends Comparable<T>>
+    void testCompareToComparableListSize(List<T> newValue,
+                                     Function<Clothing, List<T>> getter) {
+        Clothing same = copyCl();
+        List<T> clList = getter.apply(cl);
+        List<T> sameList = getter.apply(same);
+        sameList.clear();
+        sameList.addAll(newValue);
+        // Compare size first
+        assertEquals(Integer.compare(clList.size(), sameList.size()),
+                cl.compareTo(same));
+    }
+
+    @Test
+    void testCompareToDiffOneParam() {
+        testCompareToDiffOneParam("uniqlo", cl::getBrand, x -> x.setBrand("uniqlo"));
+        testCompareToDiffOneParam(Size.XS, cl::getSize, c -> c.setSize(Size.XS));
+        testCompareToDiffOneParam("abcd", cl::getMaterial, x -> x.setMaterial("abcd"));
+        testCompareToComparableListSize(Arrays.asList("A", "C"), Clothing::getTypes);
+        testCompareToComparableListSize(Arrays.asList("P", "Q", "R"), Clothing::getStyles);
+        testCompareToComparableListSize(new ArrayList<>(), Clothing::getColors);
+        testCompareToDiffOneParam(true, cl::isDirty, x -> x.setDirty(true));
+    }
+
+    @Test
+    void testToJson() {
+        JSONObject jso = cl.toJson();
+        assertNotNull(jso.get("styles"));
+        assertNotNull(jso.get("types"));
+        assertNotNull(jso.get());
     }
 
 }

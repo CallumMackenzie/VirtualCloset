@@ -1,13 +1,16 @@
 package model;
 
-import java.io.Serializable;
+import org.json.JSONObject;
+import persistance.JsonBuilder;
+import persistance.Savable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 // Manages account data in memory, has an active account and a list of
 // all accounts.
-public class AccountManager implements Serializable {
+public class AccountManager implements Savable {
 
     private final List<Account> accounts;
     private Account activeAccount;
@@ -16,6 +19,12 @@ public class AccountManager implements Serializable {
     //          accounts or an active one.
     public AccountManager() {
         this.accounts = new ArrayList<>();
+    }
+
+    // REQUIRES: accounts is internally mutable.
+    // EFFECTS: Constructs a new account manager for the given accounts.
+    public AccountManager(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     // EFFECTS: Returns whether there is an active account or not
@@ -115,4 +124,10 @@ public class AccountManager implements Serializable {
         return this.accounts;
     }
 
+    // EFFECTS: Returns a JSON representation of this object
+    @Override
+    public JSONObject toJson() {
+        return new JsonBuilder()
+                .savable("accounts", this.accounts);
+    }
 }

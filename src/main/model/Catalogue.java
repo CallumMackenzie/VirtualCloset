@@ -1,11 +1,15 @@
 package model;
 
+import org.json.JSONObject;
+import persistance.JsonBuilder;
+import persistance.Savable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 // A catalogue of outfits having a list of outfits
-public class Catalogue {
+public class Catalogue implements Savable {
 
     private final List<Outfit> outfits;
 
@@ -36,5 +40,12 @@ public class Catalogue {
     // EFFECTS: Adds the given outfit to the catalogue.
     public void addOutfit(Outfit outfit) {
         this.outfits.add(outfit);
+    }
+
+    // EFFECTS: Returns a JSON representation of this object
+    @Override
+    public JSONObject toJson() {
+        return new JsonBuilder()
+                .savable("outfits", this.outfits);
     }
 }

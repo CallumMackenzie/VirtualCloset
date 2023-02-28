@@ -1,11 +1,14 @@
 package model;
 
+import org.json.JSONObject;
+import persistance.Savable;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 // An outfit with a list of clothing, a name, and a date last modified
-public class Outfit {
+public class Outfit implements Savable {
 
     private final List<Clothing> clothing;
     private String name;
@@ -59,5 +62,12 @@ public class Outfit {
     // EFFECTS: Returns the date last modified for this clothing.
     public Instant getInstantLastModified() {
         return this.lastModified;
+    }
+
+    // EFFECTS: Returns a JSON representation of this object
+    @Override
+    public JSONObject toJson() {
+        // TODO
+        return null;
     }
 }
