@@ -126,7 +126,7 @@ public class ClothingTest {
 
     @Test
     void testToJson() {
-        JSONObject jso = cl.toJson();
+        JSONObject jso = cl.toJson(null);
         assertEquals(cl.getBrand(), jso.getString(JSON_BRAND_KEY));
         assertEquals(cl.getSize(), jso.getEnum(Size.class, JSON_SIZE_KEY));
         assertEquals(cl.isDirty(), jso.getBoolean(JSON_DIRTY_KEY));
@@ -146,6 +146,19 @@ public class ClothingTest {
         assertNotNull(cArr);
         assertEquals(cl.getTypes().size(), cArr.length());
         assertTrue(cArr.toList().containsAll(cl.getTypes()));
+    }
+
+    @Test
+    void testFromJson() {
+        JSONObject jso = cl.toJson(null);
+        Clothing c = Clothing.fromJson(jso);
+        assertEquals(c, cl);
+    }
+
+    @Test
+    void testEquals() {
+        assertNotEquals(cl, "ABC");
+        assertEquals(cl, cl);
     }
 
 }

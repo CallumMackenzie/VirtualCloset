@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 // A user account with a closet, clothing catalogue, and name
-public class Account implements Savable {
+public class Account implements Savable<Void> {
 
     public static final String JSON_CATALOGUE_KEY = "catalogue";
     public static final String JSON_CLOSETS_KEY = "closets";
@@ -96,10 +97,23 @@ public class Account implements Savable {
 
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson(Void unused) {
+        List<Clothing> allClothing = new ArrayList<>(
+                this.closets.stream().map(c -> c.getClothing().size())
+                        .reduce(0, Integer::sum));
+        for (Closet closet : this.closets) {
+            allClothing.addAll(closet.getClothing());
+        }
+        allClothing = allClothing.stream().sorted().collect(Collectors.toList());
         return new JsonBuilder()
-                .savable(JSON_CATALOGUE_KEY, this.catalogue)
-                .savable(JSON_CLOSETS_KEY, this.closets)
+                .savable(JSON_CATALOGUE_KEY, this.catalogue, allClothing)
+                .savable(JSON_CLOSETS_KEY, this.closets, null)
                 .put(JSON_NAME_KEY, this.name);
+    }
+
+    // EFFECTS: Returns an instance of this object reconstructed from JSON
+    public Account fromJson(List<Clothing> allClothing) {
+        // TODO
+        return null;
     }
 }

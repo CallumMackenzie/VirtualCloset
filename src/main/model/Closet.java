@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 // A closet having a list of clothing and various categorizations
 // of said clothing
-public class Closet implements Savable {
+public class Closet implements Savable<Void> {
 
     private final List<Clothing> clothing;
     private final String name;
@@ -192,11 +192,12 @@ public class Closet implements Savable {
         congregateByKey(this.colorMap, clothing.getColors(), clothing);
     }
 
+    // REQUIRES: allClothing is sorted
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson(Void unused) {
         return new JsonBuilder()
-                .savable("clothing", this.clothing)
+                .savable("clothing", this.clothing, null)
                 .put("name", this.name);
     }
 }

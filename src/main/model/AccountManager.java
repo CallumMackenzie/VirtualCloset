@@ -10,7 +10,7 @@ import java.util.Optional;
 
 // Manages account data in memory, has an active account and a list of
 // all accounts.
-public class AccountManager implements Savable {
+public class AccountManager implements Savable<Void> {
 
     public static final String JSON_ACCOUNTS_KEY = "accounts";
 
@@ -128,8 +128,8 @@ public class AccountManager implements Savable {
 
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson(Void unused) {
         return new JsonBuilder()
-                .savable(JSON_ACCOUNTS_KEY, this.accounts);
+                .savable(JSON_ACCOUNTS_KEY, this.accounts, null);
     }
 }

@@ -3,8 +3,8 @@ package persistance;
 import org.json.JSONObject;
 
 // A savable data type
-public interface Savable {
+public interface Savable<T> {
 
     // EFFECTS: Returns a JSON representation of this object.
-    JSONObject toJson();
+    JSONObject toJson(T args);
 }

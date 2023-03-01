@@ -1,15 +1,17 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // An outfit with a list of clothing, a name, and a date last modified
-public class Outfit implements Savable {
+public class Outfit implements Savable<List<Clothing>> {
 
     public static final String JSON_CLOTHING_KEY = "clothing";
     public static final String JSON_NAME_KEY = "name";
@@ -69,11 +71,16 @@ public class Outfit implements Savable {
         return this.lastModified;
     }
 
+    // REQUIRES: allClothing is sorted
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
-        // TODO: Clothing
+    public JSONObject toJson(List<Clothing> allClothing) {
+        JSONArray clothingIndexesJSON = new JSONArray();
+        this.clothing.stream()
+                .mapToInt(c -> Collections.binarySearch(allClothing, c))
+                .forEach(clothingIndexesJSON::put);
         return new JsonBuilder()
+                .put(JSON_CLOTHING_KEY, clothingIndexesJSON)
                 .put(JSON_NAME_KEY, this.name)
                 .put(JSON_LAST_MODIFIED_KEY, this.lastModified.getNano());
     }

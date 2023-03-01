@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // A catalogue of outfits having a list of outfits
-public class Catalogue implements Savable {
+public class Catalogue implements Savable<List<Clothing>> {
 
     private final List<Outfit> outfits;
 
@@ -42,10 +42,11 @@ public class Catalogue implements Savable {
         this.outfits.add(outfit);
     }
 
+    // REQUIRES: allClothing is sorted
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson(List<Clothing> allClothing) {
         return new JsonBuilder()
-                .savable("outfits", this.outfits);
+                .savable("outfits", this.outfits, allClothing);
     }
 }

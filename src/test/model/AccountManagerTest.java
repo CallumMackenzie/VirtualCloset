@@ -120,7 +120,7 @@ public class AccountManagerTest {
 
     @Test
     void testToJson() {
-        JSONObject jso = acm.toJson();
+        JSONObject jso = acm.toJson(null);
         JSONArray jsa = jso.getJSONArray(AccountManager.JSON_ACCOUNTS_KEY);
         assertNotNull(jsa);
         assertEquals(acm.getAccounts().size(), jsa.length());

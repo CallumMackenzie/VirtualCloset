@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -84,11 +88,15 @@ class OutfitTest {
 
     @Test
     void testToJson() {
-        JSONObject jso = this.outfit.toJson();
+        List<Clothing> allClothing = Stream.of(shirt, pants)
+                .sorted().collect(Collectors.toList());
+        JSONObject jso = this.outfit.toJson(allClothing);
         assertEquals(outfit.getName(), jso.getString(Outfit.JSON_NAME_KEY));
         assertEquals(outfit.getInstantLastModified().getNano(),
                 jso.getLong(Outfit.JSON_LAST_MODIFIED_KEY));
-        // TODO: Test clothing
+        JSONArray jsa = jso.getJSONArray(Outfit.JSON_CLOTHING_KEY);
+        assertEquals(2, jsa.length());
+        assertTrue(jsa.toList().containsAll(Arrays.asList(0, 1)));
     }
 
 }

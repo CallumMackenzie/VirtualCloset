@@ -4,7 +4,6 @@ import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 
 // An article of clothing with a list of types, styles, colors, and a brand, size, material,
 // image, and whether it is dirty or not.
-public class Clothing implements Savable, Comparable<Clothing> {
+public class Clothing implements Savable<Void>, Comparable<Clothing> {
 
     public static final String JSON_STYLES_KEY = "styles";
     public static final String JSON_TYPES_KEY = "types";
@@ -125,7 +124,7 @@ public class Clothing implements Savable, Comparable<Clothing> {
 
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson(Void unused) {
         return new JsonBuilder()
                 .put(JSON_STYLES_KEY, this.styles)
                 .put(JSON_TYPES_KEY, this.types)
@@ -134,6 +133,16 @@ public class Clothing implements Savable, Comparable<Clothing> {
                 .put(JSON_DIRTY_KEY, this.dirty)
                 .put(JSON_MATERIAL_KEY, this.material)
                 .put(JSON_COLORS_KEY, this.colors);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (!(obj instanceof Clothing)) {
+            return false;
+        }
+        return this.compareTo((Clothing) obj) == 0;
     }
 
     // EFFECTS: Compares this clothing to the provided
@@ -168,5 +177,19 @@ public class Clothing implements Savable, Comparable<Clothing> {
             }
         }
         return 0;
+    }
+
+    // REQUIRES: jso was constructed with this.toJson
+    // EFFECTS: Returns an instance of this object reconstructed from the given
+    //          JSON object.
+    public static Clothing fromJson(JSONObject jso) {
+        List<String> styles = JsonBuilder.toStringList(jso.getJSONArray(JSON_STYLES_KEY));
+        List<String> types = JsonBuilder.toStringList(jso.getJSONArray(JSON_TYPES_KEY));
+        String brand = jso.getString(JSON_BRAND_KEY);
+        Size size = jso.getEnum(Size.class, JSON_SIZE_KEY);
+        boolean dirty = jso.getBoolean(JSON_DIRTY_KEY);
+        String material = jso.getString(JSON_MATERIAL_KEY);
+        List<String> colors = JsonBuilder.toStringList(jso.getJSONArray(JSON_COLORS_KEY));
+        return new Clothing(types, size, brand, material, styles, colors, dirty);
     }
 }
