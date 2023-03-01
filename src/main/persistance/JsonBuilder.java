@@ -3,8 +3,11 @@ package persistance;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 // A JSONObject wrapper for Savable objects
 public class JsonBuilder extends JSONObject {
@@ -40,5 +43,21 @@ public class JsonBuilder extends JSONObject {
         return jsa.toList().stream()
                 .map(Object::toString)
                 .collect(Collectors.toList());
+    }
+
+    // REQUIRES: allTs is sorted and contains every element in ts
+    // EFFECTS: Maps each t in ts to its index in allTs
+    public static <T extends Comparable<T>>
+    IntStream mapToIndexSorted(List<T> ts, List<T> allTs) {
+        return ts.stream().mapToInt(t -> Collections.binarySearch(
+                allTs, t
+        ));
+    }
+
+    // REQUIRES: allTs is sorted. ts contains indexes from allTs
+    // EFFECTS: Maps each index to its value in allTs
+    public static <T extends Comparable<T>>
+    Stream<T> mapToValueSorted(int[] idxs, List<T> allTs) {
+        return IntStream.of(idxs).mapToObj(allTs::get);
     }
 }

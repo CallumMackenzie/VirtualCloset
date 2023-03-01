@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
@@ -16,6 +17,7 @@ public class Account implements Savable<Void> {
     public static final String JSON_CATALOGUE_KEY = "catalogue";
     public static final String JSON_CLOSETS_KEY = "closets";
     public static final String JSON_NAME_KEY = "name";
+    public static final String JSON_ALL_CLOTHING_KEY = "allClothing";
 
     private final Catalogue catalogue;
     private final List<Closet> closets;
@@ -23,9 +25,16 @@ public class Account implements Savable<Void> {
 
     // EFFECTS: Constructs a new account with the given name
     public Account(String name) {
+        this(name, new Catalogue(), new ArrayList<>());
+    }
+
+    // REQUIRES: closets is mutable
+    // EFFECTS: Creates an account with the given catalogue, closets,
+    //          and name.
+    private Account(String name, Catalogue c, List<Closet> closets) {
         this.name = name;
-        this.catalogue = new Catalogue();
-        this.closets = new ArrayList<>();
+        this.catalogue = c;
+        this.closets = closets;
     }
 
     // EFFECTS: Returns the name of this account
@@ -85,6 +94,17 @@ public class Account implements Savable<Void> {
                 .findFirst();
     }
 
+    // EFFECTS: Compares the equality of this vs object
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (!(obj instanceof Account)) {
+            return false;
+        }
+        return ((Account) obj).getName().equals(this.getName());
+    }
+
     // EFFECTS: Returns the catalogue for this account
     public Catalogue getCatalogue() {
         return this.catalogue;
@@ -107,13 +127,29 @@ public class Account implements Savable<Void> {
         allClothing = allClothing.stream().sorted().collect(Collectors.toList());
         return new JsonBuilder()
                 .savable(JSON_CATALOGUE_KEY, this.catalogue, allClothing)
-                .savable(JSON_CLOSETS_KEY, this.closets, null)
+                .savable(JSON_CLOSETS_KEY, this.closets, allClothing)
+                .savable(JSON_ALL_CLOTHING_KEY, allClothing, null)
                 .put(JSON_NAME_KEY, this.name);
     }
 
+    // REQUIRES: jso was created by this.toJson
     // EFFECTS: Returns an instance of this object reconstructed from JSON
-    public Account fromJson(List<Clothing> allClothing) {
-        // TODO
-        return null;
+    public static Account fromJson(JSONObject jso) {
+        JSONArray allClothingJsa = jso.getJSONArray(JSON_ALL_CLOTHING_KEY);
+        List<Clothing> allClothing = new ArrayList<>(allClothingJsa.length());
+        for (int i = 0; i < allClothingJsa.length(); ++i) {
+            JSONObject clothingJs = allClothingJsa.getJSONObject(i);
+            allClothing.add(Clothing.fromJson(clothingJs));
+        }
+        Catalogue c = Catalogue.fromJson(jso.getJSONObject(JSON_CATALOGUE_KEY),
+                allClothing);
+        String name = jso.getString(JSON_NAME_KEY);
+        JSONArray closetsJs = jso.getJSONArray(JSON_CLOSETS_KEY);
+        List<Closet> closets = new ArrayList<>(closetsJs.length());
+        for (int i = 0; i < closetsJs.length(); ++i) {
+            JSONObject closetJs = closetsJs.getJSONObject(i);
+            closets.add(Closet.fromJson(closetJs, allClothing));
+        }
+        return new Account(name, c, closets);
     }
 }

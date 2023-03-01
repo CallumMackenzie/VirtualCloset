@@ -135,6 +135,7 @@ public class Clothing implements Savable<Void>, Comparable<Clothing> {
                 .put(JSON_COLORS_KEY, this.colors);
     }
 
+    // EFFECTS: Compares the equality of this and obj
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

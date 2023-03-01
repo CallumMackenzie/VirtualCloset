@@ -94,4 +94,30 @@ public class AccountTest {
         assertEquals(ac1.getClosets().size(), jsa.length());
     }
 
+    @Test
+    void testFromJson() {
+        Clothing shirt1 = new Clothing(Collections.singletonList("shirt"),
+                Size.XL,
+                "Adidas",
+                "Silk",
+                Collections.singletonList("casual"),
+                Collections.singletonList("blue"),
+                true);
+        this.ac1.addCloset("ABC");
+        this.ac1.getCloset("ABC")
+                .ifPresent(c -> c.addClothing(shirt1));
+        JSONObject jso = this.ac1.toJson(null);
+        Account a = Account.fromJson(jso);
+        assertEquals(1, a.getClosets().size());
+        assertTrue(a.getCloset("ABC").isPresent());
+        assertTrue(a.getCloset("ABC").get().getClothing().contains(shirt1));
+    }
+
+    @Test
+    void testEquals() {
+        assertNotEquals(null, this.ac1);
+        assertEquals(this.ac1, this.ac1);
+        assertNotEquals(this.ac1, this.ac2);
+    }
+
 }

@@ -1,6 +1,7 @@
 package model;
 
 import model.search.ClothingAddress;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
@@ -10,7 +11,10 @@ import java.util.stream.Collectors;
 
 // A closet having a list of clothing and various categorizations
 // of said clothing
-public class Closet implements Savable<Void> {
+public class Closet implements Savable<List<Clothing>> {
+
+    public static final String JSON_NAME_KEY = "name";
+    public static final String JSON_CLOTHING_KEY = "clothing";
 
     private final List<Clothing> clothing;
     private final String name;
@@ -195,9 +199,27 @@ public class Closet implements Savable<Void> {
     // REQUIRES: allClothing is sorted
     // EFFECTS: Returns a JSON representation of this object
     @Override
-    public JSONObject toJson(Void unused) {
+    public JSONObject toJson(List<Clothing> allClothing) {
+        JSONArray idxs = new JSONArray(this.clothing.size());
+        JsonBuilder.mapToIndexSorted(this.clothing, allClothing)
+                .forEach(idxs::put);
         return new JsonBuilder()
-                .savable("clothing", this.clothing, null)
-                .put("name", this.name);
+                .put(JSON_CLOTHING_KEY, idxs)
+                .put(JSON_NAME_KEY, this.name);
+    }
+
+    // REQUIRES: allClothing is sorted
+    // EFFECTS: Returns an instance of this object from the given JSON
+    public static Closet fromJson(JSONObject jso, List<Clothing> allClothing) {
+        String name = jso.getString(JSON_NAME_KEY);
+        JSONArray idxsJs = jso.getJSONArray(JSON_CLOTHING_KEY);
+        int[] idxs = new int[idxsJs.length()];
+        for (int i = 0; i < idxsJs.length(); ++i) {
+            idxs[i] = idxsJs.getInt(i);
+        }
+        Closet closet = new Closet(name);
+        JsonBuilder.mapToValueSorted(idxs, allClothing)
+                .forEach(closet::addClothing);
+        return closet;
     }
 }

@@ -7,7 +7,6 @@ import persistance.Savable;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 // An outfit with a list of clothing, a name, and a date last modified
@@ -75,12 +74,11 @@ public class Outfit implements Savable<List<Clothing>> {
     // EFFECTS: Returns a JSON representation of this object
     @Override
     public JSONObject toJson(List<Clothing> allClothing) {
-        JSONArray clothingIndexesJSON = new JSONArray();
-        this.clothing.stream()
-                .mapToInt(c -> Collections.binarySearch(allClothing, c))
-                .forEach(clothingIndexesJSON::put);
+        JSONArray idxs = new JSONArray(this.clothing.size());
+        JsonBuilder.mapToIndexSorted(this.clothing, allClothing)
+                .forEach(idxs::put);
         return new JsonBuilder()
-                .put(JSON_CLOTHING_KEY, clothingIndexesJSON)
+                .put(JSON_CLOTHING_KEY, idxs)
                 .put(JSON_NAME_KEY, this.name)
                 .put(JSON_LAST_MODIFIED_KEY, this.lastModified.toEpochMilli());
     }

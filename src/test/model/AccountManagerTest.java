@@ -126,4 +126,13 @@ public class AccountManagerTest {
         assertEquals(acm.getAccounts().size(), jsa.length());
     }
 
+    @Test
+    void testFromJson() {
+        this.acm.addAccount(new Account("john"));
+        JSONObject jso = acm.toJson(null);
+        AccountManager acm2 = AccountManager.fromJson(jso);
+        assertEquals(acm.getAccounts().size(), acm2.getAccounts().size());
+        assertEquals(acm.getAccounts(), acm2.getAccounts());
+    }
+
 }

@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
@@ -131,5 +132,16 @@ public class AccountManager implements Savable<Void> {
     public JSONObject toJson(Void unused) {
         return new JsonBuilder()
                 .savable(JSON_ACCOUNTS_KEY, this.accounts, null);
+    }
+
+    // EFFECTS: Returns an instance of this object from the given JSON
+    public static AccountManager fromJson(JSONObject jso) {
+        JSONArray jsa = jso.getJSONArray(JSON_ACCOUNTS_KEY);
+        List<Account> accounts = new ArrayList<>(jsa.length());
+        for (int i = 0; i < jsa.length(); ++i) {
+            JSONObject accountJs = jsa.getJSONObject(i);
+            accounts.add(Account.fromJson(accountJs));
+        }
+        return new AccountManager(accounts);
     }
 }

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,6 +51,27 @@ class JsonBuilderTest {
         List<String> ls = JsonBuilder.toStringList(jsa);
         assertEquals(2, ls.size());
         assertTrue(ls.containsAll(Arrays.asList("123", "456")));
+    }
+
+    @Test
+    void testMapToIndexSorted() {
+        List<Integer> ints = Arrays.asList(3, 4, 9, 100, 200);
+        List<Integer> allInts = Arrays.asList(1, 2, 3, 4, 5, 6, 9, 12, 100, 200, 240);
+        int[] mapped = JsonBuilder.mapToIndexSorted(ints, allInts).toArray();
+        assertEquals(ints.size(), mapped.length);
+        for (int i = 0; i < mapped.length; ++i) {
+            assertEquals(mapped[i], allInts.indexOf(ints.get(i)));
+        }
+    }
+
+    @Test
+    void testMapToValueSorted() {
+        List<Integer> ints = Arrays.asList(3, 4, 9, 100, 200);
+        List<Integer> allInts = Arrays.asList(1, 2, 3, 4, 5, 6, 9, 12, 100, 200, 240);
+        int[] mapped = {2, 3, 6, 8, 9};
+        List<Integer> ints2 = JsonBuilder.mapToValueSorted(mapped, allInts)
+                .collect(Collectors.toList());
+        assertEquals(ints, ints2);
     }
 
 }

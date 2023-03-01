@@ -2,6 +2,8 @@ package model;
 
 import model.search.ClothingAddress;
 import model.search.ClothingAddressParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -203,6 +205,28 @@ public class ClosetTest {
         this.closet1.addClothing(other2);
         assertEquals(3, this.closet1.getClothing().size());
         assertEquals(1, this.closet1.getClothing().indexOf(other2));
+    }
+
+    @Test
+    void testToJson() {
+        this.closet1.addClothing(shirt1);
+        List<Clothing> allClothing = Collections.singletonList(shirt1);
+        JSONObject jso = this.closet1.toJson(allClothing);
+        assertEquals(this.closet1.getName(), jso.getString(Closet.JSON_NAME_KEY));
+        JSONArray jsa = jso.getJSONArray(Closet.JSON_CLOTHING_KEY);
+        assertNotNull(jsa);
+        assertEquals(1, jsa.length());
+        assertEquals(0, jsa.getInt(0));
+    }
+
+    @Test
+    void testFromJson() {
+        this.closet1.addClothing(shirt1);
+        List<Clothing> allClothing = Collections.singletonList(shirt1);
+        JSONObject jso = this.closet1.toJson(allClothing);
+        Closet c = Closet.fromJson(jso, allClothing);
+        assertEquals(this.closet1.getName(), c.getName());
+        assertEquals(this.closet1.getClothing(), c.getClothing());
     }
 
 }
