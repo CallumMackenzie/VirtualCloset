@@ -29,6 +29,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         this.accountManager = new AccountManager();
         this.initCommands();
         this.setShouldRun(true);
+        this.load();
         System.out.println("Welcome to Virtual Closet!");
     }
 
@@ -50,6 +51,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     @Override
     protected void stop() {
         super.stop();
+        this.save();
         System.out.println("Closing application ...");
     }
 
@@ -198,6 +200,21 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         }
     }
 
+    // EFFECTS: Saves data to disk
+    private void save() {
+        System.out.println("Saving to disk.");
+        this.accountManager.saveState();
+        System.out.println("Saved.");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Loads data from disk
+    private void load() {
+        System.out.println("Loading data from disk.");
+        this.accountManager.loadState();
+        System.out.println("Loaded.");
+    }
+
     // REQUIRES: this.accountManager must have an active acccount
     // MODIFIES: this
     // EFFECTS: Enters catalogue mode
@@ -262,7 +279,13 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         () -> !this.accountManager.getAccounts().isEmpty(),
                         "No accounts!",
                         "Removes an account based on the info provided.",
-                        "remove account"));
+                        "remove account"),
+                new ConsoleCommand(this::save,
+                        "Saves application state to file.",
+                        "save"),
+                new ConsoleCommand(this::load,
+                        "Loads application state from file",
+                        "load"));
     }
 
     // REQUIRES: this.initClosetCommands has not been called already

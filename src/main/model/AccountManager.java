@@ -3,8 +3,11 @@ package model;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
+import persistance.JsonReader;
+import persistance.JsonWriter;
 import persistance.Savable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +16,7 @@ import java.util.Optional;
 // all accounts.
 public class AccountManager implements Savable<Void> {
 
+    public static final String FILE_SAVE_PATH = "./data/data.json";
     public static final String JSON_ACCOUNTS_KEY = "accounts";
 
     private final List<Account> accounts;
@@ -125,6 +129,34 @@ public class AccountManager implements Savable<Void> {
     // EFFECTS: Returns the accounts this system manages
     public List<Account> getAccounts() {
         return this.accounts;
+    }
+
+    // TODO: Test this
+    // EFFECTS: Saves state to file.
+    public void saveState() {
+        JsonWriter jsw = new JsonWriter(FILE_SAVE_PATH);
+        try {
+            jsw.write(this, null);
+        } catch (IOException e) {
+            // Shouldn't throw with given path
+            throw new RuntimeException(e);
+        }
+    }
+
+    // TODO: Test this
+    // MODIFIES: this
+    // EFFECTS: Loads the state from file.
+    public void loadState() {
+        JsonReader jsr = new JsonReader(FILE_SAVE_PATH);
+        try {
+            JSONObject o = jsr.readFileJson();
+            this.accounts.clear();
+            AccountManager copy = AccountManager.fromJson(o);
+            this.accounts.addAll(copy.accounts);
+        } catch (IOException e) {
+            // Shouldn't throw with given path
+            throw new RuntimeException(e);
+        }
     }
 
     // EFFECTS: Returns a JSON representation of this object
