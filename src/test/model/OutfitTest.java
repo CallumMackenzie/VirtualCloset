@@ -92,11 +92,24 @@ class OutfitTest {
                 .sorted().collect(Collectors.toList());
         JSONObject jso = this.outfit.toJson(allClothing);
         assertEquals(outfit.getName(), jso.getString(Outfit.JSON_NAME_KEY));
-        assertEquals(outfit.getInstantLastModified().getNano(),
+        assertEquals(outfit.getInstantLastModified().toEpochMilli(),
                 jso.getLong(Outfit.JSON_LAST_MODIFIED_KEY));
         JSONArray jsa = jso.getJSONArray(Outfit.JSON_CLOTHING_KEY);
         assertEquals(2, jsa.length());
         assertTrue(jsa.toList().containsAll(Arrays.asList(0, 1)));
+    }
+
+    @Test
+    void testFromJson() {
+        List<Clothing> allClothing = Stream.of(shirt, pants)
+                .sorted().collect(Collectors.toList());
+        JSONObject jso = this.outfit.toJson(allClothing);
+        Outfit o = Outfit.fromJson(jso, allClothing);
+        assertEquals(this.outfit.getName(), o.getName());
+        assertEquals(2, o.getClothing().size());
+        assertTrue(o.getClothing().containsAll(allClothing));
+        assertEquals(o.getInstantLastModified().toEpochMilli(),
+                jso.getLong(Outfit.JSON_LAST_MODIFIED_KEY));
     }
 
 }

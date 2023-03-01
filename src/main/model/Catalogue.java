@@ -1,5 +1,6 @@
 package model;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import persistance.JsonBuilder;
 import persistance.Savable;
@@ -11,11 +12,19 @@ import java.util.stream.Collectors;
 // A catalogue of outfits having a list of outfits
 public class Catalogue implements Savable<List<Clothing>> {
 
+    public static final String JSON_OUTFITS_KEY = "outfits";
+
     private final List<Outfit> outfits;
 
     // EFFECTS: Creates a new catalogue with no outfits
     public Catalogue() {
-        this.outfits = new ArrayList<>();
+        this(new ArrayList<>());
+    }
+
+    // REQUIRES: outfits must be a mutable list
+    // EFFECTS: Creates a new catalogue with the given outfits
+    public Catalogue(List<Outfit> outfits) {
+        this.outfits = outfits;
     }
 
     // EFFECTS: Returns all the outfits in this catalogue
@@ -47,6 +56,18 @@ public class Catalogue implements Savable<List<Clothing>> {
     @Override
     public JSONObject toJson(List<Clothing> allClothing) {
         return new JsonBuilder()
-                .savable("outfits", this.outfits, allClothing);
+                .savable(JSON_OUTFITS_KEY, this.outfits, allClothing);
+    }
+
+    // REQUIRES: allClothing is sorted, jso was created with this.toJson
+    // EFFECTS: Returns an instance of this class from the given JSON
+    public static Catalogue fromJson(JSONObject jso, List<Clothing> allClothing) {
+        JSONArray jsa = jso.getJSONArray(JSON_OUTFITS_KEY);
+        List<Outfit> outfits = new ArrayList<>(jsa.length());
+        for (int i = 0; i < jsa.length(); ++i) {
+            JSONObject outfitJsonObj = jsa.getJSONObject(i);
+            outfits.add(Outfit.fromJson(outfitJsonObj, allClothing));
+        }
+        return new Catalogue(outfits);
     }
 }
