@@ -59,8 +59,11 @@ public abstract class CommandSystem {
     protected void run() {
         this.init();
         while (this.shouldRun) {
+            System.out.println(this.commandTable());
             String cmd = this.promptInput();
             this.processCommand(cmd);
+            System.out.println(new String(new char[50])
+                    .replace("\0", "-"));
         }
     }
 
@@ -76,7 +79,7 @@ public abstract class CommandSystem {
                 .toLowerCase();
     }
 
-    // EFFECTS: Repeates getIntInput with the given prompt until a valid
+    // EFFECTS: Repeats getIntInput with the given prompt until a valid
     //          output is returned, running the error function every time
     //          it does not produce a valid output.
     protected Integer forceGetIntInput(String prompt, Runnable errorFn) {
@@ -115,8 +118,8 @@ public abstract class CommandSystem {
 
     // EFFECTS: Processes the given string with the set commands
     protected void processCommand(String cmd) {
-        for (ConsoleCommand c : this.commands) {
-            if (c.process(cmd)) {
+        for (int i = 0; i < this.commands.size(); ++i) {
+            if (this.commands.get(i).process(cmd, i)) {
                 return;
             }
         }
@@ -125,15 +128,15 @@ public abstract class CommandSystem {
 
     // EFFECTS: Prints a helpful blurb for each command
     protected void help() {
-        String prefix = "\n\t- ";
-        System.out.println("Below is a list of commands. "
+        String msg = "Below is a list of commands. "
                 + "Type \"?\" before the command to see more info. "
-                + "Ex. \"help\" -> \"?help\"."
-                + prefix
-                + commands.stream()
-                .filter(ConsoleCommand::isActive)
-                .map(ConsoleCommand::getDigest)
-                .collect(Collectors.joining(prefix)));
+                + "Ex. \"help\" -> \"?help\".\n";
+        String spacer = new String(new char[msg.length()])
+                .replace("\0", "-");
+        System.out.println(spacer
+                + "\n" + msg
+                + this.commandTable()
+                + "\n" + spacer);
     }
 
     // MODIFIES: this
@@ -232,5 +235,67 @@ public abstract class CommandSystem {
                     + " Occurred at \"" + e.getErrorState().getStateCaptured() + "\".");
             return null;
         }
+    }
+
+    // EFFECTS: Returns a string table with commands and their indexes.
+    protected String commandTable() {
+        List<ConsoleCommand> cmds = new ArrayList<>(this.commands.size());
+        List<Integer> indexes = new ArrayList<>(this.commands.size());
+        for (int i = 0; i < this.commands.size(); ++i) {
+            ConsoleCommand cmd = this.commands.get(i);
+            if (cmd.isActive()) {
+                cmds.add(cmd);
+                indexes.add(i);
+            }
+        }
+        int columnCount = Math.min(Math.max(3, (int) (cmds.size() / 3.5)), 6);
+        return listToIndexedTableStr(columnCount,
+                cmds.stream().map(ConsoleCommand::getDigest)
+                        .collect(Collectors.toList()),
+                indexes);
+    }
+
+    // REQUIRES: strings and indexes are parallel arrays
+    // MODIFIES: strings
+    // EFFECTS: Maps the given strings to a table string format with indexes.
+    protected static String listToIndexedTableStr(int cols,
+                                                  List<String> strings,
+                                                  List<Integer> indexes) {
+        for (int i = 0; i < strings.size(); ++i) {
+            strings.set(i, indexes.get(i) + ": " + strings.get(i));
+        }
+        int longest = findLongestUnlessInLastCol(cols, strings);
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < strings.size(); ++i) {
+            String s = strings.get(i);
+            str.append(s);
+            if (i == strings.size() - 1) {
+                continue;
+            }
+            int col = (i + 1) % cols;
+            if (col == 0) {
+                str.append("\n");
+            } else {
+                int diff = longest - s.length();
+                str.append(new String(new char[diff])
+                                .replace("\0", " "))
+                        .append(" | ");
+            }
+        }
+        return str.toString();
+    }
+
+    // EFFECTS: Returns the length of the longest string in the given list
+    //          that would not fall in the last column.
+    private static int findLongestUnlessInLastCol(int cols,
+                                                  List<String> strings) {
+        int longest = 0;
+        for (int i = 0; i < strings.size(); ++i) {
+            int size = strings.get(i).length();
+            if (size > longest && (i + 1) % cols != 0) {
+                longest = size;
+            }
+        }
+        return longest;
     }
 }

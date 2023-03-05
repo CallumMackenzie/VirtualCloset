@@ -45,13 +45,13 @@ public final class ConsoleCommand {
     //          with a question mark, it provides the description for this
     //          command if it matches the given. Returns true if this command
     //          consumed the input.
-    public boolean process(String cmd) {
+    public boolean process(String cmd, int cmdIdx) {
         boolean run = true;
         if (cmd.startsWith("?")) {
             cmd = cmd.substring(1);
             run = false;
         }
-        if (this.matchesCommand(cmd)) {
+        if (this.matchesCommand(cmd, cmdIdx)) {
             if (run) {
                 if (!this.isActive()) {
                     System.out.println(this.inactiveMessage);
@@ -72,8 +72,15 @@ public final class ConsoleCommand {
     }
 
     // EFFECTS: Returns whether the given command activates this console command
-    public boolean matchesCommand(String cmd) {
-        return this.validCommands.contains(cmd);
+    public boolean matchesCommand(String cmd, int index) {
+        Integer cmdIndex;
+        try {
+            cmdIndex = Integer.parseInt(cmd);
+        } catch (NumberFormatException e) {
+            cmdIndex = null;
+        }
+        return (cmdIndex != null && cmdIndex == index)
+                || this.validCommands.contains(cmd);
     }
 
     // EFFECTS: Returns a string digest summarizing the command.

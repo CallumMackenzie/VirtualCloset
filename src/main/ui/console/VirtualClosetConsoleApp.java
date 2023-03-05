@@ -246,8 +246,6 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
         this.initActiveAccountCommands();
         this.initClosetCommands();
         this.initCatalogueCommands();
-        // TODO: For debugging, remove later
-        this.initDebugCommands();
     }
 
     // REQUIRES: this.initActiveAccountCommands has not been called already
@@ -259,7 +257,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         !this.accountManager.getAccounts().isEmpty(),
                         "No accounts!",
                         "Sets the active account for which to perform closet commands for.",
-                        "set active account", "set active"),
+                        "set active"),
                 new ConsoleCommand(this.accountManager::removeActiveAccount,
                         this.accountManager::hasActiveAccount,
                         "No active account!",
@@ -280,10 +278,10 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     private void initAccountCommands() {
         this.addCommands(new ConsoleCommand(this::listAccounts,
                         "Lists the names of all accounts in the account manager.",
-                        "list accounts"),
+                        "accounts"),
                 new ConsoleCommand(this::createAccount,
                         "Creates a new account based on the info provided.",
-                        "create account"),
+                        "new account"),
                 new ConsoleCommand(this::removeAccount,
                         () -> !this.accountManager.getAccounts().isEmpty(),
                         "No accounts!",
@@ -306,7 +304,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         this.accountManager::hasActiveAccount,
                         "No active account!",
                         "Creates a new closet for the current active account with the given name.",
-                        "create closet"),
+                        "new closet"),
                 new ConsoleCommand(this::removeCloset,
                         this.accountManager::hasActiveAccount,
                         "No active account!",
@@ -319,7 +317,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                                 .orElse(false),
                         "No active account, or no closets!",
                         "Lists the closets for the given active account.",
-                        "list closets"),
+                        "closets"),
                 new ConsoleCommand(this::openCloset,
                         this.accountManager::hasActiveAccount,
                         "No active account!",
@@ -336,47 +334,5 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                 "No active account!",
                 "Opens the catalogue for the active user.",
                 "catalogue"));
-    }
-
-    // REQUIRES: this.initDebugCommands has not been called already
-    // MODIFIES: this
-    // EFFECTS: Sets up debug commands for user testing purposes
-    private void initDebugCommands() {
-        this.addCommands(new ConsoleCommand(() -> {
-            String commands = String.join("\n",
-                    "create account",
-                    "Callum",
-                    "create closet",
-                    "c1",
-                    "open closet",
-                    "c1", debugClothing()) + "\n";
-            this.getInput().addScanner(new Scanner(commands));
-        }, "", "dbg"));
-    }
-
-    // EFFECTS: Returns a string of commands to create a couple pieces
-    //          of clothing in closet mode.
-    private static String debugClothing() {
-        String c1 = String.join("\n", "new",
-                "add type", "pants",
-                "set size", "xl",
-                "set brand", "adidas",
-                "set material",
-                "cotton",
-                "exit", "y");
-        String c2 = String.join("\n", "new",
-                "add type", "shirt",
-                "set size", "l",
-                "set brand", "uniqlo",
-                "set material", "polyester & cotton",
-                "add style", "casual",
-                "exit", "y");
-        String c3 = String.join("\n", "new",
-                "add type", "sweater",
-                "set size", "xl",
-                "set brand", "UBC",
-                "add style", "casual",
-                "exit", "y");
-        return String.join("\n", c1, c2, c3);
     }
 }

@@ -53,7 +53,7 @@ public class CatalogueModeConsole extends CommandSystem {
                         () -> !this.catalogue.getOutfits().isEmpty(),
                         "No outfits in this catalogue!",
                         "Lists names of all outfits in this catalogue.",
-                        "list names", "names"),
+                        "names"),
                 new ConsoleCommand(this::modifyNamedOutfit,
                         () -> !this.catalogue.getOutfits().isEmpty(),
                         "No outfits in this catalogue!",
@@ -63,7 +63,7 @@ public class CatalogueModeConsole extends CommandSystem {
                         () -> !this.catalogue.getOutfits().isEmpty(),
                         "No outfits in this catalogue!",
                         "Removes all outfits with the given name (case insensitive)",
-                        "remove by name", "remove named")
+                        "remove named")
         );
     }
 
