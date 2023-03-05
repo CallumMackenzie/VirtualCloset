@@ -33,5 +33,5 @@ As a user, I want to be able to ...
 - create & remove outfits out of clothing
 - modify outfits
 - search my catalogue
-- be able to save my data
-- be able to load my data
+- save my data automatically and if I choose
+- load my data automatically and if I choose
