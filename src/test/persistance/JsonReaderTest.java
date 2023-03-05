@@ -1,5 +1,6 @@
 package persistance;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,22 +15,32 @@ class JsonReaderTest {
 
     @BeforeEach
     void createJsr() {
-        this.jsr = new JsonReader("./data/data.json");
+        this.jsr = new JsonReader("./data/readtestdata.json");
     }
 
     @Test
     void testConstructor() {
-        assertEquals("./data/data.json", this.jsr.srcPath);
+        assertEquals("./data/readtestdata.json", this.jsr.srcPath);
     }
 
     @Test
-    void testReadFile() {
+    void testReadFileThrows() {
         try {
             this.jsr = new JsonReader("/data/adskdasadnoskddskd");
             jsr.readFile();
             fail("Expected IOException.");
         } catch (IOException e) {
             // Expected
+        }
+    }
+
+    @Test
+    void testReadFile() {
+        try {
+            JSONObject jso = this.jsr.readFileJson();
+            assertEquals(jso.getString("test-key"), "test val");
+        } catch (IOException e) {
+            fail(e);
         }
     }
 

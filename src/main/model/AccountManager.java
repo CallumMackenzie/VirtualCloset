@@ -131,7 +131,6 @@ public class AccountManager implements Savable<Void> {
         return this.accounts;
     }
 
-    // TODO: Test this
     // EFFECTS: Saves state to file.
     public void saveState() {
         JsonWriter jsw = new JsonWriter(FILE_SAVE_PATH);
@@ -143,7 +142,6 @@ public class AccountManager implements Savable<Void> {
         }
     }
 
-    // TODO: Test this
     // MODIFIES: this
     // EFFECTS: Loads the state from file.
     public void loadState() {

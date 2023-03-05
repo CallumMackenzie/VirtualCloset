@@ -17,14 +17,12 @@ public class JsonReader {
         this.srcPath = srcPath;
     }
 
-    // TODO: Test this
     // EFFECTS: Reads the file at srcPath and returns it as a string
     public String readFile() throws IOException {
         Path p = Paths.get(this.srcPath);
         return new String(Files.readAllBytes(p));
     }
 
-    // TODO: Test this
     // EFFECTS: Reads the given file to a JSONObject
     public JSONObject readFileJson() throws IOException {
         String fileData = this.readFile();

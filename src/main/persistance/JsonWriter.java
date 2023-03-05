@@ -12,11 +12,13 @@ public class JsonWriter {
 
     public final String dstPath;
 
+    // EFFECTS: Constructs a new JsonWriter to the given path
     public JsonWriter(String path) {
         this.dstPath = path;
     }
 
-    // TODO: Test this
+    // EFFECTS: Writes the given savable to the path associated with this
+    //          json writer, passing the given arguments to the savable.
     public <T> void write(Savable<T> am, T args) throws IOException {
         JSONObject jso = am.toJson(args);
         Files.write(Paths.get(this.dstPath),

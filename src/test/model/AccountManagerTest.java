@@ -135,4 +135,12 @@ public class AccountManagerTest {
         assertEquals(acm.getAccounts(), acm2.getAccounts());
     }
 
+    @Test
+    void testSaveStateLoadState() {
+        this.acm.saveState();
+        AccountManager acm2 = new AccountManager();
+        acm2.loadState();
+        assertEquals(this.acm.getAccounts(), acm2.getAccounts());
+    }
+
 }
