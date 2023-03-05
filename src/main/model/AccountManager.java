@@ -21,22 +21,36 @@ public class AccountManager implements Savable<Void> {
 
     private final List<Account> accounts;
     private Account activeAccount;
+    private String fileSavePath;
 
     // EFFECTS: Constructs a new account manager without any
     //          accounts or an active one.
     public AccountManager() {
-        this.accounts = new ArrayList<>();
+        this(new ArrayList<>());
     }
 
     // REQUIRES: accounts is internally mutable.
-    // EFFECTS: Constructs a new account manager for the given accounts.
+    // EFFECTS: Constructs a new account manager for the given accounts
+    //          with a default file save path.
     public AccountManager(List<Account> accounts) {
         this.accounts = accounts;
+        this.fileSavePath = FILE_SAVE_PATH;
     }
 
     // EFFECTS: Returns whether there is an active account or not
     public boolean hasActiveAccount() {
         return this.activeAccount != null;
+    }
+
+    // EFFECTS: Returns the file save path for this account manager
+    public String getFileSavePath() {
+        return this.fileSavePath;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets the file save path for this account manager.
+    public void setFileSavePath(String fileSavePath) {
+        this.fileSavePath = fileSavePath;
     }
 
     // EFFECTS: Returns account wrapped in optional if present,
@@ -132,29 +146,19 @@ public class AccountManager implements Savable<Void> {
     }
 
     // EFFECTS: Saves state to file.
-    public void saveState() {
-        JsonWriter jsw = new JsonWriter(FILE_SAVE_PATH);
-        try {
-            jsw.write(this, null);
-        } catch (IOException e) {
-            // Shouldn't throw with given path
-            throw new RuntimeException(e);
-        }
+    public void saveState() throws IOException {
+        JsonWriter jsw = new JsonWriter(this.fileSavePath);
+        jsw.write(this, null);
     }
 
     // MODIFIES: this
     // EFFECTS: Loads the state from file.
-    public void loadState() {
-        JsonReader jsr = new JsonReader(FILE_SAVE_PATH);
-        try {
-            JSONObject o = jsr.readFileJson();
-            this.accounts.clear();
-            AccountManager copy = AccountManager.fromJson(o);
-            this.accounts.addAll(copy.accounts);
-        } catch (IOException e) {
-            // Shouldn't throw with given path
-            throw new RuntimeException(e);
-        }
+    public void loadState() throws IOException {
+        JsonReader jsr = new JsonReader(this.fileSavePath);
+        JSONObject o = jsr.readFileJson();
+        this.accounts.clear();
+        AccountManager copy = AccountManager.fromJson(o);
+        this.accounts.addAll(copy.accounts);
     }
 
     // EFFECTS: Returns a JSON representation of this object

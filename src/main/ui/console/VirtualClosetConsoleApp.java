@@ -4,6 +4,7 @@ import model.Account;
 import model.AccountManager;
 import model.Closet;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -203,16 +204,24 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Saves data to disk
     private void save() {
         System.out.println("Saving to disk.");
-        this.accountManager.saveState();
-        System.out.println("Saved.");
+        try {
+            this.accountManager.saveState();
+            System.out.println("Saved.");
+        } catch (IOException e) {
+            System.out.println("Failed to save data to disk.");
+        }
     }
 
     // MODIFIES: this
     // EFFECTS: Loads data from disk
     private void load() {
         System.out.println("Loading data from disk.");
-        this.accountManager.loadState();
-        System.out.println("Loaded.");
+        try {
+            this.accountManager.loadState();
+            System.out.println("Loaded.");
+        } catch (IOException e) {
+            System.out.println("Failed to load data from disk.");
+        }
     }
 
     // REQUIRES: this.accountManager must have an active acccount

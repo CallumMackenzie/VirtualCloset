@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,12 +25,15 @@ public class AccountManagerTest {
 
     @Test
     void testConstructor() {
-        assertEquals(this.acm.getAccounts().size(), 0);
+        assertEquals(0, this.acm.getAccounts().size());
+        assertEquals(AccountManager.FILE_SAVE_PATH, this.acm.getFileSavePath());
         List<Account> acs = new ArrayList<>();
         acs.add(jake);
         this.acm = new AccountManager(acs);
+        this.acm.setFileSavePath("ABCD");
         assertEquals(1, this.acm.getAccounts().size());
         assertEquals(jake, this.acm.getAccounts().get(0));
+        assertEquals("ABCD", acm.getFileSavePath());
     }
 
     @Test
@@ -137,10 +141,33 @@ public class AccountManagerTest {
 
     @Test
     void testSaveStateLoadState() {
-        this.acm.saveState();
+        assertDoesNotThrow(this.acm::saveState);
         AccountManager acm2 = new AccountManager();
-        acm2.loadState();
+        assertDoesNotThrow(acm2::loadState);
         assertEquals(this.acm.getAccounts(), acm2.getAccounts());
+    }
+
+    @Test
+    void testLoadStateThrows() {
+        this.acm.setFileSavePath("./data/DNOSADNASDDNSAD");
+        try {
+            this.acm.loadState();
+            fail("Should have thrown IOException.");
+        } catch (IOException e) {
+            // Ok
+        }
+    }
+
+    @Test
+    void testSaveStateThrows() {
+        this.acm.setFileSavePath("./data/dasjkjd12292312//;..dsdopa"
+                + "]P{d$#@I#!kn21n\0sd");
+        try {
+            this.acm.saveState();
+            fail("Should have thrown Exception");
+        } catch (Exception e) {
+            // Ok
+        }
     }
 
 }
