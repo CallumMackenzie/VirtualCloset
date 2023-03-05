@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClosetTest {
 
     private Closet closet1;
-    private Clothing shirt1;
+    private Clothing shirt1, pants1;
 
     @BeforeEach
     void setup() {
@@ -30,6 +30,13 @@ public class ClosetTest {
                 Collections.singletonList("casual"),
                 Collections.singletonList("blue"),
                 true);
+        this.pants1 = new Clothing(Collections.singletonList("pants"),
+                Size.L,
+                "Nike",
+                "Cotton",
+                Collections.singletonList("casual"),
+                Arrays.asList("orange", "yellow"),
+                false);
     }
 
     @Test
@@ -128,6 +135,26 @@ public class ClosetTest {
         this.closet1.addClothing(shirt1);
         List<Clothing> res = this.closet1.findClothing(new ClothingAddress());
         assertTrue(res.isEmpty());
+    }
+
+    @Test
+    void testFindClothingMultiParamMatch() {
+        this.closet1.addClothing(shirt1);
+        this.closet1.addClothing(pants1);
+        ClothingAddress address = new ClothingAddress();
+        address.getSizes().add(shirt1.getSize());
+        address.getColors().addAll(pants1.getColors());
+        List<Clothing> clothing = this.closet1.findClothing(address);
+        assertEquals(2, clothing.size());
+        assertEquals(pants1, clothing.get(1));
+        assertEquals(shirt1, clothing.get(0));
+    }
+
+    @Test
+    void testAddClothingInListAlready() {
+        this.closet1.addClothing(shirt1);
+        this.closet1.addClothing(shirt1);
+        assertEquals(1, this.closet1.getClothing().size());
     }
 
     @Test

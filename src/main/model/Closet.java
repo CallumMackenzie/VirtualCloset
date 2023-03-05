@@ -107,6 +107,7 @@ public class Closet implements Savable<List<Clothing>> {
 
     // EFFECTS: Searches the clothing in this closet for the pieces matching
     //          the given clothing address most closely, and returns them.
+    //          The closest matches will be at the end of the list.
     public List<Clothing> findClothing(ClothingAddress address) {
         Map<Clothing, Integer> matchMap = new HashMap<>();
 
