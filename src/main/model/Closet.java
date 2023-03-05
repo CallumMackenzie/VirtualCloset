@@ -74,11 +74,8 @@ public class Closet implements Savable<List<Clothing>> {
                 categoryMap.put(e, new ArrayList<>());
             }
             List<V> values = categoryMap.get(e);
+            // SEE REQUIRES CLAUSE
             int idx = Collections.binarySearch(values, element);
-            if (idx >= 0 && idx < values.size()) {
-                // Value is in list
-                return;
-            }
             int insertionPoint = -idx - 1;
             values.add(insertionPoint, element);
         });
