@@ -65,10 +65,10 @@ public class Closet implements Savable<List<Clothing>> {
     // EFFECTS: Places element in the lists associated with each key in keys,
     //          and creates a new list first if it is not already present in
     //          the map.
-    private static <K, V extends Comparable<V>>
-    void congregateByKey(Map<K, List<V>> categoryMap,
-                         Iterable<K> keys,
-                         V element) {
+    private static <K, V extends Comparable<V>> void congregateByKey(
+            Map<K, List<V>> categoryMap,
+            Iterable<K> keys,
+            V element) {
         keys.forEach(e -> {
             if (!categoryMap.containsKey(e)) {
                 categoryMap.put(e, new ArrayList<>());
@@ -87,10 +87,10 @@ public class Closet implements Savable<List<Clothing>> {
     // MODIFIES: categoryMap
     // EFFECTS: Removes the element provided from each key in the category map
     //          if present.
-    private static <K, V extends Comparable<V>>
-    void removeByKey(Map<K, List<V>> categoryMap,
-                     Iterable<K> keys,
-                     V element) {
+    private static <K, V extends Comparable<V>> void removeByKey(
+            Map<K, List<V>> categoryMap,
+            Iterable<K> keys,
+            V element) {
         keys.forEach(e -> {
             if (categoryMap.containsKey(e)) {
                 List<V> values = categoryMap.get(e);

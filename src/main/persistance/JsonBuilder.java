@@ -29,8 +29,8 @@ public class JsonBuilder extends JSONObject {
     }
 
     // EFFECTS: Returns a JSONArray of the given Savable
-    public static <T extends Savable<E>, E>
-    JSONArray savableArray(Iterable<T> s, E args) {
+    public static <T extends Savable<E>, E> JSONArray savableArray(
+            Iterable<T> s, E args) {
         JSONArray jsa = new JSONArray();
         for (Savable<E> savable : s) {
             jsa.put(savable.toJson(args));
@@ -47,8 +47,9 @@ public class JsonBuilder extends JSONObject {
 
     // REQUIRES: allTs is sorted and contains every element in ts
     // EFFECTS: Maps each t in ts to its index in allTs
-    public static <T extends Comparable<T>>
-    IntStream mapToIndexSorted(List<T> ts, List<T> allTs) {
+    public static <T extends Comparable<T>> IntStream mapToIndexSorted(
+            List<T> ts,
+            List<T> allTs) {
         return ts.stream().mapToInt(t -> Collections.binarySearch(
                 allTs, t
         ));
@@ -56,8 +57,9 @@ public class JsonBuilder extends JSONObject {
 
     // REQUIRES: allTs is sorted. ts contains indexes from allTs
     // EFFECTS: Maps each index to its value in allTs
-    public static <T extends Comparable<T>>
-    Stream<T> mapToValueSorted(int[] idxs, List<T> allTs) {
+    public static <T extends Comparable<T>> Stream<T> mapToValueSorted(
+            int[] idxs,
+            List<T> allTs) {
         return IntStream.of(idxs).mapToObj(allTs::get);
     }
 }
