@@ -31,17 +31,6 @@ public class ClothingTest {
                 false);
     }
 
-    Clothing copyCl() {
-        return new Clothing(
-                cl.getTypes(),
-                cl.getSize(),
-                cl.getBrand(),
-                cl.getMaterial(),
-                cl.getStyles(),
-                cl.getColors(),
-                cl.isDirty()
-        );
-    }
 
     @Test
     void testConstructor() {
@@ -87,14 +76,14 @@ public class ClothingTest {
     @Test
     void testCompareToSameObj() {
         assertEquals(0, this.cl.compareTo(this.cl));
-        assertEquals(0, this.cl.compareTo(copyCl()));
+        assertEquals(0, this.cl.compareTo(cl.copy()));
     }
 
     <T extends Comparable<T>>
     void testCompareToDiffOneParam(T newValue,
                                    Supplier<T> getter,
                                    Consumer<Clothing> setter) {
-        Clothing same = copyCl();
+        Clothing same = cl.copy();
         setter.accept(same);
         assertEquals(getter.get().compareTo(newValue), cl.compareTo(same));
     }
@@ -102,7 +91,7 @@ public class ClothingTest {
     <T extends Comparable<T>>
     void testCompareToComparableListSize(List<T> newValue,
                                          Function<Clothing, List<T>> getter) {
-        Clothing same = copyCl();
+        Clothing same = cl.copy();
         List<T> clList = getter.apply(cl);
         List<T> sameList = getter.apply(same);
         sameList.clear();
@@ -158,6 +147,13 @@ public class ClothingTest {
     void testEquals() {
         assertNotEquals(cl, "ABC");
         assertEquals(cl, cl);
+    }
+
+    @Test
+    void testCopy() {
+        Clothing other = cl.copy();
+        assertNotSame(cl, other);
+        assertEquals(cl, other);
     }
 
 }

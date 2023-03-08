@@ -167,6 +167,17 @@ public class Clothing implements Savable<Void>, Comparable<Clothing> {
                         .compareTo(String.join("" + Character.MAX_VALUE, o.colors)));
     }
 
+    // EFFECTS: Produces an exact copy of this clothing
+    public Clothing copy() {
+        return new Clothing(new ArrayList<>(this.types),
+                this.size,
+                this.brand,
+                this.material,
+                new ArrayList<>(this.styles),
+                new ArrayList<>(this.colors),
+                this.dirty);
+    }
+
     // EFFECTS: For every supplier, returns it if it does not provide 0,
     //          if it does, moves on to the next.
     @SafeVarargs

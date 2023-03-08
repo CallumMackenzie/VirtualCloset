@@ -86,9 +86,9 @@ public final class ClosetModeConsole extends CommandSystem {
             List<Clothing> clothing = this.closet.findClothing(addr);
             Clothing c = this.getClothingIndexed(clothing);
             if (c != null) {
-                this.closet.removeClothing(c);
-                new ClothingCreationConsole(this.getInput(), c);
-                this.closet.addClothing(c);
+                new ClothingCreationConsole(this.getInput(),
+                        this.closet,
+                        c);
             }
         }
     }
@@ -103,8 +103,8 @@ public final class ClosetModeConsole extends CommandSystem {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 false);
-        new ClothingCreationConsole(getInput(), newClothing);
-        this.closet.addClothing(newClothing);
+        new ClothingCreationConsole(getInput(), this.closet,
+                newClothing);
     }
 
     // REQUIRES: this.initCommands has not been called

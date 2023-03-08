@@ -1,5 +1,6 @@
 package ui.console;
 
+import model.Closet;
 import model.Clothing;
 import model.Size;
 import model.search.EnumListCapture;
@@ -16,15 +17,21 @@ import static model.search.CAStateMachineBuilder.LIST_SEPARATOR_STR;
 public class ClothingCreationConsole extends CommandSystem {
 
     private final Clothing clothing;
+    private boolean shouldSave = true;
 
     // REQUIRES: clothing must have interior lists which are mutable.
     // EFFECTS: Creates a new clothing creation console from the given article
     //          of clothing.
     public ClothingCreationConsole(DynamicScanner ds,
+                                   Closet closet,
                                    Clothing clothing) {
         super(ds);
         this.clothing = clothing;
+        closet.removeClothing(this.clothing);
         this.run();
+        if (shouldSave) {
+            closet.addClothing(this.clothing);
+        }
     }
 
     // EFFECTS: Prompts the user for input and returns it.
@@ -54,11 +61,21 @@ public class ClothingCreationConsole extends CommandSystem {
         this.initStringListEditCommands();
     }
 
+    // MODIFIES: this
+    // EFFECTS: Exits the creation mode without saving
+    private void exitNoSave() {
+        this.stop();
+        this.shouldSave = false;
+    }
+
     // REQUIRES: this.initClothingCommands has not been called
     // MODIFIES: this
     // EFFECTS: Initializes clothing commands
     private void initClothingEditCommands() {
         this.addCommands(
+                new ConsoleCommand(this::exitNoSave,
+                        "Exits clothing creation mode and does not save.",
+                        "discard"),
                 new ConsoleCommand(this.createStringEditFn(this.clothing::setBrand, "brand"),
                         "Sets the brand for this clothing (ex. \"Nike\").",
                         "set brand"),
@@ -83,6 +100,7 @@ public class ClothingCreationConsole extends CommandSystem {
                         "Adds a clothing type to this article of clothing (ex. \"shirt\").",
                         "add type"),
                 new ConsoleCommand(this.createStringListRemoveFn(this.clothing::getTypes, "types"),
+                        () -> !this.clothing.getTypes().isEmpty(), "No clothing types!",
                         "Removes a clothing type from this article of clothing (ex \"sweater\").",
                         "remove type"),
                 new ConsoleCommand(this.createStringListAddFn(this.clothing::getStyles, "styles"),
@@ -92,9 +110,11 @@ public class ClothingCreationConsole extends CommandSystem {
                         "Adds a color to this article of clothing (ex. \"orange\").",
                         "add color"),
                 new ConsoleCommand(this.createStringListRemoveFn(this.clothing::getColors, "colors"),
+                        () -> !this.clothing.getColors().isEmpty(), "No clothing colors!",
                         "Removes a color from this article of clothing (ex. \"blue\").",
                         "remove color"),
                 new ConsoleCommand(this.createStringListRemoveFn(this.clothing::getStyles, "styles"),
+                        () -> !this.clothing.getStyles().isEmpty(), "No clothing styles!",
                         "Removes a style from this article of clothing (ex. \"athletic\").",
                         "remove style")
         );
