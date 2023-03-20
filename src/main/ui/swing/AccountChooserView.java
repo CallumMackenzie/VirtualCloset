@@ -3,6 +3,7 @@ package ui.swing;
 import model.Account;
 import model.AccountManager;
 import ui.swing.GBC.Anchor;
+import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,15 +13,18 @@ import java.util.Optional;
 // TODO
 public class AccountChooserView extends View {
 
+    private static final int SELECTED_ACCOUNT_VIEW_X = 1;
+    private static final int SELECTED_ACCOUNT_VIEW_Y = 0;
+
     private final AccountManager accountManager;
     private Account selectedAccount;
 
-    private JTextField activeAccountNameField;
+    private JTextArea activeAccountNameField;
 
     private JList<Account> accountJList;
     private JScrollPane accountJListScrollPane;
 
-    private JTextField accountNameField;
+    private JTextArea accountNameField;
     private JTextField accountNameEditField;
     private JButton setAccountNameButton;
     private JButton setActiveButton;
@@ -68,6 +72,7 @@ public class AccountChooserView extends View {
 
         this.addAccountListView();
         this.addAccountSelectedView();
+        this.addCreateAccountComponents();
 
         this.setSelectedAccount(null);
         this.refreshActiveAccountComponents();
@@ -106,38 +111,44 @@ public class AccountChooserView extends View {
         });
     }
 
+    // REQUIRES: this.addAccountCreationView has not been called
+    // MODIFIES: this
+    // EFFECTS: Sets up and adds the account creation view
+    private void addAccountCreationView() {
+        // TODO
+    }
+
     // REQUIRES: this.addAccountSelectedView has not been called
     // MODIFIES: this
     // EFFECTS: Sets up and adds the account selected view
     private void addAccountSelectedView() {
-        this.activeAccountNameField = new JTextField();
-        this.activeAccountNameField.setEditable(false);
-        this.add(this.activeAccountNameField, GBC.at(1, 0).fillHorizontal()
-                .gridwidth(2).anchor(Anchor.North));
+        final int x = SELECTED_ACCOUNT_VIEW_X;
+        final int y = SELECTED_ACCOUNT_VIEW_Y;
 
-        this.accountNameField = new JTextField();
+        this.activeAccountNameField = new JTextArea();
+        this.activeAccountNameField.setEditable(false);
+        this.add(this.activeAccountNameField,
+                GBC.at(x, y).fillHorizontal().gridwidth(2).anchor(Anchor.North));
+
+        this.accountNameField = new JTextArea();
         this.accountNameField.setEditable(false);
         this.add(this.accountNameField,
-                GBC.at(1, 1).fillHorizontal()
-                        .weightx(0.5)
+                GBC.at(x, y + 1).fillHorizontal().weightx(0.5)
                         .gridwidth(2).anchor(Anchor.North));
 
-        this.accountNameEditField = new JTextField();
+        this.accountNameEditField = PromptedTextField.prompt("Account Name");
         this.add(this.accountNameEditField,
-                GBC.at(1, 2).fillHorizontal()
-                        .weightx(0.5).anchor(Anchor.North));
+                GBC.at(x, y + 2).fillHorizontal().weightx(0.5).anchor(Anchor.North));
 
         this.setAccountNameButton = new JButton("Set Account Name");
-        this.add(this.setAccountNameButton, GBC.at(2, 2)
-                .fillHorizontal().weightx(0.2)
-                .anchor(Anchor.North));
+        this.add(this.setAccountNameButton,
+                GBC.at(x + 1, y + 2).fillHorizontal().weightx(0.2).anchor(Anchor.North));
 
         this.setActiveButton = new JButton("Set as Active Account");
-        this.add(this.setActiveButton, GBC.at(2, 3)
-                .fillHorizontal().anchor(Anchor.North));
+        this.add(this.setActiveButton, GBC.at(x + 1, y + 3).fillHorizontal().anchor(Anchor.North));
 
         this.deleteAccountButton = new JButton("Delete Account");
-        this.add(this.deleteAccountButton, GBC.at(1, 3).anchor(Anchor.North));
+        this.add(this.deleteAccountButton, GBC.at(x, y + 3).anchor(Anchor.North));
     }
 
     // REQUIRES: addAccountSelectedView has been called
@@ -206,6 +217,13 @@ public class AccountChooserView extends View {
     private void refreshAccountListData() {
         this.accountJList.setListData(this.accountManager.getAccounts()
                 .toArray(new Account[0]));
+    }
+
+    // REQUIRES: this.addCreateAccountComponents has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes and adds account creation components
+    private void addCreateAccountComponents() {
+        // TODO
     }
 
     @Override
