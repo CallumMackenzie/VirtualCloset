@@ -2,6 +2,7 @@ package ui.swing.views;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
 
 // A view pane within a GUI
 public abstract class View extends JPanel {

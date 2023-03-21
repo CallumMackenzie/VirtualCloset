@@ -1,13 +1,10 @@
 package ui;
 
-import ui.console.VirtualClosetConsoleApp;
-import ui.swing.VirtualClosetSwingApp;
-
 // The application entry point
 public class Main {
     // EFFECTS: Starts a new virtual closet application instance.
     public static void main(String[] args) {
-//        new VirtualClosetConsoleApp();
-        new VirtualClosetSwingApp();
+//        new ui.console.VirtualClosetConsoleApp();
+        new ui.swing.VirtualClosetSwingApp();
     }
 }

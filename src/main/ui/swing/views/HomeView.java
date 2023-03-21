@@ -26,6 +26,7 @@ public class HomeView extends View {
 
     private JLabel selectedClosetName;
     private JButton openSelectedClosetButton;
+    private JButton deleteSelectedClosetButton;
 
     // TODO
     public HomeView(Container root, AccountManager accountManager) {
@@ -57,14 +58,13 @@ public class HomeView extends View {
     // EFFECTS: Adds top bar view components
     private void addSelectedComponents() {
         this.add(selectedClosetName = new JLabel(),
-                GBC.hFillNorth(2, 1).gridwidth(2));
+                GBC.hfillNorth(2, 1).gridwidth(2));
 
         this.add(openSelectedClosetButton = new JButton("Open Closet"),
-                GBC.hFillNorth(2, 2));
+                GBC.hfillNorth(2, 2));
 
-        // TODO
-        this.add(new JButton("Delete Closet"),
-                GBC.hFillNorth(3, 2));
+        this.add(deleteSelectedClosetButton = new JButton("Delete Closet"),
+                GBC.hfillNorth(3, 2));
     }
 
     // REQUIRES: addSelectedClosetListeners has not been called
@@ -73,6 +73,13 @@ public class HomeView extends View {
     private void addSelectedClosetListeners() {
         openSelectedClosetButton.addActionListener(e ->
                 this.transition(new ClosetView(this.root)));
+        deleteSelectedClosetButton.addActionListener(e -> {
+            if (active != null) {
+                active.removeCloset(this.selectedCloset.getName());
+                this.setSelectedCloset(null);
+                this.refreshClosetListData();
+            }
+        });
     }
 
     // REQUIRES: addTopBarComponents has not been called
@@ -83,11 +90,11 @@ public class HomeView extends View {
                 GBC.at(0, 0).insets(2));
 
         this.add(exitButton = new JButton("Exit"),
-                GBC.at(2, 0).hFill().insets(2));
+                GBC.at(2, 0).hfill().insets(2));
 
         // TODO
         this.add(new JButton("Open Catalogue"),
-                GBC.at(1, 0).hFill().insets(2));
+                GBC.at(1, 0).hfill().insets(2));
     }
 
     // REQUIRES: addTopBarListeners has not been called
@@ -104,6 +111,7 @@ public class HomeView extends View {
     // MODIFIES: this
     // EFFECTS: Adds closet list components
     private void addClosetListComponents() {
+
         this.closetJList = new JList<>();
         this.closetJList.setCellRenderer(ClosetListItem::new);
         this.refreshClosetListData();
@@ -117,11 +125,11 @@ public class HomeView extends View {
                         .gridwidth(2));
 
         this.add(addClosetButton = new JButton("Create New Closet"),
-                GBC.hFillNorth(1, 2).insets(2)
+                GBC.hfillNorth(1, 2).insets(2)
                         .weightx(0.3));
 
         this.add(addClosetNameField = PromptedTextField.prompt(CLOSET_NAME_PROMPT),
-                GBC.hFillNorth(0, 2).insets(2)
+                GBC.hfillNorth(0, 2).insets(2)
                         .weightx(0.7));
     }
 
@@ -155,9 +163,10 @@ public class HomeView extends View {
     // EFFECTS: Sets selected closet and gui params based on input
     private void setSelectedCloset(Closet c) {
         this.selectedCloset = c;
-        this.selectedClosetName.setText(c == null ?
-                "No Selected Closet" : "Selected Closet: " + c.getName());
+        this.selectedClosetName.setText(c == null
+                ? "No Selected Closet" : "Selected Closet: " + c.getName());
         openSelectedClosetButton.setEnabled(c != null);
+        deleteSelectedClosetButton.setEnabled(c != null);
     }
 
     // A list view item for a closet

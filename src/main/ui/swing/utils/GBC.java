@@ -12,8 +12,8 @@ public class GBC extends GridBagConstraints {
 
     // EFFECTS: Returns a new GBC with the given x, y and with horizontal fill
     //          and a north anchor.
-    public static GBC hFillNorth(int x, int y) {
-        return GBC.at(x, y).hFill().anchor(Anchor.North);
+    public static GBC hfillNorth(int x, int y) {
+        return GBC.at(x, y).hfill().anchor(Anchor.North);
     }
 
     // MODIFIES: this
@@ -37,7 +37,7 @@ public class GBC extends GridBagConstraints {
 
     // MODIFIES: this
     // EFFECTS: Sets to fill horizontally
-    public GBC hFill() {
+    public GBC hfill() {
         return this.fill(Fill.Horizontal);
     }
 
@@ -45,6 +45,13 @@ public class GBC extends GridBagConstraints {
     // EFFECTS: Sets anchor to given value
     public GBC anchor(Anchor a) {
         return this.anchor(a.wrappedValue);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets anchor to v and returns this
+    public GBC anchor(int v) {
+        this.anchor = v;
+        return this;
     }
 
     // MODIFIES: this
@@ -57,13 +64,6 @@ public class GBC extends GridBagConstraints {
     // EFFECTS: Sets anchor to center
     public GBC center() {
         return this.anchor(Anchor.Center);
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Sets anchor to v and returns this
-    public GBC anchor(int v) {
-        this.anchor = v;
-        return this;
     }
 
     // MODIFIES: this
