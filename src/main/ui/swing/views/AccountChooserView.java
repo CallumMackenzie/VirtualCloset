@@ -1,7 +1,8 @@
-package ui.swing;
+package ui.swing.views;
 
 import model.Account;
 import model.AccountManager;
+import ui.swing.utils.GBC;
 import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
@@ -37,9 +38,12 @@ public class AccountChooserView extends View {
     private JButton createAccountButton;
     private JTextField createAccountNameField;
 
+    private JButton openAccountHomeButton;
+
     // EFFECTS: Creates a new account chooser view from the given account manager
-    public AccountChooserView(AccountManager accountManager) {
-        super();
+    public AccountChooserView(Container root,
+                              AccountManager accountManager) {
+        super(root);
         this.accountManager = accountManager;
     }
 
@@ -70,6 +74,7 @@ public class AccountChooserView extends View {
         } else {
             this.activeAccountNameField.setText("No Active Account");
         }
+        this.openAccountHomeButton.setEnabled(accountManager.hasActiveAccount());
     }
 
     @Override
@@ -79,9 +84,33 @@ public class AccountChooserView extends View {
         this.addAccountListView();
         this.addAccountSelectedView();
         this.addCreateAccountView();
+        this.addActiveAccountControlView();
 
         this.setSelectedAccount(null);
         this.refreshActiveAccountComponents();
+    }
+
+    // REQUIRES: addActiveAccountControlView has not been called
+    // MODIFIES: this
+    // EFFECTS: Sets up active account control view components
+    private void addActiveAccountControlView() {
+        final int x = CREATE_ACCOUNT_VIEW_X;
+        final int y = CREATE_ACCOUNT_VIEW_Y;
+        this.openAccountHomeButton = new JButton("Open Active Account");
+        this.openAccountHomeButton.setEnabled(accountManager.hasActiveAccount());
+        this.add(openAccountHomeButton, GBC.hFillNorth(x, y + 2)
+                .gridwidth(2).insets(2));
+    }
+
+    // REQUIRES: this.addActiveAccountControlListeners has not been called
+    // MODIFIES: this
+    // EFFECTS: Adds listeners to components from addActiveAccountControlView
+    private void addActiveAccountControlListeners() {
+        this.openAccountHomeButton.addActionListener(e -> {
+            if (accountManager.hasActiveAccount()) {
+                this.transition(new HomeView(this.root, this.accountManager));
+            }
+        });
     }
 
     // REQUIRES: addAccountListView has not been called before
@@ -253,6 +282,7 @@ public class AccountChooserView extends View {
         this.setAccountListViewListeners();
         this.setAccountSelectedListeners();
         this.setCreateAccountViewListeners();
+        this.addActiveAccountControlListeners();
     }
 
     // A list view item for an account

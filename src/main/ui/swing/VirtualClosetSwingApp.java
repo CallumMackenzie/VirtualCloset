@@ -1,9 +1,10 @@
 package ui.swing;
 
 import model.AccountManager;
+import ui.swing.utils.LookAndFeelManager;
+import ui.swing.views.AccountChooserView;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.IOException;
 
 // Virtual Closet swing GUI application
@@ -12,8 +13,6 @@ public class VirtualClosetSwingApp extends JFrame {
     private static final String APP_TITLE = "Virtual Closet";
 
     private AccountManager accountManager;
-
-    private View currentView;
 
     // EFFECTS: Creates and runs a new virtual closet swing application
     public VirtualClosetSwingApp() {
@@ -34,18 +33,8 @@ public class VirtualClosetSwingApp extends JFrame {
             throw new RuntimeException(e);
         }
 
-        this.setCurrentView(new AccountChooserView(accountManager));
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Sets the current view to the given
-    private void setCurrentView(View view) {
-        this.currentView = view;
-        view.init();
-
-        Container cp = this.getContentPane();
-        cp.removeAll();
-        cp.add(this.currentView);
+        AccountChooserView av = new AccountChooserView(this.getContentPane(), accountManager);
+        av.init();
         this.pack();
     }
 
