@@ -303,8 +303,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         "Removes the closet with the given name.",
                         "remove closet"),
                 new ConsoleCommand(this::listClosets,
-                        () -> this.accountManager.getActiveAccount() == null
-                                || this.accountManager.getActiveAccount()
+                        () -> this.accountManager.getActiveAccount() != null
+                                && !this.accountManager.getActiveAccount()
                                 .getClosets().isEmpty(),
                         "No active account, or no closets!",
                         "Lists the closets for the given active account.",

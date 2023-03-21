@@ -32,12 +32,32 @@ public class AccountChooserView extends View {
     private JTextField createAccountNameField;
 
     private JButton openAccountHomeButton;
+    private JButton openSelectedAccountButton;
 
     // EFFECTS: Creates a new account chooser view from the given account manager
     public AccountChooserView(Container root,
                               AccountManager accountManager) {
         super(root);
         this.accountManager = accountManager;
+    }
+
+    @Override
+    void addComponents() {
+        this.setLayout(new GridBagLayout());
+
+        this.addAccountListComponents();
+        this.addAccountSelectedComponents();
+        this.addActiveAccountComponents();
+
+        this.setSelectedAccount(null);
+        this.refreshActiveAccountComponents();
+    }
+
+    @Override
+    void addEventListeners() {
+        this.addAccountListListeners();
+        this.addAccountSelectedListeners();
+        this.addActiveAccountListeners();
     }
 
     // REQUIRES: this.addAccountSelectedView has been called
@@ -55,6 +75,7 @@ public class AccountChooserView extends View {
         this.deleteAccountButton.setEnabled(a != null);
         this.deleteConfirmed = false;
         this.deleteAccountButton.setText("Delete Account");
+        this.openSelectedAccountButton.setEnabled(a != null);
     }
 
     // REQUIRES: this.addComponents has been called
@@ -70,42 +91,26 @@ public class AccountChooserView extends View {
         this.openAccountHomeButton.setEnabled(accountManager.hasActiveAccount());
     }
 
-    @Override
-    void addComponents() {
-        this.setLayout(new GridBagLayout());
-
-        this.addAccountListView();
-        this.addAccountSelectedView();
-        this.addCreateAccountView();
-        this.addActiveAccountControlView();
-
-        this.setSelectedAccount(null);
-        this.refreshActiveAccountComponents();
-    }
-
     // REQUIRES: addActiveAccountControlView has not been called
     // MODIFIES: this
     // EFFECTS: Sets up active account control view components
-    private void addActiveAccountControlView() {
+    private void addActiveAccountComponents() {
         final int x = 2;
         final int y = 5;
 
-        this.activeAccountNameField = new JLabel();
-        this.add(this.activeAccountNameField,
+        this.add(this.activeAccountNameField = new JLabel(),
                 GBC.at(x, y).gridwidth(2).insets(2)
-                        .fillHorizontal()
+                        .hFill()
                         .anchor(GBC.Anchor.South));
 
-        this.openAccountHomeButton = new JButton("Open Active Account");
-        this.openAccountHomeButton.setEnabled(accountManager.hasActiveAccount());
-        this.add(openAccountHomeButton, GBC.hFillNorth(x, y + 1)
-                .gridwidth(2).insets(2));
+        this.add(openAccountHomeButton = new JButton("Open Active Account"),
+                GBC.hFillNorth(x, y + 1).gridwidth(2).insets(2));
     }
 
     // REQUIRES: this.addActiveAccountControlListeners has not been called
     // MODIFIES: this
     // EFFECTS: Adds listeners to components from addActiveAccountControlView
-    private void addActiveAccountControlListeners() {
+    private void addActiveAccountListeners() {
         this.openAccountHomeButton.addActionListener(e -> {
             if (accountManager.hasActiveAccount()) {
                 this.transition(new HomeView(this.root, this.accountManager));
@@ -116,7 +121,7 @@ public class AccountChooserView extends View {
     // REQUIRES: addAccountListView has not been called before
     // MODIFIES: this
     // EFFECTS: Sets up and adds account list view
-    private void addAccountListView() {
+    private void addAccountListComponents() {
         JLabel accountsLabel = new JLabel("Account List");
         this.add(accountsLabel, GBC.at(0, 0).center());
 
@@ -131,44 +136,24 @@ public class AccountChooserView extends View {
                         .gridheight(5)
                         .weight(0.5, 1)
                         .insets(5));
+
+        this.add(createAccountButton = new JButton("Create Account"),
+                GBC.hFillNorth(1, 6).insets(2).weightx(0.4));
+
+        this.add(createAccountNameField = PromptedTextField.prompt(CREATE_ACCOUNT_STR),
+                GBC.hFillNorth(0, 6).insets(2).weightx(0.6));
     }
 
     // REQUIRES: addAccountListView has been called
     // MODIFIES: this
     // EFFECTS: Sets listeners for the account list view
-    private void setAccountListViewListeners() {
+    private void addAccountListListeners() {
         this.accountJList.addListSelectionListener(e -> {
             if (e.getValueIsAdjusting()) {
-                int idx = accountJList.getSelectedIndex();
-                if (idx >= 0 && idx < this.accountManager.getAccounts().size()) {
-                    this.setSelectedAccount(this.accountManager
-                            .getAccounts().get(accountJList.getSelectedIndex()));
-                } else {
-                    this.setSelectedAccount(null);
-                }
+                this.setSelectedAccount(accountJList.getSelectedValue());
             }
         });
-    }
 
-    // REQUIRES: this.addAccountCreationView has not been called
-    // MODIFIES: this
-    // EFFECTS: Sets up and adds the account creation view
-    private void addCreateAccountView() {
-        final int x = 0;
-        final int y = 5;
-
-        this.createAccountButton = new JButton("Create Account");
-        this.add(createAccountButton, GBC.hFillNorth(x + 1, y + 1)
-                .insets(2).weightx(0.4));
-
-        this.createAccountNameField = PromptedTextField.prompt(CREATE_ACCOUNT_STR);
-        this.add(createAccountNameField, GBC.hFillNorth(x, y + 1)
-                .insets(2).weightx(0.6));
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Sets up listeners for create account view components
-    private void setCreateAccountViewListeners() {
         this.createAccountButton.addActionListener(e -> {
             String t = createAccountNameField.getText();
             if (!t.isEmpty() && !t.equals(CREATE_ACCOUNT_STR)) {
@@ -182,39 +167,43 @@ public class AccountChooserView extends View {
     // REQUIRES: this.addAccountSelectedView has not been called
     // MODIFIES: this
     // EFFECTS: Sets up and adds the account selected view
-    private void addAccountSelectedView() {
+    private void addAccountSelectedComponents() {
         final int x = 2;
         final int y = 0;
 
         this.add(new JLabel("Selected Account Edit Controls"),
                 GBC.hFillNorth(x, y).gridwidth(2).insets(2));
 
-        this.accountNameField = new JLabel();
-        this.add(this.accountNameField,
+        this.add(accountNameField = new JLabel(),
                 GBC.hFillNorth(x, y + 1).gridwidth(2).insets(2));
 
-        this.accountNameEditField = PromptedTextField.prompt("Account Name");
-        this.add(this.accountNameEditField,
+        this.add(accountNameEditField = PromptedTextField.prompt("Account Name"),
                 GBC.hFillNorth(x, y + 2).weightx(0.5).insets(2));
 
-        this.setAccountNameButton = new JButton("Set Account Name");
-        this.add(this.setAccountNameButton,
+        this.add(setAccountNameButton = new JButton("Set Account Name"),
                 GBC.hFillNorth(x + 1, y + 2).weightx(0.2).insets(2));
 
-        this.setActiveButton = new JButton("Set as Active Account");
-        this.add(this.setActiveButton, GBC.hFillNorth(x + 1, y + 3).insets(2));
+        this.add(setActiveButton = new JButton("Set as Active Account"),
+                GBC.hFillNorth(x + 1, y + 3).insets(2));
 
-        this.deleteAccountButton = new JButton("Delete Account");
-        this.add(this.deleteAccountButton, GBC.hFillNorth(x, y + 3).insets(2));
+        this.add(deleteAccountButton = new JButton("Delete Account"),
+                GBC.hFillNorth(x, y + 3).insets(2));
+
+        this.add(openSelectedAccountButton = new JButton("Open Selected Account"),
+                GBC.hFillNorth(x, y + 4).insets(2).gridwidth(2));
     }
 
     // REQUIRES: addAccountSelectedView has been called
     // MODIFIES: this
     // EFFECTS: Sets listeners for selected account controls
-    private void setAccountSelectedListeners() {
+    private void addAccountSelectedListeners() {
         this.setAccountNameButton.addActionListener(this::onSetSelectedAccountName);
         this.setActiveButton.addActionListener(this::onSetActiveAccount);
         this.deleteAccountButton.addActionListener(this::onRemoveActiveAccount);
+        this.openSelectedAccountButton.addActionListener(e -> {
+            this.accountManager.setActiveAccount(this.selectedAccount.getName());
+            this.transition(new HomeView(this.root, this.accountManager));
+        });
     }
 
     // MODIFIES: this
@@ -274,14 +263,6 @@ public class AccountChooserView extends View {
     private void refreshAccountListData() {
         this.accountJList.setListData(this.accountManager.getAccounts()
                 .toArray(new Account[0]));
-    }
-
-    @Override
-    void addEventListeners() {
-        this.setAccountListViewListeners();
-        this.setAccountSelectedListeners();
-        this.setCreateAccountViewListeners();
-        this.addActiveAccountControlListeners();
     }
 
     // A list view item for an account
