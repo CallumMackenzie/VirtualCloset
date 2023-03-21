@@ -10,7 +10,6 @@ import persistance.Savable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 // Manages account data in memory, has an active account and a list of
 // all accounts.
@@ -37,6 +36,17 @@ public class AccountManager implements Savable<Void> {
         this.fileSavePath = FILE_SAVE_PATH;
     }
 
+    // EFFECTS: Returns an instance of this object from the given JSON
+    public static AccountManager fromJson(JSONObject jso) {
+        JSONArray jsa = jso.getJSONArray(JSON_ACCOUNTS_KEY);
+        List<Account> accounts = new ArrayList<>(jsa.length());
+        for (int i = 0; i < jsa.length(); ++i) {
+            JSONObject accountJs = jsa.getJSONObject(i);
+            accounts.add(Account.fromJson(accountJs));
+        }
+        return new AccountManager(accounts);
+    }
+
     // EFFECTS: Returns whether there is an active account or not
     public boolean hasActiveAccount() {
         return this.activeAccount != null;
@@ -54,12 +64,12 @@ public class AccountManager implements Savable<Void> {
     }
 
     // EFFECTS: Returns account wrapped in optional if present,
-    //          otherwise returns Optional.empty().
-    public Optional<Account> getActiveAccount() {
+    //          otherwise returns null.
+    public Account getActiveAccount() {
         if (this.hasActiveAccount()) {
-            return Optional.of(this.activeAccount);
+            return this.activeAccount;
         }
-        return Optional.empty();
+        return null;
     }
 
     // EFFECTS: Returns true if the given account name is
@@ -166,16 +176,5 @@ public class AccountManager implements Savable<Void> {
     public JSONObject toJson(Void unused) {
         return new JsonBuilder()
                 .savable(JSON_ACCOUNTS_KEY, this.accounts, null);
-    }
-
-    // EFFECTS: Returns an instance of this object from the given JSON
-    public static AccountManager fromJson(JSONObject jso) {
-        JSONArray jsa = jso.getJSONArray(JSON_ACCOUNTS_KEY);
-        List<Account> accounts = new ArrayList<>(jsa.length());
-        for (int i = 0; i < jsa.length(); ++i) {
-            JSONObject accountJs = jsa.getJSONObject(i);
-            accounts.add(Account.fromJson(accountJs));
-        }
-        return new AccountManager(accounts);
     }
 }

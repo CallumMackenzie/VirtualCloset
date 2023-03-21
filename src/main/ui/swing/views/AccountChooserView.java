@@ -8,15 +8,9 @@ import ui.swing.utils.PromptedTextField;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Optional;
 
 // A view to choose and edit accounts
 public class AccountChooserView extends View {
-
-    private static final int SELECTED_ACCOUNT_VIEW_X = 1;
-    private static final int SELECTED_ACCOUNT_VIEW_Y = 0;
-    private static final int CREATE_ACCOUNT_VIEW_X = 1;
-    private static final int CREATE_ACCOUNT_VIEW_Y = 4;
 
     private static final String CREATE_ACCOUNT_STR = "Name for New Account";
 
@@ -26,7 +20,6 @@ public class AccountChooserView extends View {
     private JLabel activeAccountNameField;
 
     private JList<Account> accountJList;
-    private JScrollPane accountJListScrollPane;
 
     private JLabel accountNameField;
     private JTextField accountNameEditField;
@@ -70,7 +63,7 @@ public class AccountChooserView extends View {
     private void refreshActiveAccountComponents() {
         if (accountManager.hasActiveAccount()) {
             this.activeAccountNameField.setText("Active Account: "
-                    + accountManager.getActiveAccount().get().getName());
+                    + accountManager.getActiveAccount().getName());
         } else {
             this.activeAccountNameField.setText("No Active Account");
         }
@@ -94,11 +87,18 @@ public class AccountChooserView extends View {
     // MODIFIES: this
     // EFFECTS: Sets up active account control view components
     private void addActiveAccountControlView() {
-        final int x = CREATE_ACCOUNT_VIEW_X;
-        final int y = CREATE_ACCOUNT_VIEW_Y;
+        final int x = 2;
+        final int y = 5;
+
+        this.activeAccountNameField = new JLabel();
+        this.add(this.activeAccountNameField,
+                GBC.at(x, y).gridwidth(2).insets(2)
+                        .fillHorizontal()
+                        .anchor(GBC.Anchor.South));
+
         this.openAccountHomeButton = new JButton("Open Active Account");
         this.openAccountHomeButton.setEnabled(accountManager.hasActiveAccount());
-        this.add(openAccountHomeButton, GBC.hFillNorth(x, y + 2)
+        this.add(openAccountHomeButton, GBC.hFillNorth(x, y + 1)
                 .gridwidth(2).insets(2));
     }
 
@@ -123,14 +123,14 @@ public class AccountChooserView extends View {
         this.accountJList = new JList<>();
         this.accountJList.setCellRenderer(AccountListItem::new);
         this.refreshAccountListData();
-        this.accountJListScrollPane = new JScrollPane(this.accountJList);
-        this.add(this.accountJListScrollPane,
+        this.add(new JScrollPane(this.accountJList),
                 GBC.at(0, 1)
                         .north()
                         .fillBoth()
+                        .gridwidth(2)
+                        .gridheight(5)
                         .weight(0.5, 1)
-                        .insets(5)
-                        .gridheight(GridBagConstraints.REMAINDER));
+                        .insets(5));
     }
 
     // REQUIRES: addAccountListView has been called
@@ -154,16 +154,16 @@ public class AccountChooserView extends View {
     // MODIFIES: this
     // EFFECTS: Sets up and adds the account creation view
     private void addCreateAccountView() {
-        final int x = CREATE_ACCOUNT_VIEW_X;
-        final int y = CREATE_ACCOUNT_VIEW_Y;
+        final int x = 0;
+        final int y = 5;
 
         this.createAccountButton = new JButton("Create Account");
         this.add(createAccountButton, GBC.hFillNorth(x + 1, y + 1)
-                .insets(2));
+                .insets(2).weightx(0.4));
 
         this.createAccountNameField = PromptedTextField.prompt(CREATE_ACCOUNT_STR);
         this.add(createAccountNameField, GBC.hFillNorth(x, y + 1)
-                .insets(2));
+                .insets(2).weightx(0.6));
     }
 
     // MODIFIES: this
@@ -183,11 +183,10 @@ public class AccountChooserView extends View {
     // MODIFIES: this
     // EFFECTS: Sets up and adds the account selected view
     private void addAccountSelectedView() {
-        final int x = SELECTED_ACCOUNT_VIEW_X;
-        final int y = SELECTED_ACCOUNT_VIEW_Y;
+        final int x = 2;
+        final int y = 0;
 
-        this.activeAccountNameField = new JLabel();
-        this.add(this.activeAccountNameField,
+        this.add(new JLabel("Selected Account Edit Controls"),
                 GBC.hFillNorth(x, y).gridwidth(2).insets(2));
 
         this.accountNameField = new JLabel();
@@ -221,12 +220,12 @@ public class AccountChooserView extends View {
     // MODIFIES: this
     // EFFECTS: Sets selected account name
     private void onSetSelectedAccountName(ActionEvent e) {
-        Optional<Account> activeBefore = this.accountManager.getActiveAccount();
+        Account activeBefore = this.accountManager.getActiveAccount();
         int selectedIndex = this.accountJList.getSelectedIndex();
         this.accountManager.setActiveAccount(selectedAccount.getName());
         this.accountManager.setActiveAccountName(accountNameEditField.getText());
-        if (activeBefore.isPresent()) {
-            this.accountManager.setActiveAccount(activeBefore.get().getName());
+        if (this.accountManager.hasActiveAccount()) {
+            this.accountManager.setActiveAccount(activeBefore.getName());
         } else {
             this.accountManager.removeActiveAccount();
         }
@@ -286,9 +285,7 @@ public class AccountChooserView extends View {
     }
 
     // A list view item for an account
-    private class AccountListItem extends JPanel {
-
-        private final Account account;
+    private static class AccountListItem extends JPanel {
 
         // EFFECTS: Constructs a new account list item
         public AccountListItem(JList<? extends Account> list,
@@ -296,15 +293,11 @@ public class AccountChooserView extends View {
                                int index,
                                boolean isSelected,
                                boolean cellHasFocus) {
-            this.account = value;
-
             if (isSelected) {
                 this.setBackground(UIManager
                         .getDefaults().getColor("List.selectionBackground"));
             }
-            JTextField name = new JTextField(account.getName());
-            name.setEditable(false);
-            this.add(name);
+            this.add(new JLabel(value.getName()));
         }
 
     }

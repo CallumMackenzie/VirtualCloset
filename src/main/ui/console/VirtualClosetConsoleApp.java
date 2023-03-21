@@ -37,13 +37,13 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Prompts the user for a command and returns it
     @Override
     protected String promptInput() {
-        String prompt = this.accountManager.getActiveAccount()
-                .map(Account::getName)
-                .map(name -> "Enter a command "
-                        + name
-                        + " (ex. \"help\"): ")
-                .orElse(DEFAULT_INPUT_PROMPT);
-        return this.getInput(prompt);
+        if (this.accountManager.hasActiveAccount()) {
+            return this.getInput("Enter a command "
+                    + this.accountManager.getActiveAccount().getName()
+                    + " (ex. \"help\"): ");
+        } else {
+            return this.getInput(DEFAULT_INPUT_PROMPT);
+        }
     }
 
     // MODIFIES: this
@@ -61,9 +61,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: creates a new closet with the given name unless
     //          a closet with the name is already present
     private void createCloset() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String closetName = this.getInput("\tEnter closet name to create: ");
-        Account active = this.accountManager.getActiveAccount().get();
+        Account active = this.accountManager.getActiveAccount();
         if (active.addCloset(closetName)) {
             System.out.println("\tAdded closet \"" + closetName + "\".");
         } else {
@@ -76,10 +75,9 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Removes the closet with the given name and informs
     //          the user if it was removed successfully.
     private void removeCloset() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String closetName = this.getInput("\tEnter a closet name to remove: ");
         String verify = this.getInput("\tEnter the closet name again to confirm: ");
-        Account active = this.accountManager.getActiveAccount().get();
+        Account active = this.accountManager.getActiveAccount();
         if (!closetName.equalsIgnoreCase(verify)) {
             System.out.println("\tNames did not match, not removing closet.");
         } else if (active.removeCloset(closetName)) {
@@ -154,8 +152,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // REQUIRES: this.accountManager has an active account
     // EFFECTS: Lists the closets of the given active account
     private void listClosets() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
-        Account a = this.accountManager.getActiveAccount().get();
+        Account a = this.accountManager.getActiveAccount();
         System.out.println("\tClosets: "
                 + a.getClosets().stream()
                 .map(Closet::getName)
@@ -168,10 +165,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     //          and renames the active account if no other
     //          account presently has the same name.
     private void renameActive() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
         String name = this.getInput("\tEnter new account name: ");
-        String nameBefore = this.accountManager.getActiveAccount()
-                .get().getName();
+        String nameBefore = this.accountManager.getActiveAccount().getName();
         if (this.accountManager.setActiveAccountName(name)) {
             System.out.println("\tAccount \"" + nameBefore
                     + "\" renamed to \"" + name + "\".");
@@ -186,10 +181,8 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // EFFECTS: Enters closet mode for the given closet name provided
     //          by the user
     private void openCloset() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account present!";
-
         String closetName = this.getInput("\tEnter closet name: ");
-        Account active = this.accountManager.getActiveAccount().get();
+        Account active = this.accountManager.getActiveAccount();
         if (active.hasCloset(closetName)) {
             // This assertion is guaranteed by the check to active.hasCloset; this is to suppress the warning
             // and ensure the correct behavior of active.hasCloset
@@ -228,8 +221,7 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
     // MODIFIES: this
     // EFFECTS: Enters catalogue mode
     private void openCatalogue() {
-        assert this.accountManager.getActiveAccount().isPresent() : "No active account!";
-        Account active = this.accountManager.getActiveAccount().get();
+        Account active = this.accountManager.getActiveAccount();
         new CatalogueModeConsole(this.getInput(), active);
     }
 
@@ -311,10 +303,9 @@ public final class VirtualClosetConsoleApp extends CommandSystem {
                         "Removes the closet with the given name.",
                         "remove closet"),
                 new ConsoleCommand(this::listClosets,
-                        () -> this.accountManager.getActiveAccount()
-                                .map(Account::getClosets)
-                                .map(l -> !l.isEmpty())
-                                .orElse(false),
+                        () -> this.accountManager.getActiveAccount() == null
+                                || this.accountManager.getActiveAccount()
+                                .getClosets().isEmpty(),
                         "No active account, or no closets!",
                         "Lists the closets for the given active account.",
                         "closets"),

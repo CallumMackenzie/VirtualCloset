@@ -140,6 +140,13 @@ public class GBC extends GridBagConstraints {
     }
 
     // MODIFIES: this
+    // EFFECTS: Sets top inset only to v and returns this
+    public GBC bottomInset(int v) {
+        this.insets.top = v;
+        return this;
+    }
+
+    // MODIFIES: this
     // EFFECTS: Sets ipadx to v and returns this
     public GBC ipadx(int v) {
         this.ipadx = v;
