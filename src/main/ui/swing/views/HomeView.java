@@ -13,6 +13,8 @@ import java.awt.*;
 public class HomeView extends View {
 
     private static final String CLOSET_NAME_PROMPT = "Closet Name";
+    private static final String DELETE_CLOSET_INITIAL = "Delete Closet";
+    private static final String DELETE_CLOSET_CONFIRM = "Confirm Delete?";
 
     private final AccountManager accountManager;
     private final Account active;
@@ -27,6 +29,8 @@ public class HomeView extends View {
     private JLabel selectedClosetName;
     private JButton openSelectedClosetButton;
     private JButton deleteSelectedClosetButton;
+    private boolean deleteSelectedClosetConfirmed;
+    private JButton openCatalogueButton;
 
     // TODO
     public HomeView(Container root, AccountManager accountManager) {
@@ -63,7 +67,7 @@ public class HomeView extends View {
         this.add(openSelectedClosetButton = new JButton("Open Closet"),
                 GBC.hfillNorth(2, 2));
 
-        this.add(deleteSelectedClosetButton = new JButton("Delete Closet"),
+        this.add(deleteSelectedClosetButton = new JButton(DELETE_CLOSET_INITIAL),
                 GBC.hfillNorth(3, 2));
     }
 
@@ -75,9 +79,16 @@ public class HomeView extends View {
                 this.transition(new ClosetView(this.root)));
         deleteSelectedClosetButton.addActionListener(e -> {
             if (active != null) {
-                active.removeCloset(this.selectedCloset.getName());
-                this.setSelectedCloset(null);
-                this.refreshClosetListData();
+                if (deleteSelectedClosetConfirmed) {
+                    active.removeCloset(this.selectedCloset.getName());
+                    this.setSelectedCloset(null);
+                    this.refreshClosetListData();
+                    deleteSelectedClosetConfirmed = false;
+                    deleteSelectedClosetButton.setText(DELETE_CLOSET_INITIAL);
+                } else {
+                    deleteSelectedClosetConfirmed = true;
+                    deleteSelectedClosetButton.setText(DELETE_CLOSET_CONFIRM);
+                }
             }
         });
     }
@@ -92,8 +103,7 @@ public class HomeView extends View {
         this.add(exitButton = new JButton("Exit"),
                 GBC.at(2, 0).hfill().insets(2));
 
-        // TODO
-        this.add(new JButton("Open Catalogue"),
+        this.add(openCatalogueButton = new JButton("Open Catalogue"),
                 GBC.at(1, 0).hfill().insets(2));
     }
 
@@ -101,10 +111,10 @@ public class HomeView extends View {
     // MODIFIES: this
     // EFFECTS: Adds top bar component listeners
     private void addTopBarListeners() {
-        this.exitButton.addActionListener(e -> this.transition(new AccountChooserView(
-                this.root,
-                accountManager
-        )));
+        this.exitButton.addActionListener(e ->
+                this.transition(new AccountChooserView(this.root, accountManager)));
+        this.openCatalogueButton.addActionListener(e ->
+                this.transition(new CatalogueView(this.root)));
     }
 
     // REQUIRES: addClosetListComponents has not been called
@@ -167,6 +177,8 @@ public class HomeView extends View {
                 ? "No Selected Closet" : "Selected Closet: " + c.getName());
         openSelectedClosetButton.setEnabled(c != null);
         deleteSelectedClosetButton.setEnabled(c != null);
+        deleteSelectedClosetConfirmed = false;
+        deleteSelectedClosetButton.setText(DELETE_CLOSET_INITIAL);
     }
 
     // A list view item for a closet
