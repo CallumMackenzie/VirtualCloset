@@ -14,6 +14,17 @@ public abstract class PromptedTextField extends JTextField {
         this.setPromptState();
     }
 
+    // EFFECTS: Returns an anonymous PromptTextField instance with the given
+    //          string prompt
+    public static PromptedTextField prompt(String prompt) {
+        return new PromptedTextField() {
+            @Override
+            protected String getPrompt() {
+                return prompt;
+            }
+        };
+    }
+
     // MODIFIES: this
     // EFFECTS: Sets edit variables
     protected void setEditState() {
@@ -42,7 +53,9 @@ public abstract class PromptedTextField extends JTextField {
         this.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent fe) {
-                if (getText().equals(getPrompt())) {
+                if (getText().equals(getPrompt())
+                        && PromptedTextField.this.isEnabled()
+                        && PromptedTextField.this.isEditable()) {
                     PromptedTextField.super.setText("");
                     setEditState();
                 }
@@ -63,24 +76,13 @@ public abstract class PromptedTextField extends JTextField {
     // EFFECTS: Returns the text color to be used when prompting, or
     //          null if it should stay the same.
     protected Color getPromptColor() {
-        return Color.gray;
+        return UIManager.getDefaults().getColor("TextField.inactiveForeground");
     }
 
     // EFFECTS: Returns the text color to be used when normal
     //          input is being done.
     protected Color getEditColor() {
-        return Color.black;
-    }
-
-    // EFFECTS: Returns an anonymous PromptTextField instance with the given
-    //          string prompt
-    public static PromptedTextField prompt(String prompt) {
-        return new PromptedTextField() {
-            @Override
-            protected String getPrompt() {
-                return prompt;
-            }
-        };
+        return UIManager.getDefaults().getColor("TextField.foreground");
     }
 
 }

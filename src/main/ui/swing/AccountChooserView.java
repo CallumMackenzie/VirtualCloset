@@ -2,7 +2,6 @@ package ui.swing;
 
 import model.Account;
 import model.AccountManager;
-import ui.swing.GBC.Anchor;
 import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
@@ -10,26 +9,33 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Optional;
 
-// TODO
+// A view to choose and edit accounts
 public class AccountChooserView extends View {
 
     private static final int SELECTED_ACCOUNT_VIEW_X = 1;
     private static final int SELECTED_ACCOUNT_VIEW_Y = 0;
+    private static final int CREATE_ACCOUNT_VIEW_X = 1;
+    private static final int CREATE_ACCOUNT_VIEW_Y = 4;
+
+    private static final String CREATE_ACCOUNT_STR = "Name for New Account";
 
     private final AccountManager accountManager;
     private Account selectedAccount;
 
-    private JTextArea activeAccountNameField;
+    private JLabel activeAccountNameField;
 
     private JList<Account> accountJList;
     private JScrollPane accountJListScrollPane;
 
-    private JTextArea accountNameField;
+    private JLabel accountNameField;
     private JTextField accountNameEditField;
     private JButton setAccountNameButton;
     private JButton setActiveButton;
     private JButton deleteAccountButton;
     private boolean deleteConfirmed;
+
+    private JButton createAccountButton;
+    private JTextField createAccountNameField;
 
     // EFFECTS: Creates a new account chooser view from the given account manager
     public AccountChooserView(AccountManager accountManager) {
@@ -72,7 +78,7 @@ public class AccountChooserView extends View {
 
         this.addAccountListView();
         this.addAccountSelectedView();
-        this.addCreateAccountComponents();
+        this.addCreateAccountView();
 
         this.setSelectedAccount(null);
         this.refreshActiveAccountComponents();
@@ -82,15 +88,19 @@ public class AccountChooserView extends View {
     // MODIFIES: this
     // EFFECTS: Sets up and adds account list view
     private void addAccountListView() {
+        JLabel accountsLabel = new JLabel("Account List");
+        this.add(accountsLabel, GBC.at(0, 0).center());
+
         this.accountJList = new JList<>();
         this.accountJList.setCellRenderer(AccountListItem::new);
         this.refreshAccountListData();
         this.accountJListScrollPane = new JScrollPane(this.accountJList);
         this.add(this.accountJListScrollPane,
-                GBC.at(0, 0)
-                        .fillHorizontal()
-                        .anchor(Anchor.North)
+                GBC.at(0, 1)
+                        .north()
+                        .fillBoth()
                         .weight(0.5, 1)
+                        .insets(5)
                         .gridheight(GridBagConstraints.REMAINDER));
     }
 
@@ -114,8 +124,30 @@ public class AccountChooserView extends View {
     // REQUIRES: this.addAccountCreationView has not been called
     // MODIFIES: this
     // EFFECTS: Sets up and adds the account creation view
-    private void addAccountCreationView() {
-        // TODO
+    private void addCreateAccountView() {
+        final int x = CREATE_ACCOUNT_VIEW_X;
+        final int y = CREATE_ACCOUNT_VIEW_Y;
+
+        this.createAccountButton = new JButton("Create Account");
+        this.add(createAccountButton, GBC.hFillNorth(x + 1, y + 1)
+                .insets(2));
+
+        this.createAccountNameField = PromptedTextField.prompt(CREATE_ACCOUNT_STR);
+        this.add(createAccountNameField, GBC.hFillNorth(x, y + 1)
+                .insets(2));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets up listeners for create account view components
+    private void setCreateAccountViewListeners() {
+        this.createAccountButton.addActionListener(e -> {
+            String t = createAccountNameField.getText();
+            if (!t.isEmpty() && !t.equals(CREATE_ACCOUNT_STR)) {
+                accountManager.addAccount(new Account(t));
+                createAccountNameField.setText("");
+                this.refreshAccountListData();
+            }
+        });
     }
 
     // REQUIRES: this.addAccountSelectedView has not been called
@@ -125,30 +157,27 @@ public class AccountChooserView extends View {
         final int x = SELECTED_ACCOUNT_VIEW_X;
         final int y = SELECTED_ACCOUNT_VIEW_Y;
 
-        this.activeAccountNameField = new JTextArea();
-        this.activeAccountNameField.setEditable(false);
+        this.activeAccountNameField = new JLabel();
         this.add(this.activeAccountNameField,
-                GBC.at(x, y).fillHorizontal().gridwidth(2).anchor(Anchor.North));
+                GBC.hFillNorth(x, y).gridwidth(2).insets(2));
 
-        this.accountNameField = new JTextArea();
-        this.accountNameField.setEditable(false);
+        this.accountNameField = new JLabel();
         this.add(this.accountNameField,
-                GBC.at(x, y + 1).fillHorizontal().weightx(0.5)
-                        .gridwidth(2).anchor(Anchor.North));
+                GBC.hFillNorth(x, y + 1).gridwidth(2).insets(2));
 
         this.accountNameEditField = PromptedTextField.prompt("Account Name");
         this.add(this.accountNameEditField,
-                GBC.at(x, y + 2).fillHorizontal().weightx(0.5).anchor(Anchor.North));
+                GBC.hFillNorth(x, y + 2).weightx(0.5).insets(2));
 
         this.setAccountNameButton = new JButton("Set Account Name");
         this.add(this.setAccountNameButton,
-                GBC.at(x + 1, y + 2).fillHorizontal().weightx(0.2).anchor(Anchor.North));
+                GBC.hFillNorth(x + 1, y + 2).weightx(0.2).insets(2));
 
         this.setActiveButton = new JButton("Set as Active Account");
-        this.add(this.setActiveButton, GBC.at(x + 1, y + 3).fillHorizontal().anchor(Anchor.North));
+        this.add(this.setActiveButton, GBC.hFillNorth(x + 1, y + 3).insets(2));
 
         this.deleteAccountButton = new JButton("Delete Account");
-        this.add(this.deleteAccountButton, GBC.at(x, y + 3).anchor(Anchor.North));
+        this.add(this.deleteAccountButton, GBC.hFillNorth(x, y + 3).insets(2));
     }
 
     // REQUIRES: addAccountSelectedView has been called
@@ -219,17 +248,11 @@ public class AccountChooserView extends View {
                 .toArray(new Account[0]));
     }
 
-    // REQUIRES: this.addCreateAccountComponents has not been called
-    // MODIFIES: this
-    // EFFECTS: Initializes and adds account creation components
-    private void addCreateAccountComponents() {
-        // TODO
-    }
-
     @Override
     void addEventListeners() {
         this.setAccountListViewListeners();
         this.setAccountSelectedListeners();
+        this.setCreateAccountViewListeners();
     }
 
     // A list view item for an account
@@ -246,7 +269,8 @@ public class AccountChooserView extends View {
             this.account = value;
 
             if (isSelected) {
-                this.setBackground(Color.GRAY);
+                this.setBackground(UIManager
+                        .getDefaults().getColor("List.selectionBackground"));
             }
             JTextField name = new JTextField(account.getName());
             name.setEditable(false);

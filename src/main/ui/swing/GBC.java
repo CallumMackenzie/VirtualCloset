@@ -5,44 +5,15 @@ import java.awt.*;
 // Wrapper class for builder pattern GridBagConstraints
 public class GBC extends GridBagConstraints {
 
-    // Enum wrapper for GridBagConstraints fill
-    public enum Fill {
-        None(GridBagConstraints.NONE),
-        Both(GridBagConstraints.BOTH),
-        Horizontal(GridBagConstraints.HORIZONTAL),
-        Vertical(GridBagConstraints.VERTICAL);
-
-        public final int wrappedValue;
-
-        // EFFECTS: Constructs new enum with given wrapped value
-        Fill(int wv) {
-            this.wrappedValue = wv;
-        }
-    }
-
-    // Enum wrapper for GridBagConstraints anchor
-    public enum Anchor {
-        Center(GridBagConstraints.CENTER),
-        North(GridBagConstraints.NORTH),
-        NorthEast(GridBagConstraints.NORTHEAST),
-        East(GridBagConstraints.EAST),
-        SouthEast(GridBagConstraints.SOUTHEAST),
-        South(GridBagConstraints.SOUTH),
-        SouthWest(GridBagConstraints.SOUTHWEST),
-        West(GridBagConstraints.WEST),
-        NorthWest(GridBagConstraints.NORTHWEST);
-
-        public final int wrappedValue;
-
-        // EFFECTS: Constructs new enum with given wrapped value
-        Anchor(int wv) {
-            this.wrappedValue = wv;
-        }
-    }
-
-    // EFFECTS: Returns a new GBCBuilder with the given x and y
+    // EFFECTS: Returns a new GBC with the given x and y
     public static GBC at(int x, int y) {
         return new GBC().gridx(x).gridy(y);
+    }
+
+    // EFFECTS: Returns a new GBC with the given x, y and with horizontal fill
+    //          and a north anchor.
+    public static GBC hFillNorth(int x, int y) {
+        return GBC.at(x, y).fillHorizontal().anchor(Anchor.North);
     }
 
     // MODIFIES: this
@@ -56,7 +27,6 @@ public class GBC extends GridBagConstraints {
     public GBC fill(Fill f) {
         return this.fill(f.wrappedValue);
     }
-
 
     // MODIFIES: this
     // EFFECTS: Sets fill to v and returns this
@@ -75,6 +45,18 @@ public class GBC extends GridBagConstraints {
     // EFFECTS: Sets anchor to given value
     public GBC anchor(Anchor a) {
         return this.anchor(a.wrappedValue);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets anchor to north
+    public GBC north() {
+        return this.anchor(Anchor.North);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets anchor to center
+    public GBC center() {
+        return this.anchor(Anchor.Center);
     }
 
     // MODIFIES: this
@@ -138,12 +120,23 @@ public class GBC extends GridBagConstraints {
         return this;
     }
 
-
     // MODIFIES: this
     // EFFECTS: Sets insets to v and returns this
     public GBC insets(Insets v) {
         this.insets = v;
         return this;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets insets to the given vals and returns this
+    public GBC insets(int top, int left, int right, int bottom) {
+        return this.insets(new Insets(top, left, bottom, right));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets all insets to v and returns this
+    public GBC insets(int v) {
+        return this.insets(v, v, v, v);
     }
 
     // MODIFIES: this
@@ -158,6 +151,53 @@ public class GBC extends GridBagConstraints {
     public GBC ipady(int v) {
         this.ipady = v;
         return this;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets ipad x and y and returns this
+    public GBC ipad(int x, int y) {
+        return this.ipadx(x).ipady(y);
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets ipad x and y to v and returns this
+    public GBC ipad(int v) {
+        return this.ipad(v, v);
+    }
+
+    // Enum wrapper for GridBagConstraints fill
+    public enum Fill {
+        None(GridBagConstraints.NONE),
+        Both(GridBagConstraints.BOTH),
+        Horizontal(GridBagConstraints.HORIZONTAL),
+        Vertical(GridBagConstraints.VERTICAL);
+
+        public final int wrappedValue;
+
+        // EFFECTS: Constructs new enum with given wrapped value
+        Fill(int wv) {
+            this.wrappedValue = wv;
+        }
+    }
+
+    // Enum wrapper for GridBagConstraints anchor
+    public enum Anchor {
+        Center(GridBagConstraints.CENTER),
+        North(GridBagConstraints.NORTH),
+        NorthEast(GridBagConstraints.NORTHEAST),
+        East(GridBagConstraints.EAST),
+        SouthEast(GridBagConstraints.SOUTHEAST),
+        South(GridBagConstraints.SOUTH),
+        SouthWest(GridBagConstraints.SOUTHWEST),
+        West(GridBagConstraints.WEST),
+        NorthWest(GridBagConstraints.NORTHWEST);
+
+        public final int wrappedValue;
+
+        // EFFECTS: Constructs new enum with given wrapped value
+        Anchor(int wv) {
+            this.wrappedValue = wv;
+        }
     }
 
 }

@@ -18,6 +18,7 @@ public class VirtualClosetSwingApp extends JFrame {
     // EFFECTS: Creates and runs a new virtual closet swing application
     public VirtualClosetSwingApp() {
         super();
+        LookAndFeelManager.setLookAndFeel();
         this.initWindowParams();
         this.initAppState();
         this.setVisible(true);
