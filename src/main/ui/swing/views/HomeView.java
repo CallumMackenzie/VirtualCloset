@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Function;
 
-// TODO
+// A view to see user closets and open the catalogue
 public class HomeView extends View {
 
     private static final String CLOSET_NAME_PROMPT = "Closet Name";
@@ -39,7 +39,8 @@ public class HomeView extends View {
     private JLabel closetBrandsLabel;
     private JLabel closetStylesLabel;
 
-    // TODO
+    // EFFECTS: Constructs a new home view from the given root pane and account
+    //          manager.
     public HomeView(Container root, AccountManager accountManager) {
         super(root);
         this.accountManager = accountManager;
