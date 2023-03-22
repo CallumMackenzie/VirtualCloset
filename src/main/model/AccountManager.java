@@ -167,6 +167,7 @@ public class AccountManager implements Savable<Void> {
         JsonReader jsr = new JsonReader(this.fileSavePath);
         JSONObject o = jsr.readFileJson();
         this.accounts.clear();
+        this.removeActiveAccount();
         AccountManager copy = AccountManager.fromJson(o);
         this.accounts.addAll(copy.accounts);
     }

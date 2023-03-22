@@ -8,6 +8,7 @@ import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Function;
 
 // TODO
 public class HomeView extends View {
@@ -31,12 +32,36 @@ public class HomeView extends View {
     private JButton deleteSelectedClosetButton;
     private boolean deleteSelectedClosetConfirmed;
     private JButton openCatalogueButton;
+    private JLabel closetClothingCountLabel;
+    private JLabel closetTypesLabel;
+    private JLabel closetSizesLabel;
+    private JLabel closetColorsLabel;
+    private JLabel closetBrandsLabel;
+    private JLabel closetStylesLabel;
 
     // TODO
     public HomeView(Container root, AccountManager accountManager) {
         super(root);
         this.accountManager = accountManager;
         this.active = accountManager.getActiveAccount();
+    }
+
+    // MODIFIES: label
+    // EFFECTS: Sets the text of the given JLabel to the result of
+    //          formatNaNullStr.
+    private static void formatNaNullLabel(JLabel label,
+                                          String prefix,
+                                          Closet c,
+                                          Function<Closet, Object> getter) {
+        label.setText(formatNaNullStr(prefix, c, getter));
+    }
+
+    // EFFECTS: Returns the prefix appended with either NA if o is null
+    //          or the result of fn if it is not.
+    private static String formatNaNullStr(String prefix,
+                                          Closet c,
+                                          Function<Closet, Object> getter) {
+        return prefix + (c == null ? "NA" : getter.apply(c));
     }
 
     @Override
@@ -64,11 +89,28 @@ public class HomeView extends View {
         this.add(selectedClosetName = new JLabel(),
                 GBC.hfillNorth(2, 1).gridwidth(2));
 
+        JPanel closetInfoPanel = new JPanel(new GridBagLayout());
+        closetInfoPanel.add(closetClothingCountLabel = new JLabel(),
+                GBC.hfillNorth(0, 0));
+        closetInfoPanel.add(closetTypesLabel = new JLabel(),
+                GBC.hfillNorth(0, 1));
+        closetInfoPanel.add(closetSizesLabel = new JLabel(),
+                GBC.hfillNorth(0, 2));
+        closetInfoPanel.add(closetColorsLabel = new JLabel(),
+                GBC.hfillNorth(0, 3));
+        closetInfoPanel.add(closetBrandsLabel = new JLabel(),
+                GBC.hfillNorth(0, 4));
+        closetInfoPanel.add(closetStylesLabel = new JLabel(),
+                GBC.hfillNorth(0, 5));
+        this.add(new JScrollPane(closetInfoPanel),
+                GBC.at(2, 2).fillBoth().gridwidth(2).insets(3));
+
         this.add(openSelectedClosetButton = new JButton("Open Closet"),
-                GBC.hfillNorth(2, 2));
+                GBC.hfillNorth(2, 3).insets(2));
 
         this.add(deleteSelectedClosetButton = new JButton(DELETE_CLOSET_INITIAL),
-                GBC.hfillNorth(3, 2));
+                GBC.hfillNorth(3, 3).insets(2));
+
     }
 
     // REQUIRES: addSelectedClosetListeners has not been called
@@ -101,7 +143,7 @@ public class HomeView extends View {
                 GBC.at(0, 0).insets(2));
 
         this.add(exitButton = new JButton("Exit"),
-                GBC.at(2, 0).hfill().insets(2));
+                GBC.at(2, 0).hfill().insets(2).gridwidth(2));
 
         this.add(openCatalogueButton = new JButton("Open Catalogue"),
                 GBC.at(1, 0).hfill().insets(2));
@@ -121,6 +163,7 @@ public class HomeView extends View {
     // MODIFIES: this
     // EFFECTS: Adds closet list components
     private void addClosetListComponents() {
+        final int height = 2;
 
         this.closetJList = new JList<>();
         this.closetJList.setCellRenderer(ClosetListItem::new);
@@ -131,15 +174,15 @@ public class HomeView extends View {
                         .fillBoth()
                         .weight(0.5, 1)
                         .insets(5)
-                        .gridheight(1)
+                        .gridheight(height)
                         .gridwidth(2));
 
         this.add(addClosetButton = new JButton("Create New Closet"),
-                GBC.hfillNorth(1, 2).insets(2)
+                GBC.hfillNorth(1, height + 1).insets(2)
                         .weightx(0.3));
 
         this.add(addClosetNameField = PromptedTextField.prompt(CLOSET_NAME_PROMPT),
-                GBC.hfillNorth(0, 2).insets(2)
+                GBC.hfillNorth(0, height + 1).insets(2)
                         .weightx(0.7));
     }
 
@@ -179,6 +222,18 @@ public class HomeView extends View {
         deleteSelectedClosetButton.setEnabled(c != null);
         deleteSelectedClosetConfirmed = false;
         deleteSelectedClosetButton.setText(DELETE_CLOSET_INITIAL);
+        formatNaNullLabel(closetClothingCountLabel, "Count: ",
+                c, x -> x.getClothing().size());
+        formatNaNullLabel(closetTypesLabel, "Types: ",
+                c, Closet::getTypes);
+        formatNaNullLabel(closetSizesLabel, "Sizes: ",
+                c, Closet::getSizes);
+        formatNaNullLabel(closetColorsLabel, "Colors: ",
+                c, Closet::getColors);
+        formatNaNullLabel(closetBrandsLabel, "Brands: ",
+                c, Closet::getBrands);
+        formatNaNullLabel(closetStylesLabel, "Styles: ",
+                c, Closet::getStyles);
     }
 
     // A list view item for a closet

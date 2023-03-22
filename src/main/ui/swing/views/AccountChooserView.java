@@ -4,6 +4,7 @@ import model.Account;
 import model.AccountManager;
 import ui.swing.utils.GBC;
 import ui.swing.utils.PromptedTextField;
+import ui.swing.utils.SaveLoadControls;
 
 import javax.swing.*;
 import java.awt.*;
@@ -188,6 +189,19 @@ public class AccountChooserView extends View {
 
         this.add(openSelectedAccountButton = new JButton("Open Selected Account"),
                 GBC.hfillNorth(2, 4).insets(2).gridwidth(2));
+
+        this.add(new SaveLoadControls(accountManager) {
+            @Override
+            protected void onSave() {
+            }
+
+            @Override
+            protected void onLoad() {
+                setSelectedAccount(null);
+                refreshAccountListData();
+                refreshActiveAccountComponents();
+            }
+        }, GBC.hfillNorth(2, 5).insets(2).gridwidth(2));
     }
 
     // REQUIRES: addAccountSelectedView has been called
