@@ -32,12 +32,7 @@ public class HomeView extends View {
     private JButton deleteSelectedClosetButton;
     private boolean deleteSelectedClosetConfirmed;
     private JButton openCatalogueButton;
-    private JLabel closetClothingCountLabel;
-    private JLabel closetTypesLabel;
-    private JLabel closetSizesLabel;
-    private JLabel closetColorsLabel;
-    private JLabel closetBrandsLabel;
-    private JLabel closetStylesLabel;
+    private JTextArea closetInfoPanel;
 
     // EFFECTS: Constructs a new home view from the given root pane and account
     //          manager.
@@ -47,22 +42,12 @@ public class HomeView extends View {
         this.active = accountManager.getActiveAccount();
     }
 
-    // MODIFIES: label
-    // EFFECTS: Sets the text of the given JLabel to the result of
-    //          formatNaNullStr.
-    private static void formatNaNullLabel(JLabel label,
-                                          String prefix,
-                                          Closet c,
-                                          Function<Closet, Object> getter) {
-        label.setText(formatNaNullStr(prefix, c, getter));
-    }
-
     // EFFECTS: Returns the prefix appended with either NA if o is null
     //          or the result of fn if it is not.
     private static String formatNaNullStr(String prefix,
                                           Closet c,
                                           Function<Closet, Object> getter) {
-        return prefix + (c == null ? "NA" : getter.apply(c));
+        return prefix + (c == null ? "NA" : getter.apply(c)) + "\n";
     }
 
     @Override
@@ -90,28 +75,19 @@ public class HomeView extends View {
         this.add(selectedClosetName = new JLabel(),
                 GBC.hfillNorth(2, 1).gridwidth(2));
 
-        JPanel closetInfoPanel = new JPanel(new GridBagLayout());
-        closetInfoPanel.add(closetClothingCountLabel = new JLabel(),
-                GBC.hfillNorth(0, 0));
-        closetInfoPanel.add(closetTypesLabel = new JLabel(),
-                GBC.hfillNorth(0, 1));
-        closetInfoPanel.add(closetSizesLabel = new JLabel(),
-                GBC.hfillNorth(0, 2));
-        closetInfoPanel.add(closetColorsLabel = new JLabel(),
-                GBC.hfillNorth(0, 3));
-        closetInfoPanel.add(closetBrandsLabel = new JLabel(),
-                GBC.hfillNorth(0, 4));
-        closetInfoPanel.add(closetStylesLabel = new JLabel(),
-                GBC.hfillNorth(0, 5));
-        this.add(new JScrollPane(closetInfoPanel),
-                GBC.at(2, 2).fillBoth().gridwidth(2).insets(3));
+        closetInfoPanel = new JTextArea();
+        closetInfoPanel.setEditable(false);
+        closetInfoPanel.setWrapStyleWord(true);
+        closetInfoPanel.setLineWrap(true);
+        JScrollPane jsp = new JScrollPane(closetInfoPanel);
+        jsp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        this.add(jsp, GBC.at(2, 2).fillBoth().gridwidth(2).insets(3));
 
         this.add(openSelectedClosetButton = new JButton("Open Closet"),
                 GBC.hfillNorth(2, 3).insets(2));
 
         this.add(deleteSelectedClosetButton = new JButton(DELETE_CLOSET_INITIAL),
                 GBC.hfillNorth(3, 3).insets(2));
-
     }
 
     // REQUIRES: addSelectedClosetListeners has not been called
@@ -225,18 +201,20 @@ public class HomeView extends View {
         deleteSelectedClosetButton.setEnabled(c != null);
         deleteSelectedClosetConfirmed = false;
         deleteSelectedClosetButton.setText(DELETE_CLOSET_INITIAL);
-        formatNaNullLabel(closetClothingCountLabel, "Count: ",
-                c, x -> x.getClothing().size());
-        formatNaNullLabel(closetTypesLabel, "Types: ",
-                c, Closet::getTypes);
-        formatNaNullLabel(closetSizesLabel, "Sizes: ",
-                c, Closet::getSizes);
-        formatNaNullLabel(closetColorsLabel, "Colors: ",
-                c, Closet::getColors);
-        formatNaNullLabel(closetBrandsLabel, "Brands: ",
-                c, Closet::getBrands);
-        formatNaNullLabel(closetStylesLabel, "Styles: ",
-                c, Closet::getStyles);
+
+        closetInfoPanel.setText(
+                formatNaNullStr("Count: ",
+                        c, x -> x.getClothing().size())
+                        + formatNaNullStr("Types: ",
+                        c, Closet::getTypes)
+                        + formatNaNullStr("Sizes: ",
+                        c, Closet::getSizes)
+                        + formatNaNullStr("Colors: ",
+                        c, Closet::getColors)
+                        + formatNaNullStr("Brands: ",
+                        c, Closet::getBrands)
+                        + formatNaNullStr("Styles: ",
+                        c, Closet::getStyles));
     }
 
     // A list view item for a closet
