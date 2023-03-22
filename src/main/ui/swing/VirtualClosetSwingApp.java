@@ -12,8 +12,6 @@ public class VirtualClosetSwingApp extends JFrame {
 
     private static final String APP_TITLE = "Virtual Closet";
 
-    private AccountManager accountManager;
-
     // EFFECTS: Creates and runs a new virtual closet swing application
     public VirtualClosetSwingApp() {
         super();
@@ -26,9 +24,9 @@ public class VirtualClosetSwingApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: Initializes app state
     private void initAppState() {
-        this.accountManager = new AccountManager();
+        AccountManager accountManager = new AccountManager();
         try {
-            this.accountManager.loadState();
+            accountManager.loadState();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
