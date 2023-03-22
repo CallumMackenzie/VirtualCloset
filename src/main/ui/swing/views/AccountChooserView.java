@@ -192,10 +192,6 @@ public class AccountChooserView extends View {
 
         this.add(new SaveLoadControls(accountManager) {
             @Override
-            protected void onSave() {
-            }
-
-            @Override
             protected void onLoad() {
                 setSelectedAccount(null);
                 refreshAccountListData();

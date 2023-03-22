@@ -7,7 +7,7 @@ import java.awt.*;
 import java.io.IOException;
 
 // UI Controls for saving and loading data
-public abstract class SaveLoadControls extends JPanel {
+public class SaveLoadControls extends JPanel {
 
     private static final String SAVE_PROMPT = "Save";
     private static final String SAVE_DONE_PROMPT = "Saved";
@@ -44,6 +44,14 @@ public abstract class SaveLoadControls extends JPanel {
     // MODIFIES: this
     // EFFECTS: Initializes event listeners
     private void addEventListeners() {
+        this.addSaveListeners();
+        this.addLoadListeners();
+    }
+
+    // REQUIRES: addSaveListeners has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes save event listeners
+    private void addSaveListeners() {
         this.saveButton.addActionListener(e -> {
             ConfirmDialog c = new ConfirmDialog("Overwrite saved data with disk data?",
                     () -> {
@@ -57,6 +65,12 @@ public abstract class SaveLoadControls extends JPanel {
                     }, () -> this.saveButton.setText(SAVE_PROMPT));
             c.setTitle("Save Data?");
         });
+    }
+
+    // REQUIRES: addLoadListeners has not been called
+    // MODIFIES: this
+    // EFFECTS: Initializes save event listeners
+    private void addLoadListeners() {
         this.loadButton.addActionListener(e -> {
             ConfirmDialog c = new ConfirmDialog("Overwrite current data with disk data?",
                     () -> {
@@ -73,9 +87,11 @@ public abstract class SaveLoadControls extends JPanel {
     }
 
     // EFFECTS: Invoked when data is saved.
-    protected abstract void onSave();
+    protected void onSave() {
+    }
 
     // EFFECTS: Invoked when data is loaded.
-    protected abstract void onLoad();
+    protected void onLoad() {
+    }
 
 }
