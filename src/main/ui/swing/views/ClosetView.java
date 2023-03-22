@@ -3,6 +3,7 @@ package ui.swing.views;
 import model.AccountManager;
 import model.Closet;
 import model.Clothing;
+import model.Size;
 import model.search.ClothingAddress;
 import model.search.ClothingAddressParseException;
 import ui.swing.utils.GBC;
@@ -10,17 +11,23 @@ import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 // TODO
 public class ClosetView extends View {
 
     private final AccountManager accountManager;
     private final Closet closet;
+    private Clothing selectedClothing;
 
     private JTextField searchExpressionField;
-    private JLabel searchExpressionErrorText;
+    private JTextArea searchExpressionErrorText;
     private JButton searchButton;
     private JList<Clothing> searchClothingJList;
+
+    private JButton createClothingButton;
+    private JButton editClothingButton;
+    private JButton deleteClothingButton;
 
     // TODO
     public ClosetView(Container root,
@@ -36,11 +43,15 @@ public class ClosetView extends View {
         this.setLayout(new GridBagLayout());
 
         this.addSearchComponents();
+        this.addEditComponents();
+
+        this.setSelectedClothing(null);
     }
 
     @Override
     void addEventListeners() {
         this.addSearchListeners();
+        this.addEditListeners();
     }
 
     // REQUIRES: this.addSearchComponents has not been called
@@ -51,8 +62,11 @@ public class ClosetView extends View {
                 GBC.at(0, 0).hfill().weightx(0.8).insets(2));
         this.add(searchButton = new JButton("Search"),
                 GBC.at(1, 0).hfill().weightx(0.2).insets(2));
-        this.add(searchExpressionErrorText = new JLabel(),
+        this.add(searchExpressionErrorText = new JTextArea(),
                 GBC.at(0, 1).hfill().gridwidth(2).insets(2));
+        searchExpressionErrorText.setEditable(false);
+        searchExpressionErrorText.setLineWrap(true);
+        searchExpressionErrorText.setWrapStyleWord(true);
 
         this.searchClothingJList = new JList<>();
         this.searchClothingJList.setCellRenderer(ClothingListItem::new);
@@ -66,6 +80,46 @@ public class ClosetView extends View {
     private void addSearchListeners() {
         this.searchButton.addActionListener(e -> searchClothingWithExpr());
         this.searchExpressionField.addActionListener(e -> searchClothingWithExpr());
+        this.searchClothingJList.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) {
+                this.setSelectedClothing(searchClothingJList.getSelectedValue());
+            }
+        });
+    }
+
+    // REQUIRES: this.addEditComponents has not been called
+    // MODIFIES: this
+    // EFFECTS: Adds edit components to gui
+    private void addEditComponents() {
+        this.add(createClothingButton = new JButton("Create Clothing"),
+                GBC.at(2, 0).hfill().insets(2));
+
+        this.add(editClothingButton = new JButton("Edit Selected Clothing"),
+                GBC.at(2, 1).hfill().insets(2));
+
+        this.add(deleteClothingButton = new JButton("Delete Selected Clothing"),
+                GBC.at(2, 2).fillBoth().insets(2));
+    }
+
+    // REQUIRES: this.addEditListeners has not been called
+    // MODIFIES: this
+    // EFFECTS: Adds edit component listeners
+    private void addEditListeners() {
+        this.createClothingButton.addActionListener(e ->
+                this.transition(new ClothingEditView(root,
+                        new Clothing(new ArrayList<>(),
+                                Size.UNKNOWN,
+                                "", "",
+                                new ArrayList<>(),
+                                new ArrayList<>(),
+                                false))));
+        this.editClothingButton.addActionListener(e ->
+                this.transition(new ClothingEditView(root, this.selectedClothing)));
+        this.deleteClothingButton.addActionListener(e -> {
+            this.closet.removeClothing(this.selectedClothing);
+            this.setSelectedClothing(null);
+            this.searchClothingWithExpr();
+        });
     }
 
     // MODIFIES: this
@@ -83,8 +137,17 @@ public class ClosetView extends View {
             this.searchClothingJList.setListData(clothingArr);
             searchExpressionErrorText.setText("Search expression ok.");
         } catch (ClothingAddressParseException e) {
-            searchExpressionErrorText.setText(e.getMessage());
+            searchExpressionErrorText.setText("Error in expression: " + e.getMessage()
+                    + " At \"" + e.getErrorState().getStateCaptured() + "\".");
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Updates selected clothing views
+    private void setSelectedClothing(Clothing c) {
+        this.selectedClothing = c;
+        this.editClothingButton.setEnabled(c != null);
+        this.deleteClothingButton.setEnabled(c != null);
     }
 
     // A list view item for clothing
