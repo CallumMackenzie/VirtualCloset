@@ -97,10 +97,12 @@ public abstract class ConfirmDialog extends JFrame {
     }
 
     // EFFECTS: Run exactly once when dialog confirmed
-    protected abstract void onConfirm();
+    protected void onConfirm() {
+    }
 
     // EFFECTS: Run exactly once when dialog cancelled
-    protected abstract void onCancel();
+    protected void onCancel() {
+    }
 
     // EFFECTS: Run exactly once when dialog closed
     protected void onComplete() {

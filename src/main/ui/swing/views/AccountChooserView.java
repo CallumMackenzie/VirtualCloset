@@ -2,9 +2,7 @@ package ui.swing.views;
 
 import model.Account;
 import model.AccountManager;
-import ui.swing.utils.GBC;
-import ui.swing.utils.PromptedTextField;
-import ui.swing.utils.SaveLoadControls;
+import ui.swing.utils.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +25,6 @@ public class AccountChooserView extends View {
     private JButton setAccountNameButton;
     private JButton setActiveButton;
     private JButton deleteAccountButton;
-    private boolean deleteConfirmed;
 
     private JButton createAccountButton;
     private JTextField createAccountNameField;
@@ -74,8 +71,6 @@ public class AccountChooserView extends View {
         this.setActiveButton.setText(a == null ? "Set No Active Account"
                 : "Set as Active Account");
         this.deleteAccountButton.setEnabled(a != null);
-        this.deleteConfirmed = false;
-        this.deleteAccountButton.setText("Delete Account");
         this.openSelectedAccountButton.setEnabled(a != null);
     }
 
@@ -249,18 +244,18 @@ public class AccountChooserView extends View {
     private void onRemoveActiveAccount(ActionEvent e) {
         int selectedIdx = this.accountJList.getSelectedIndex();
         if (selectedIdx >= 0 && selectedIdx < this.accountManager.getAccounts().size()) {
-            if (this.deleteConfirmed) {
-                this.accountManager.removeAccount(selectedAccount.getName());
-                this.refreshAccountListData();
-                this.refreshActiveAccountComponents();
-                this.setSelectedAccount(null);
-            } else {
-                this.deleteConfirmed = true;
-                this.deleteAccountButton.setText("Press Again to Delete");
-            }
-        } else {
-            deleteConfirmed = false;
-            this.deleteAccountButton.setText("Delete Account");
+            ConfirmDialog c = new ForcedConfirmDialog(SwingUtilities.getWindowAncestor(this),
+                    "Delete account \"" + selectedAccount.getName() + "\"? "
+                            + "All user data will be removed.") {
+                @Override
+                protected void onConfirm() {
+                    accountManager.removeAccount(selectedAccount.getName());
+                    refreshAccountListData();
+                    refreshActiveAccountComponents();
+                    setSelectedAccount(null);
+                }
+            };
+            c.setTitle("Delete Account?");
         }
     }
 
