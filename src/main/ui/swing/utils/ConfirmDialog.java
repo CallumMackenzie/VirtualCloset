@@ -6,11 +6,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 // A class to confirm saving/loading
-public class ConfirmDialog extends JFrame {
+public abstract class ConfirmDialog extends JFrame {
 
     private final String prompt;
-    private final Runnable onConfirm;
-    private final Runnable onCancel;
     private boolean cancelRan;
     private boolean confirmRan;
 
@@ -19,12 +17,8 @@ public class ConfirmDialog extends JFrame {
 
     // EFFECTS: Constructs a new confirm dialog with the given
     //          action and prompts.
-    public ConfirmDialog(String prompt,
-                         Runnable onConfirm,
-                         Runnable onCancel) {
+    public ConfirmDialog(String prompt) {
         this.prompt = prompt;
-        this.onConfirm = onConfirm;
-        this.onCancel = onCancel;
         this.cancelRan = false;
         this.confirmRan = false;
 
@@ -33,6 +27,7 @@ public class ConfirmDialog extends JFrame {
         this.addComponents();
         this.addEventListeners();
         this.pack();
+        this.setResizable(false);
         this.setVisible(true);
     }
 
@@ -40,13 +35,14 @@ public class ConfirmDialog extends JFrame {
     // MODIFIES: this
     // EFFECTS: Adds window listeners
     private void addWindowListeners() {
-        this.addWindowStateListener(new WindowAdapter() {
+        this.addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
+            public void windowClosed(WindowEvent e) {
                 if (!confirmRan && !cancelRan) {
                     registerCancel();
                 }
+                onComplete();
+                dispose();
             }
         });
     }
@@ -86,7 +82,7 @@ public class ConfirmDialog extends JFrame {
     // EFFECTS: Runs onCancel if it has not already
     private void registerCancel() {
         if (!cancelRan) {
-            this.onCancel.run();
+            this.onCancel();
         }
         this.cancelRan = true;
     }
@@ -95,9 +91,19 @@ public class ConfirmDialog extends JFrame {
     // EFFECTS: Runs onConfirm if it has not already
     private void registerConfirm() {
         if (!confirmRan) {
-            this.onConfirm.run();
+            this.onConfirm();
         }
         this.confirmRan = true;
+    }
+
+    // EFFECTS: Run exactly once when dialog confirmed
+    protected abstract void onConfirm();
+
+    // EFFECTS: Run exactly once when dialog cancelled
+    protected abstract void onCancel();
+
+    // EFFECTS: Run exactly once when dialog closed
+    protected void onComplete() {
     }
 
 }

@@ -52,38 +52,16 @@ public class SaveLoadControls extends JPanel {
     // MODIFIES: this
     // EFFECTS: Initializes save event listeners
     private void addSaveListeners() {
-        this.saveButton.addActionListener(e -> {
-            ConfirmDialog c = new ConfirmDialog("Overwrite saved data with disk data?",
-                    () -> {
-                        try {
-                            this.accountManager.saveState();
-                            this.saveButton.setText(SAVE_DONE_PROMPT);
-                            this.onSave();
-                        } catch (IOException ex) {
-                            this.saveButton.setText(SAVE_FAILED_PROMPT);
-                        }
-                    }, () -> this.saveButton.setText(SAVE_PROMPT));
-            c.setTitle("Save Data?");
-        });
+        this.saveButton.addActionListener(e ->
+                new SaveConfirmDialog(SwingUtilities.getWindowAncestor(this)));
     }
 
     // REQUIRES: addLoadListeners has not been called
     // MODIFIES: this
     // EFFECTS: Initializes save event listeners
     private void addLoadListeners() {
-        this.loadButton.addActionListener(e -> {
-            ConfirmDialog c = new ConfirmDialog("Overwrite current data with disk data?",
-                    () -> {
-                        try {
-                            this.accountManager.loadState();
-                            this.loadButton.setText(LOAD_DONE_PROMPT);
-                            this.onLoad();
-                        } catch (IOException ex) {
-                            this.loadButton.setText(LOAD_FAILED_PROMPT);
-                        }
-                    }, () -> this.loadButton.setText(LOAD_PROMPT));
-            c.setTitle("Load Data?");
-        });
+        this.loadButton.addActionListener(e ->
+                new LoadConfirmDialog(SwingUtilities.getWindowAncestor(this)));
     }
 
     // EFFECTS: Invoked when data is saved.
@@ -92,6 +70,58 @@ public class SaveLoadControls extends JPanel {
 
     // EFFECTS: Invoked when data is loaded.
     protected void onLoad() {
+    }
+
+    // A save confirm dialog class
+    private class SaveConfirmDialog extends ForcedConfirmDialog {
+
+        // EFFECTS: Constructs a new save confirm dialog with the given root window
+        public SaveConfirmDialog(Window w) {
+            super(w, "Overwrite saved data with disk data?");
+            this.setTitle("Save Data?");
+        }
+
+        @Override
+        protected void onCancel() {
+            saveButton.setText(SAVE_PROMPT);
+        }
+
+        @Override
+        protected void onConfirm() {
+            try {
+                accountManager.saveState();
+                saveButton.setText(SAVE_DONE_PROMPT);
+                onSave();
+            } catch (IOException ex) {
+                saveButton.setText(SAVE_FAILED_PROMPT);
+            }
+        }
+    }
+
+    // A load confirm dialog class
+    private class LoadConfirmDialog extends ForcedConfirmDialog {
+
+        // EFFECTS: Constructs a new load confirm dialog with the given root window
+        public LoadConfirmDialog(Window w) {
+            super(w, "Overwrite current data with disk data?");
+            this.setTitle("Load Data?");
+        }
+
+        @Override
+        protected void onConfirm() {
+            try {
+                accountManager.loadState();
+                loadButton.setText(LOAD_DONE_PROMPT);
+                onLoad();
+            } catch (IOException ex) {
+                loadButton.setText(LOAD_FAILED_PROMPT);
+            }
+        }
+
+        @Override
+        protected void onCancel() {
+            loadButton.setText(LOAD_PROMPT);
+        }
     }
 
 }

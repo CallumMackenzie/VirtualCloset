@@ -119,7 +119,9 @@ public class HomeView extends View {
     // EFFECTS: Adds top bar component listeners
     private void addSelectedClosetListeners() {
         openSelectedClosetButton.addActionListener(e ->
-                this.transition(new ClosetView(this.root)));
+                this.transition(new ClosetView(this.root,
+                        this.accountManager,
+                        selectedCloset)));
         deleteSelectedClosetButton.addActionListener(e -> {
             if (active != null) {
                 if (deleteSelectedClosetConfirmed) {
