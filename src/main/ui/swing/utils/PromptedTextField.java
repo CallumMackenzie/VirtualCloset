@@ -19,7 +19,7 @@ public abstract class PromptedTextField extends JTextField {
     public static PromptedTextField prompt(String prompt) {
         return new PromptedTextField() {
             @Override
-            protected String getPrompt() {
+            public String getPrompt() {
                 return prompt;
             }
         };
@@ -71,7 +71,7 @@ public abstract class PromptedTextField extends JTextField {
     }
 
     // EFFECTS: Returns the prompt to be used when updating
-    protected abstract String getPrompt();
+    public abstract String getPrompt();
 
     // EFFECTS: Returns the text color to be used when prompting, or
     //          null if it should stay the same.

@@ -129,6 +129,7 @@ public class ClosetView extends View {
     private void addEditListeners() {
         this.createClothingButton.addActionListener(e ->
                 this.transition(new ClothingEditView(root,
+                        accountManager, closet,
                         new Clothing(new ArrayList<>(),
                                 Size.UNKNOWN,
                                 "", "",
@@ -136,7 +137,7 @@ public class ClosetView extends View {
                                 new ArrayList<>(),
                                 false))));
         this.editClothingButton.addActionListener(e ->
-                this.transition(new ClothingEditView(root, this.selectedClothing)));
+                this.transition(new ClothingEditView(root, accountManager, closet, selectedClothing)));
         this.deleteClothingButton.addActionListener(e -> {
             this.closet.removeClothing(this.selectedClothing);
             this.setSelectedClothing(null);
