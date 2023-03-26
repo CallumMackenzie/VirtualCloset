@@ -29,6 +29,10 @@ public class ClosetView extends View {
     private JButton editClothingButton;
     private JButton deleteClothingButton;
 
+    private JTextArea clothingInfoTextArea;
+
+    private JButton exitButton;
+
     // TODO
     public ClosetView(Container root,
                       AccountManager accountManager,
@@ -59,11 +63,12 @@ public class ClosetView extends View {
     // EFFECTS: Adds search components to gui
     private void addSearchComponents() {
         this.add(searchExpressionField = PromptedTextField.prompt("Search Expression"),
-                GBC.at(0, 0).hfill().weightx(0.8).insets(2));
+                GBC.hfillNorth(0, 0).weightx(0.8).insets(2));
         this.add(searchButton = new JButton("Search"),
-                GBC.at(1, 0).hfill().weightx(0.2).insets(2));
-        this.add(searchExpressionErrorText = new JTextArea(),
-                GBC.at(0, 1).hfill().gridwidth(2).insets(2));
+                GBC.hfillNorth(1, 0).weightx(0.2).insets(2));
+        this.add(new JScrollPane(searchExpressionErrorText = new JTextArea()),
+                GBC.hfillNorth(0, 1).gridwidth(3).insets(2)
+                        .weighty(0.05));
         searchExpressionErrorText.setEditable(false);
         searchExpressionErrorText.setLineWrap(true);
         searchExpressionErrorText.setWrapStyleWord(true);
@@ -71,7 +76,12 @@ public class ClosetView extends View {
         this.searchClothingJList = new JList<>();
         this.searchClothingJList.setCellRenderer(ClothingListItem::new);
         this.add(new JScrollPane(searchClothingJList),
-                GBC.at(0, 2).fillBoth().gridwidth(2).insets(7));
+                GBC.at(0, 2)
+                        .fillBoth()
+                        .north()
+                        .weighty(1)
+                        .gridwidth(2)
+                        .insets(4));
     }
 
     // REQUIRES: this.addSearchListeners has not been called
@@ -92,13 +102,25 @@ public class ClosetView extends View {
     // EFFECTS: Adds edit components to gui
     private void addEditComponents() {
         this.add(createClothingButton = new JButton("Create Clothing"),
-                GBC.at(2, 0).hfill().insets(2));
+                GBC.hfillNorth(0, 3).insets(2));
+
+        this.add(exitButton = new JButton("Exit"),
+                GBC.hfillNorth(2, 0).insets(2));
 
         this.add(editClothingButton = new JButton("Edit Selected Clothing"),
-                GBC.at(2, 1).hfill().insets(2));
+                GBC.hfillNorth(2, 3).insets(2));
 
         this.add(deleteClothingButton = new JButton("Delete Selected Clothing"),
-                GBC.at(2, 2).fillBoth().insets(2));
+                GBC.hfillNorth(1, 3).insets(2));
+
+        this.clothingInfoTextArea = new JTextArea();
+        this.clothingInfoTextArea.setEditable(false);
+        this.clothingInfoTextArea.setLineWrap(true);
+        this.clothingInfoTextArea.setWrapStyleWord(true);
+        this.add(new JScrollPane(this.clothingInfoTextArea),
+                GBC.at(2, 2).fillBoth()
+                        .north()
+                        .insets(2));
     }
 
     // REQUIRES: this.addEditListeners has not been called
@@ -120,6 +142,8 @@ public class ClosetView extends View {
             this.setSelectedClothing(null);
             this.searchClothingWithExpr();
         });
+        this.exitButton.addActionListener(e ->
+                this.transition(new HomeView(root, this.accountManager)));
     }
 
     // MODIFIES: this
@@ -148,6 +172,8 @@ public class ClosetView extends View {
         this.selectedClothing = c;
         this.editClothingButton.setEnabled(c != null);
         this.deleteClothingButton.setEnabled(c != null);
+        this.clothingInfoTextArea.setText(c == null
+                ? "NA" : c.toString().replaceAll("\t+", ""));
     }
 
     // A list view item for clothing
