@@ -6,12 +6,17 @@ import model.Clothing;
 import model.Size;
 import model.search.ClothingAddress;
 import model.search.ClothingAddressParseException;
+import ui.swing.utils.AssetLoader;
 import ui.swing.utils.GBC;
 import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 // TODO
 public class ClosetView extends View {
@@ -33,6 +38,8 @@ public class ClosetView extends View {
 
     private JButton exitButton;
 
+    private ConcurrentMap<Path, Image> cachedImages;
+
     // TODO
     public ClosetView(Container root,
                       AccountManager accountManager,
@@ -40,6 +47,7 @@ public class ClosetView extends View {
         super(root);
         this.accountManager = accountManager;
         this.closet = closet;
+        this.cachedImages = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -178,7 +186,7 @@ public class ClosetView extends View {
     }
 
     // A list view item for clothing
-    private static class ClothingListItem extends JPanel {
+    private class ClothingListItem extends JPanel {
 
         private final Clothing value;
 
@@ -196,10 +204,39 @@ public class ClosetView extends View {
                         .getColor("List.selectionBackground"));
             }
             this.addColorComponents();
-            this.add(new JLabel(value.getTypes().toString()),
-                    GBC.at(0, 0).hfill().insets(2));
+            this.addTypeComponents();
             this.add(new JLabel(value.getBrand()),
                     GBC.at(1, 0).hfill().insets(2));
+        }
+
+        // REQUIRES: this.addTypeComponents has not been called
+        // MODIFIES: this
+        // EFFECTS: Adds components which indicate type
+        private void addTypeComponents() {
+            JPanel typePanel = new JPanel(new GridBagLayout());
+            double weight = (double) 1 / value.getTypes().size();
+            for (int i = 0; i < value.getTypes().size(); ++i) {
+                String type = value.getTypes().get(i);
+                JLabel typeLabel = new JLabel("?");
+                Path p = Paths.get("./data/img/" + type + ".png");
+                if (cachedImages.containsKey(p)) {
+                    typeLabel.setIcon(new ImageIcon(cachedImages.get(p)));
+                    typeLabel.setText("");
+                } else {
+                    AssetLoader.getInstance().getImage(p,
+                            img -> {
+                                Image scaled = img.getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+                                SwingUtilities.invokeLater(() -> {
+                                    cachedImages.put(p, scaled);
+                                    ClosetView.this.revalidate();
+                                    ClosetView.this.repaint();
+                                });
+                            });
+                }
+                typePanel.add(typeLabel, GBC.at(i, 0).weightx(weight)
+                        .anchor(GBC.Anchor.West));
+            }
+            this.add(typePanel, GBC.at(0, 0).hfill());
         }
 
         // REQUIRES: this.addColorComponents has not been called

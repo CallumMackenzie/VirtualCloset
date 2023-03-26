@@ -35,9 +35,11 @@ public class SaveLoadControls extends JPanel {
     // EFFECTS: Initializes GUI components
     private void addComponents() {
         this.add(saveButton = new JButton(SAVE_PROMPT),
-                GBC.at(0, 0).hfill().weightx(0.5).insets(2));
+                GBC.at(0, 0).hfill().weightx(0.5)
+                        .insets(0, 0, 2, 0));
         this.add(loadButton = new JButton(LOAD_PROMPT),
-                GBC.at(1, 0).hfill().weightx(0.5).insets(2));
+                GBC.at(1, 0).hfill().weightx(0.5)
+                        .insets(0, 2, 0, 0));
     }
 
     // REQUIRES: addEventListeners has not been called
