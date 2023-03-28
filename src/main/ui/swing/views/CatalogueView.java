@@ -9,6 +9,7 @@ import ui.swing.utils.PromptedTextField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 // A GUI view to view and edit catalogue contents
 public class CatalogueView extends View {
@@ -82,11 +83,14 @@ public class CatalogueView extends View {
         });
         createOutfitButton.addActionListener(e -> {
             if (createOutfitNameField.hasTextValue()) {
-                // TODO
+                this.transition(new OutfitEditView(root, accountManager,
+                        new Outfit(createOutfitNameField.getText(),
+                                new ArrayList<>())));
             }
         });
         editSelectedOutfitButton.addActionListener(e -> {
-            // TODO
+            this.transition(new OutfitEditView(root, accountManager,
+                    outfitJList.getSelectedValue()));
         });
         deleteSelectedOutfitButton.addActionListener(e -> {
             Outfit selected = outfitJList.getSelectedValue();
