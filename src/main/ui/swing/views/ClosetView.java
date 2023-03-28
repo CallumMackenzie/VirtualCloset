@@ -18,14 +18,13 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-// TODO
+// A GUI view to view and edit closet contents
 public class ClosetView extends View {
 
     private final AccountManager accountManager;
     private final Closet closet;
-    private Clothing selectedClothing;
 
-    private JTextField searchExpressionField;
+    private PromptedTextField searchExpressionField;
     private JTextArea searchExpressionErrorText;
     private JButton searchButton;
     private JList<Clothing> searchClothingJList;
@@ -40,7 +39,8 @@ public class ClosetView extends View {
 
     private ConcurrentMap<Path, Image> cachedImages;
 
-    // TODO
+    // EFFECTS: Constructs a new closet view attached to the given root
+    //          with the given accountManager, viewing the provided closet.
     public ClosetView(Container root,
                       AccountManager accountManager,
                       Closet closet) {
@@ -145,9 +145,10 @@ public class ClosetView extends View {
                                 new ArrayList<>(),
                                 false))));
         this.editClothingButton.addActionListener(e ->
-                this.transition(new ClothingEditView(root, accountManager, closet, selectedClothing)));
+                this.transition(new ClothingEditView(root, accountManager, closet,
+                        searchClothingJList.getSelectedValue())));
         this.deleteClothingButton.addActionListener(e -> {
-            this.closet.removeClothing(this.selectedClothing);
+            this.closet.removeClothing(searchClothingJList.getSelectedValue());
             this.setSelectedClothing(null);
             this.searchClothingWithExpr();
         });
@@ -159,26 +160,29 @@ public class ClosetView extends View {
     // EFFECTS: Searches clothing by given expression and saves it to the
     //          search clothing jList.
     private void searchClothingWithExpr() {
-        try {
-            java.util.List<Clothing> found = this.closet.findClothing(ClothingAddress.of(
-                    this.searchExpressionField.getText()
-            ));
-            Clothing[] clothingArr = new Clothing[found.size()];
-            for (int i = found.size() - 1; i >= 0; --i) {
-                clothingArr[i] = found.get(found.size() - i - 1);
+        if (searchExpressionField.hasTextValue()) {
+            try {
+                java.util.List<Clothing> found = this.closet.findClothing(ClothingAddress.of(
+                        this.searchExpressionField.getText()
+                ));
+                Clothing[] clothingArr = new Clothing[found.size()];
+                for (int i = found.size() - 1; i >= 0; --i) {
+                    clothingArr[i] = found.get(found.size() - i - 1);
+                }
+                this.searchClothingJList.setListData(clothingArr);
+                searchExpressionErrorText.setText("Search expression ok.");
+            } catch (ClothingAddressParseException e) {
+                searchExpressionErrorText.setText("Error in expression: " + e.getMessage()
+                        + " At \"" + e.getErrorState().getStateCaptured() + "\".");
             }
-            this.searchClothingJList.setListData(clothingArr);
-            searchExpressionErrorText.setText("Search expression ok.");
-        } catch (ClothingAddressParseException e) {
-            searchExpressionErrorText.setText("Error in expression: " + e.getMessage()
-                    + " At \"" + e.getErrorState().getStateCaptured() + "\".");
+        } else {
+            this.searchExpressionErrorText.setText("No expression entered.");
         }
     }
 
     // MODIFIES: this
     // EFFECTS: Updates selected clothing views
     private void setSelectedClothing(Clothing c) {
-        this.selectedClothing = c;
         this.editClothingButton.setEnabled(c != null);
         this.deleteClothingButton.setEnabled(c != null);
         this.clothingInfoTextArea.setText(c == null
@@ -190,7 +194,7 @@ public class ClosetView extends View {
 
         private final Clothing value;
 
-        // EFFECTS: Constructs a new account list item
+        // EFFECTS: Constructs a new clothing list item
         public ClothingListItem(JList<? extends Clothing> list,
                                 Clothing value,
                                 int index,

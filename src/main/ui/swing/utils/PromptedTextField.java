@@ -70,6 +70,12 @@ public abstract class PromptedTextField extends JTextField {
         });
     }
 
+    // EFFECTS: Returns whether this text field has a value
+    public boolean hasTextValue() {
+        return !this.getText().isEmpty()
+                && !this.getText().equals(this.getPrompt());
+    }
+
     // EFFECTS: Returns the prompt to be used when updating
     public abstract String getPrompt();
 

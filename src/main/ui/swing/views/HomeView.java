@@ -13,19 +13,17 @@ import java.util.function.Function;
 // A view to see user closets and open the catalogue
 public class HomeView extends View {
 
-    private static final String CLOSET_NAME_PROMPT = "Closet Name";
     private static final String DELETE_CLOSET_INITIAL = "Delete Closet";
     private static final String DELETE_CLOSET_CONFIRM = "Confirm Delete?";
 
     private final AccountManager accountManager;
     private final Account active;
-    private Closet selectedCloset;
 
     private JButton exitButton;
 
     private JList<Closet> closetJList;
     private JButton addClosetButton;
-    private JTextField addClosetNameField;
+    private PromptedTextField addClosetNameField;
 
     private JLabel selectedClosetName;
     private JButton openSelectedClosetButton;
@@ -97,11 +95,11 @@ public class HomeView extends View {
         openSelectedClosetButton.addActionListener(e ->
                 this.transition(new ClosetView(this.root,
                         this.accountManager,
-                        selectedCloset)));
+                        closetJList.getSelectedValue())));
         deleteSelectedClosetButton.addActionListener(e -> {
             if (active != null) {
                 if (deleteSelectedClosetConfirmed) {
-                    active.removeCloset(this.selectedCloset.getName());
+                    active.removeCloset(closetJList.getSelectedValue().getName());
                     this.setSelectedCloset(null);
                     this.refreshClosetListData();
                     deleteSelectedClosetConfirmed = false;
@@ -135,7 +133,7 @@ public class HomeView extends View {
         this.exitButton.addActionListener(e ->
                 this.transition(new AccountChooserView(this.root, accountManager)));
         this.openCatalogueButton.addActionListener(e ->
-                this.transition(new CatalogueView(this.root)));
+                this.transition(new CatalogueView(this.root, accountManager)));
     }
 
     // REQUIRES: addClosetListComponents has not been called
@@ -160,7 +158,7 @@ public class HomeView extends View {
                 GBC.hfillNorth(1, height + 1).insets(2)
                         .weightx(0.3));
 
-        this.add(addClosetNameField = PromptedTextField.prompt(CLOSET_NAME_PROMPT),
+        this.add(addClosetNameField = PromptedTextField.prompt("Closet Name"),
                 GBC.hfillNorth(0, height + 1).insets(2)
                         .weightx(0.7));
     }
@@ -170,9 +168,8 @@ public class HomeView extends View {
     // EFFECTS: Adds top bar component listeners
     private void addClosetListListeners() {
         this.addClosetButton.addActionListener(e -> {
-            String t = this.addClosetNameField.getText();
-            if (!t.isEmpty() && !t.equals(CLOSET_NAME_PROMPT)) {
-                active.addCloset(t);
+            if (addClosetNameField.hasTextValue()) {
+                active.addCloset(addClosetNameField.getText());
                 this.addClosetNameField.setText("");
                 this.refreshClosetListData();
             }
@@ -194,7 +191,6 @@ public class HomeView extends View {
     // MODIFIES: this
     // EFFECTS: Sets selected closet and gui params based on input
     private void setSelectedCloset(Closet c) {
-        this.selectedCloset = c;
         this.selectedClosetName.setText(c == null
                 ? "No Selected Closet" : "Selected Closet: " + c.getName());
         openSelectedClosetButton.setEnabled(c != null);

@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 // A view to choose and edit accounts
 public class AccountChooserView extends View {
 
-    private static final String CREATE_ACCOUNT_STR = "Name for New Account";
-
     private final AccountManager accountManager;
     private Account selectedAccount;
 
@@ -21,13 +19,13 @@ public class AccountChooserView extends View {
     private JList<Account> accountJList;
 
     private JLabel accountNameField;
-    private JTextField accountNameEditField;
+    private PromptedTextField accountNameEditField;
     private JButton setAccountNameButton;
     private JButton setActiveButton;
     private JButton deleteAccountButton;
 
     private JButton createAccountButton;
-    private JTextField createAccountNameField;
+    private PromptedTextField createAccountNameField;
 
     private JButton openAccountHomeButton;
     private JButton openSelectedAccountButton;
@@ -136,7 +134,7 @@ public class AccountChooserView extends View {
         this.add(createAccountButton = new JButton("Create Account"),
                 GBC.hfillNorth(1, 6).insets(2).weightx(0.4));
 
-        this.add(createAccountNameField = PromptedTextField.prompt(CREATE_ACCOUNT_STR),
+        this.add(createAccountNameField = PromptedTextField.prompt("Name for New Account"),
                 GBC.hfillNorth(0, 6).insets(2).weightx(0.6));
     }
 
@@ -151,9 +149,8 @@ public class AccountChooserView extends View {
         });
 
         this.createAccountButton.addActionListener(e -> {
-            String t = createAccountNameField.getText();
-            if (!t.isEmpty() && !t.equals(CREATE_ACCOUNT_STR)) {
-                accountManager.addAccount(new Account(t));
+            if (createAccountNameField.hasTextValue()) {
+                accountManager.addAccount(new Account(createAccountNameField.getText()));
                 createAccountNameField.setText("");
                 this.refreshAccountListData();
             }
