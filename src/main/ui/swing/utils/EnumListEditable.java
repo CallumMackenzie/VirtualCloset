@@ -11,8 +11,8 @@ public class EnumListEditable<T extends Enum<T>> extends JPanel {
     private final Class<? extends T> enumClass;
     private final String paramName;
     private JComboBox<T> enumComboBox;
-    private Supplier<T> getter;
-    private Consumer<T> setter;
+    private final Supplier<T> getter;
+    private final Consumer<T> setter;
 
     // TODO
     public EnumListEditable(Class<? extends T> enumClass,
