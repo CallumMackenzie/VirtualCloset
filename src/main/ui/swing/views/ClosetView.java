@@ -9,17 +9,13 @@ import ui.swing.utils.GBC;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 // A GUI view to view and edit closet contents
 public class ClosetView extends View {
 
     private final AccountManager accountManager;
     private final Closet closet;
-    private final ConcurrentMap<Path, Image> cachedImages;
     private JButton createClothingButton;
     private JButton editClothingButton;
     private JButton deleteClothingButton;
@@ -34,7 +30,6 @@ public class ClosetView extends View {
         super(root);
         this.accountManager = accountManager;
         this.closet = closet;
-        this.cachedImages = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -42,10 +37,10 @@ public class ClosetView extends View {
         this.setLayout(new GridBagLayout());
 
         this.add(closetSearchPanel = new ClosetSearchPanel(closet),
-                GBC.at(0, 0).fillBoth().weight(1, 1).gridheight(3));
+                GBC.at(0, 0).fillBoth().weight(1, 1).gridheight(4));
 
         this.add(createClothingButton = new JButton("Create Clothing"),
-                GBC.hfillNorth(0, 1).insets(2));
+                GBC.hfillNorth(1, 3).insets(2));
 
         this.add(exitButton = new JButton("Exit"),
                 GBC.hfillNorth(1, 0).insets(2));
