@@ -88,9 +88,8 @@ public class CatalogueView extends View {
                 this.transition(new OutfitEditView(root, accountManager, o));
             }
         });
-        editSelectedOutfitButton.addActionListener(e ->
-                this.transition(new OutfitEditView(root, accountManager,
-                        outfitJList.getSelectedValue())));
+        editSelectedOutfitButton.addActionListener(e -> this.transition(
+                new OutfitEditView(root, accountManager, outfitJList.getSelectedValue())));
         deleteSelectedOutfitButton.addActionListener(e -> {
             if (outfitJList.getSelectedValue() != null) {
                 catalogue.removeAllWithName(outfitJList.getSelectedValue().getName());
