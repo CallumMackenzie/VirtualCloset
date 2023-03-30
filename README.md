@@ -35,3 +35,10 @@ As a user, I want to be able to ...
 - search my catalogue
 - save my data automatically and if I choose
 - load my data automatically and if I choose
+
+# Instructions for Grader
+- You can generate the first required action related to adding Xs to a Y by typing a unique account name in the account list view and pressing create account.
+- You can generate the second required action related to adding Xs to a Y by selecting an account, clicking "Delete Account", and clicking confirm in the popup window.
+- You can locate my visual component by completing the first required action related to adding Xs to a Y then selecting an account, clicking "Open Selected Account", typing a unique name into the "Closet Name" field, pressing "Create New Closet", selecting the new closet, clicking "Open Closet", clicking "Create Clothing", typing "pants" into "Types", clicking "Add Types", clicking "Save & Exit", clicking "Confirm" in the popup window, typing "type = pants;" into the "Search Expression" box, and pressing enter. There will be a small image of pants in the list view component.
+- You can save the state of my application by clicking "Save" on the accounts view, then clicking confirm in the popup window.
+- You can reload the state of my application by clicking "Load" on the accounts view, then clicking confirm in the popup window.
