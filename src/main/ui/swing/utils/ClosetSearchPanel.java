@@ -103,9 +103,7 @@ public class ClosetSearchPanel extends JPanel {
     // MODIFIES: this
     // EFFECTS: Updates selected clothing views
     public void refreshSelectedClothing() {
-        Clothing c = searchClothingJList.getSelectedValue();
-        this.clothingInfoTextArea.setText(c == null
-                ? "NA" : c.toString().replaceAll("\t+", ""));
+        displayClothingInfo(searchClothingJList.getSelectedValue());
     }
 
     // MODIFIES: this
@@ -118,6 +116,13 @@ public class ClosetSearchPanel extends JPanel {
     // EFFECTS: Returns the current selected clothing, or null if there is none
     public Clothing getSelected() {
         return this.searchClothingJList.getSelectedValue();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Sets clothing info pane to display info for the provided clothing
+    public void displayClothingInfo(Clothing c) {
+        this.clothingInfoTextArea.setText(c == null
+                ? "NA" : c.toString().replaceAll("\t+", ""));
     }
 
     // MODIFIES: this

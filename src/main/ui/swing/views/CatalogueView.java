@@ -83,19 +83,19 @@ public class CatalogueView extends View {
         });
         createOutfitButton.addActionListener(e -> {
             if (createOutfitNameField.hasTextValue()) {
-                this.transition(new OutfitEditView(root, accountManager,
-                        new Outfit(createOutfitNameField.getText(),
-                                new ArrayList<>())));
+                Outfit o = new Outfit(createOutfitNameField.getText(), new ArrayList<>());
+                catalogue.addOutfit(o);
+                this.transition(new OutfitEditView(root, accountManager, o));
             }
         });
-        editSelectedOutfitButton.addActionListener(e -> {
-            this.transition(new OutfitEditView(root, accountManager,
-                    outfitJList.getSelectedValue()));
-        });
+        editSelectedOutfitButton.addActionListener(e ->
+                this.transition(new OutfitEditView(root, accountManager,
+                        outfitJList.getSelectedValue())));
         deleteSelectedOutfitButton.addActionListener(e -> {
-            Outfit selected = outfitJList.getSelectedValue();
-            if (selected != null) {
-                catalogue.removeAllWithName(selected.getName());
+            if (outfitJList.getSelectedValue() != null) {
+                catalogue.removeAllWithName(outfitJList.getSelectedValue().getName());
+                refreshOutfitList();
+                refreshSelectedOutfit();
             }
         });
     }
@@ -121,16 +121,21 @@ public class CatalogueView extends View {
     // A list view item for an outfit
     private static class OutfitListItem extends JPanel {
 
-        private final Outfit value;
-
         // EFFECTS: Constructs a new outfit list item
         public OutfitListItem(JList<? extends Outfit> list,
                               Outfit value,
                               int index,
                               boolean isSelected,
                               boolean cellHasFocus) {
-            this.value = value;
-            this.add(new JLabel(value.getName()));
+            this.setLayout(new GridBagLayout());
+
+            this.add(new JLabel(value.getName()),
+                    GBC.hfillNorth(0, 0).insets(2));
+
+            if (isSelected) {
+                this.setBackground(UIManager.getDefaults()
+                        .getColor("List.selectionBackground"));
+            }
         }
     }
 }
