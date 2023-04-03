@@ -22,7 +22,7 @@ public class IntegerCapture {
         if (whitespaceConsumer.shouldConsumeWhitespace(input)) {
             return false;
         }
-        KeyStringSearcher.MatchState ms = this.endTokenSearcher.tryFindKey(input);
+        MatchState ms = this.endTokenSearcher.tryFindKey(input);
         if (ms.wasMatch()) {
             this.captured = Integer.parseInt(this.token.toString());
             return true;

@@ -176,7 +176,7 @@ public class CAStateMachine
             if (this.whitespaceConsumer.shouldConsumeWhitespace(input)) {
                 return this;
             }
-            KeyStringSearcher.MatchState equalityTokenMatch
+            MatchState equalityTokenMatch
                     = this.equalityStrSearcher.tryFindKey(input);
             if (equalityTokenMatch.wasMatchRestarted()
                     || equalityTokenMatch.wasMatchBroken()) {

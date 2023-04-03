@@ -39,8 +39,8 @@ public class BooleanCapture {
     public boolean foundBoolean(char input) throws UnexpectedBoolInputException {
         if (!this.hasFoundBool
                 && !this.whitespaceConsumer.shouldConsumeWhitespace(input)) {
-            KeyStringSearcher.MatchState foundTrue = this.trueSearcher.tryFindKey(input);
-            KeyStringSearcher.MatchState foundFalse = this.falseSearcher.tryFindKey(input);
+            MatchState foundTrue = this.trueSearcher.tryFindKey(input);
+            MatchState foundFalse = this.falseSearcher.tryFindKey(input);
             if (foundTrue.wasMatch() || foundFalse.wasMatch()) {
                 hasFoundBool = true;
                 // Assume foundTrue and foundFalse are not both true

@@ -2,7 +2,7 @@ package model.search;
 
 import org.junit.jupiter.api.Test;
 
-import static model.search.KeyStringSearcher.MatchState.*;
+import static model.search.MatchState.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class KeyStringSearcherTest {

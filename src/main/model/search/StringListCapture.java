@@ -1,7 +1,5 @@
 package model.search;
 
-import model.search.KeyStringSearcher.MatchState;
-
 import java.util.ArrayList;
 import java.util.List;
 
