@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentMap;
 // A list view item for clothing
 public class ClothingListItem extends JPanel {
 
-
     private static final ConcurrentMap<Path, Image> cachedImages = new ConcurrentHashMap<>();
 
     private final Clothing value;

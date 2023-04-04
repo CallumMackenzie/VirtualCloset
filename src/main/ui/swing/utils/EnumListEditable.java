@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-// TODO
+// An editable enumeration panel
 public class EnumListEditable<T extends Enum<T>> extends JPanel {
 
     private final Class<? extends T> enumClass;
@@ -14,7 +14,7 @@ public class EnumListEditable<T extends Enum<T>> extends JPanel {
     private final Supplier<T> getter;
     private final Consumer<T> setter;
 
-    // TODO
+    // EFFECTS: Constructs a new editable enum component
     public EnumListEditable(Class<? extends T> enumClass,
                             String paramName,
                             Consumer<T> setter,
