@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 public class CAStateMachine
         extends StateMachine<CAStateMachine.State, ClothingAddressParseException> {
 
-
     public final String styleKey;
     public final String brandKey;
     public final String typeKey;
