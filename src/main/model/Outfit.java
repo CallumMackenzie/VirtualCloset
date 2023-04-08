@@ -28,6 +28,21 @@ public class Outfit implements Savable<List<Clothing>> {
         this.lastModified = Instant.now();
     }
 
+    // REQUIRES: allClothing is sorted, jso was created by this.toJson
+    // EFFECTS: Returns an instance of this object from the given JSON
+    public static Outfit fromJson(JSONObject jso, List<Clothing> allClothing) {
+        String name = jso.getString(JSON_NAME_KEY);
+        JSONArray clIs = jso.getJSONArray(JSON_CLOTHING_KEY);
+        List<Clothing> clothing = new ArrayList<>(clIs.length());
+        for (int i = 0; i < clIs.length(); ++i) {
+            clothing.add(allClothing.get(clIs.getInt(i)));
+        }
+        Outfit o = new Outfit(name, clothing);
+        long lastModifiedMillis = jso.getLong(JSON_LAST_MODIFIED_KEY);
+        o.lastModified = Instant.ofEpochMilli(lastModifiedMillis);
+        return o;
+    }
+
     // EFFECTS: Returns the name of this outfit
     public String getName() {
         return this.name;
@@ -37,6 +52,10 @@ public class Outfit implements Savable<List<Clothing>> {
     // EFFECTS: Sets the name of this outfit
     public void setName(String name) {
         this.name = name;
+        EventLog.getInstance().logEvent(new Event(
+                "Outfit: Switching name from "
+                        + this.name + " to " + name + "."
+        ));
     }
 
     // MODIFIES: this
@@ -45,6 +64,9 @@ public class Outfit implements Savable<List<Clothing>> {
     public void addClothing(Clothing clothing) {
         this.clothing.add(clothing);
         this.lastModified = Instant.now();
+        EventLog.getInstance().logEvent(new Event(
+                "Outfit: Adding clothing @ " + lastModified + "."
+        ));
     }
 
     // EFFECTS: Returns the clothing in this outfit
@@ -59,11 +81,16 @@ public class Outfit implements Savable<List<Clothing>> {
     public boolean removeClothing(Clothing clothing) {
         if (this.clothing.remove(clothing)) {
             this.lastModified = Instant.now();
+            EventLog.getInstance().logEvent(new Event(
+                    "Outfit: Removed clothing @ " + lastModified + "."
+            ));
             return true;
         }
+        EventLog.getInstance().logEvent(new Event(
+                "Outfit: Could not remove clothing " + clothing + "."
+        ));
         return false;
     }
-
 
     // EFFECTS: Returns the date last modified for this clothing.
     public Instant getInstantLastModified() {
@@ -81,20 +108,5 @@ public class Outfit implements Savable<List<Clothing>> {
                 .put(JSON_CLOTHING_KEY, idxs)
                 .put(JSON_NAME_KEY, this.name)
                 .put(JSON_LAST_MODIFIED_KEY, this.lastModified.toEpochMilli());
-    }
-
-    // REQUIRES: allClothing is sorted, jso was created by this.toJson
-    // EFFECTS: Returns an instance of this object from the given JSON
-    public static Outfit fromJson(JSONObject jso, List<Clothing> allClothing) {
-        String name = jso.getString(JSON_NAME_KEY);
-        JSONArray clIs = jso.getJSONArray(JSON_CLOTHING_KEY);
-        List<Clothing> clothing = new ArrayList<>(clIs.length());
-        for (int i = 0; i < clIs.length(); ++i) {
-            clothing.add(allClothing.get(clIs.getInt(i)));
-        }
-        Outfit o = new Outfit(name, clothing);
-        long lastModifiedMillis = jso.getLong(JSON_LAST_MODIFIED_KEY);
-        o.lastModified = Instant.ofEpochMilli(lastModifiedMillis);
-        return o;
     }
 }

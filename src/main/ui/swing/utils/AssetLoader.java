@@ -78,9 +78,7 @@ public class AssetLoader {
                         imageCompletionListeners.get(nextImage).run();
                         imageCompletionListeners.remove(nextImage);
                     }
-                    System.out.println("Loaded " + nextImage);
                 } catch (IOException e) {
-                    System.err.println("Could not load image " + nextImage);
                     failedLoading.add(nextImage);
                 }
             }

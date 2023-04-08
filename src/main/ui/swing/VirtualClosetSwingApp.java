@@ -1,11 +1,15 @@
 package ui.swing;
 
 import model.AccountManager;
+import model.Event;
+import model.EventLog;
 import ui.swing.utils.AssetLoader;
 import ui.swing.utils.LookAndFeelManager;
 import ui.swing.views.AccountChooserView;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -66,7 +70,17 @@ public class VirtualClosetSwingApp extends JFrame {
     // EFFECTS: Sets up window parameters such as size, title, etc
     private void initWindowParams() {
         this.setTitle(APP_TITLE);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                for (Event event : EventLog.getInstance()) {
+                    System.out.println(event);
+                }
+                super.windowClosed(e);
+                System.exit(0);
+            }
+        });
     }
 
 }

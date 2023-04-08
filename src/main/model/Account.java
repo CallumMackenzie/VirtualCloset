@@ -37,6 +37,27 @@ public class Account implements Savable<Void> {
         this.closets = closets;
     }
 
+    // REQUIRES: jso was created by this.toJson
+    // EFFECTS: Returns an instance of this object reconstructed from JSON
+    public static Account fromJson(JSONObject jso) {
+        JSONArray allClothingJsa = jso.getJSONArray(JSON_ALL_CLOTHING_KEY);
+        List<Clothing> allClothing = new ArrayList<>(allClothingJsa.length());
+        for (int i = 0; i < allClothingJsa.length(); ++i) {
+            JSONObject clothingJs = allClothingJsa.getJSONObject(i);
+            allClothing.add(Clothing.fromJson(clothingJs));
+        }
+        Catalogue c = Catalogue.fromJson(jso.getJSONObject(JSON_CATALOGUE_KEY),
+                allClothing);
+        String name = jso.getString(JSON_NAME_KEY);
+        JSONArray closetsJs = jso.getJSONArray(JSON_CLOSETS_KEY);
+        List<Closet> closets = new ArrayList<>(closetsJs.length());
+        for (int i = 0; i < closetsJs.length(); ++i) {
+            JSONObject closetJs = closetsJs.getJSONObject(i);
+            closets.add(Closet.fromJson(closetJs, allClothing));
+        }
+        return new Account(name, c, closets);
+    }
+
     // EFFECTS: Returns the name of this account
     public String getName() {
         return this.name;
@@ -50,10 +71,17 @@ public class Account implements Savable<Void> {
     public boolean setName(String name, Collection<Account> allAccounts) {
         for (Account a : allAccounts) {
             if (a != this && a.getName().equals(name)) {
+                EventLog.getInstance().logEvent(new Event(
+                        "Account: Could not set name "
+                                + this.name + " to " + name + "."
+                ));
                 return false;
             }
         }
         this.name = name;
+        EventLog.getInstance().logEvent(new Event(
+                "Account: Set name (" + this.name + ") to " + name + "."
+        ));
         return true;
     }
 
@@ -64,9 +92,16 @@ public class Account implements Savable<Void> {
     public boolean addCloset(String name) {
         if (this.closets.stream()
                 .anyMatch(n -> n.getName().equalsIgnoreCase(name))) {
+            EventLog.getInstance().logEvent(new Event(
+                    "Account: Could not add closet "
+                            + name + " to " + this.name + "."
+            ));
             return false;
         }
         this.closets.add(new Closet(name));
+        EventLog.getInstance().logEvent(new Event(
+                "Account: Added closet " + name + " to " + this.name + "."
+        ));
         return true;
     }
 
@@ -75,6 +110,10 @@ public class Account implements Savable<Void> {
     //          present. Returns true if it was removed, false if
     //          it was not present.
     public boolean removeCloset(String name) {
+        EventLog.getInstance().logEvent(new Event(
+                "Account: Attempting to remove Closet "
+                        + name + " from " + this.name + "."
+        ));
         int lengthBefore = this.closets.size();
         this.closets.removeIf(c -> c.getName().equalsIgnoreCase(name));
         return lengthBefore != this.closets.size();
@@ -130,26 +169,5 @@ public class Account implements Savable<Void> {
                 .savable(JSON_CLOSETS_KEY, this.closets, allClothing)
                 .savable(JSON_ALL_CLOTHING_KEY, allClothing, null)
                 .put(JSON_NAME_KEY, this.name);
-    }
-
-    // REQUIRES: jso was created by this.toJson
-    // EFFECTS: Returns an instance of this object reconstructed from JSON
-    public static Account fromJson(JSONObject jso) {
-        JSONArray allClothingJsa = jso.getJSONArray(JSON_ALL_CLOTHING_KEY);
-        List<Clothing> allClothing = new ArrayList<>(allClothingJsa.length());
-        for (int i = 0; i < allClothingJsa.length(); ++i) {
-            JSONObject clothingJs = allClothingJsa.getJSONObject(i);
-            allClothing.add(Clothing.fromJson(clothingJs));
-        }
-        Catalogue c = Catalogue.fromJson(jso.getJSONObject(JSON_CATALOGUE_KEY),
-                allClothing);
-        String name = jso.getString(JSON_NAME_KEY);
-        JSONArray closetsJs = jso.getJSONArray(JSON_CLOSETS_KEY);
-        List<Closet> closets = new ArrayList<>(closetsJs.length());
-        for (int i = 0; i < closetsJs.length(); ++i) {
-            JSONObject closetJs = closetsJs.getJSONObject(i);
-            closets.add(Closet.fromJson(closetJs, allClothing));
-        }
-        return new Account(name, c, closets);
     }
 }

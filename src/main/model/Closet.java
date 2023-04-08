@@ -102,10 +102,27 @@ public class Closet implements Savable<List<Clothing>> {
         });
     }
 
+    // REQUIRES: allClothing is sorted
+    // EFFECTS: Returns an instance of this object from the given JSON
+    public static Closet fromJson(JSONObject jso, List<Clothing> allClothing) {
+        String name = jso.getString(JSON_NAME_KEY);
+        JSONArray idxsJs = jso.getJSONArray(JSON_CLOTHING_KEY);
+        int[] idxs = new int[idxsJs.length()];
+        for (int i = 0; i < idxsJs.length(); ++i) {
+            idxs[i] = idxsJs.getInt(i);
+        }
+        Closet closet = new Closet(name);
+        JsonBuilder.mapToValueSorted(idxs, allClothing)
+                .forEach(closet::addClothing);
+        return closet;
+    }
+
     // EFFECTS: Searches the clothing in this closet for the pieces matching
     //          the given clothing address most closely, and returns them.
     //          The closest matches will be at the end of the list.
     public List<Clothing> findClothing(ClothingAddress address) {
+        EventLog.getInstance().logEvent(new Event(
+                "Closet: Searching closet by address."));
         Map<Clothing, Integer> matchMap = new HashMap<>();
 
         countMapMatches(this.styleMap, address.getStyles(), matchMap);
@@ -118,11 +135,16 @@ public class Closet implements Savable<List<Clothing>> {
         countMapMatches(this.materialsMap, address.getMaterials(), matchMap);
         countMapMatches(this.colorMap, address.getColors(), matchMap);
 
-        return matchMap.entrySet().stream()
-                .sorted(Comparator.comparingInt(Map.Entry::getValue))
-                .map(Map.Entry::getKey)
-                .skip(Math.max(0, matchMap.size() - address.getMatchCount()))
-                .collect(Collectors.toList());
+        try {
+            return matchMap.entrySet().stream()
+                    .sorted(Comparator.comparingInt(Map.Entry::getValue))
+                    .map(Map.Entry::getKey)
+                    .skip(Math.max(0, matchMap.size() - address.getMatchCount()))
+                    .collect(Collectors.toList());
+        } finally {
+            EventLog.getInstance().logEvent(
+                    new Event("Closet: Returning search matches."));
+        }
     }
 
     // EFFECTS: Returns the name of this closet
@@ -172,6 +194,10 @@ public class Closet implements Savable<List<Clothing>> {
         removeByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
         removeByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
         removeByKey(this.colorMap, clothing.getColors(), clothing);
+
+        EventLog.getInstance().logEvent(new Event(
+                "Closet: Removed clothing " + clothing + "."
+        ));
     }
 
     // MODIFIES: this
@@ -192,6 +218,10 @@ public class Closet implements Savable<List<Clothing>> {
         congregateByKey(this.dirtyMap, Collections.singletonList(clothing.isDirty()), clothing);
         congregateByKey(this.materialsMap, Collections.singletonList(clothing.getMaterial()), clothing);
         congregateByKey(this.colorMap, clothing.getColors(), clothing);
+
+        EventLog.getInstance().logEvent(new Event(
+                "Closet: Added clothing " + clothing + "."
+        ));
     }
 
     // REQUIRES: allClothing is sorted
@@ -204,20 +234,5 @@ public class Closet implements Savable<List<Clothing>> {
         return new JsonBuilder()
                 .put(JSON_CLOTHING_KEY, idxs)
                 .put(JSON_NAME_KEY, this.name);
-    }
-
-    // REQUIRES: allClothing is sorted
-    // EFFECTS: Returns an instance of this object from the given JSON
-    public static Closet fromJson(JSONObject jso, List<Clothing> allClothing) {
-        String name = jso.getString(JSON_NAME_KEY);
-        JSONArray idxsJs = jso.getJSONArray(JSON_CLOTHING_KEY);
-        int[] idxs = new int[idxsJs.length()];
-        for (int i = 0; i < idxsJs.length(); ++i) {
-            idxs[i] = idxsJs.getInt(i);
-        }
-        Closet closet = new Closet(name);
-        JsonBuilder.mapToValueSorted(idxs, allClothing)
-                .forEach(closet::addClothing);
-        return closet;
     }
 }

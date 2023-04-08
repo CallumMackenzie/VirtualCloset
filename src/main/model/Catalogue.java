@@ -27,6 +27,18 @@ public class Catalogue implements Savable<List<Clothing>> {
         this.outfits = outfits;
     }
 
+    // REQUIRES: allClothing is sorted, jso was created with this.toJson
+    // EFFECTS: Returns an instance of this class from the given JSON
+    public static Catalogue fromJson(JSONObject jso, List<Clothing> allClothing) {
+        JSONArray jsa = jso.getJSONArray(JSON_OUTFITS_KEY);
+        List<Outfit> outfits = new ArrayList<>(jsa.length());
+        for (int i = 0; i < jsa.length(); ++i) {
+            JSONObject outfitJsonObj = jsa.getJSONObject(i);
+            outfits.add(Outfit.fromJson(outfitJsonObj, allClothing));
+        }
+        return new Catalogue(outfits);
+    }
+
     // EFFECTS: Returns all the outfits in this catalogue
     public List<Outfit> getOutfits() {
         return this.outfits;
@@ -43,12 +55,18 @@ public class Catalogue implements Savable<List<Clothing>> {
     // EFFECTS: Removes outfits matching the given name
     public void removeAllWithName(String name) {
         this.outfits.removeIf(x -> x.getName().equalsIgnoreCase(name));
+        EventLog.getInstance().logEvent(new Event(
+                "Catalogue: Removed all Outfits with name " + name + "."
+        ));
     }
 
     // MODIFIES: this
     // EFFECTS: Adds the given outfit to the catalogue.
     public void addOutfit(Outfit outfit) {
         this.outfits.add(outfit);
+        EventLog.getInstance().logEvent(new Event(
+                "Catalogue: Added Outfit " + outfit.getName() + "."
+        ));
     }
 
     // REQUIRES: allClothing is sorted
@@ -57,17 +75,5 @@ public class Catalogue implements Savable<List<Clothing>> {
     public JSONObject toJson(List<Clothing> allClothing) {
         return new JsonBuilder()
                 .savable(JSON_OUTFITS_KEY, this.outfits, allClothing);
-    }
-
-    // REQUIRES: allClothing is sorted, jso was created with this.toJson
-    // EFFECTS: Returns an instance of this class from the given JSON
-    public static Catalogue fromJson(JSONObject jso, List<Clothing> allClothing) {
-        JSONArray jsa = jso.getJSONArray(JSON_OUTFITS_KEY);
-        List<Outfit> outfits = new ArrayList<>(jsa.length());
-        for (int i = 0; i < jsa.length(); ++i) {
-            JSONObject outfitJsonObj = jsa.getJSONObject(i);
-            outfits.add(Outfit.fromJson(outfitJsonObj, allClothing));
-        }
-        return new Catalogue(outfits);
     }
 }

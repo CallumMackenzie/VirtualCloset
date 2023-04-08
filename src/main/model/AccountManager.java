@@ -97,6 +97,9 @@ public class AccountManager implements Savable<Void> {
         Account ac = this.getAccount(accountName);
         if (ac != null) {
             this.activeAccount = ac;
+            EventLog.getInstance().logEvent(new Event(
+                    "AccountManager: Set active Account to " + accountName + "."
+            ));
         }
         return ac != null;
     }
@@ -114,6 +117,8 @@ public class AccountManager implements Savable<Void> {
     //          does not set and returns false.
     public boolean setActiveAccountName(String name) {
         if (!this.hasActiveAccount()) {
+            EventLog.getInstance().logEvent(
+                    new Event("AccountManager: No active Account; could not set name."));
             return false;
         }
         return this.activeAccount.setName(name, this.accounts);
@@ -126,8 +131,16 @@ public class AccountManager implements Savable<Void> {
     //          and does not add account.
     public boolean addAccount(Account account) {
         if (this.accountExists(account.getName())) {
+            EventLog.getInstance()
+                    .logEvent(new Event("AccountManager: Account "
+                            + account.getName()
+                            + " is not tracked by this AccountManager."));
             return false;
         } else {
+            EventLog.getInstance()
+                    .logEvent(new Event("AccountManager: Account "
+                            + account.getName()
+                            + " added to this AccountManager."));
             this.accounts.add(account);
             return true;
         }
@@ -144,9 +157,18 @@ public class AccountManager implements Savable<Void> {
                     && this.activeAccount.getName()
                     .equalsIgnoreCase(accountName)) {
                 this.removeActiveAccount();
+                EventLog.getInstance().logEvent(
+                        new Event("AccountManager: Removed active Account "
+                                + accountName + "."));
+            } else {
+                EventLog.getInstance().logEvent(
+                        new Event("AccountManager: Removed Account " + accountName + "."));
             }
             return true;
         }
+        EventLog.getInstance().logEvent(
+                new Event("AccountManager: Could not remove Account "
+                        + accountName + "."));
         return false;
     }
 
@@ -159,6 +181,8 @@ public class AccountManager implements Savable<Void> {
     public void saveState() throws IOException {
         JsonWriter jsw = new JsonWriter(this.fileSavePath);
         jsw.write(this, null);
+        EventLog.getInstance().logEvent(
+                new Event("AccountManager: Saved state."));
     }
 
     // MODIFIES: this
@@ -170,6 +194,8 @@ public class AccountManager implements Savable<Void> {
         this.removeActiveAccount();
         AccountManager copy = AccountManager.fromJson(o);
         this.accounts.addAll(copy.accounts);
+        EventLog.getInstance().logEvent(
+                new Event("AccountManager: Loaded state."));
     }
 
     // EFFECTS: Returns a JSON representation of this object
