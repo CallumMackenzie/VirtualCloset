@@ -1,60 +1,36 @@
 # Virtual Closet
 
-## About
+A SwiftUI iOS app for organizing clothing, shoes, accessories, outfits, and future purchases. Firebase Authentication, Cloud Firestore, and Cloud Storage provide private accounts, sync, and optional item photos. A Firebase-hosted MCP server offers read/write access outside the app, including bulk item and wishlist creation.
 
-Virtual closet is a Java desktop application with the purpose of *keeping track of items of clothing* in your closet(s),
-allowing you to *combine them into outfits* which can be *saved for later viewing and reference*.
+## Repository layout
 
-**What is Virtual Closet useful for?**
+- [`ios/`](ios/) — current iPhone app, Firebase rules and Functions MCP server. [Setup and developer notes](ios/README.md).
+- [`desktop-java-prototype/`](desktop-java-prototype/) — archived original Java desktop/console prototype, including its [original README](desktop-java-prototype/README.md), design diagram, sample data, and tests.
 
-- Individuals interested in fashion
-- Keeping track of clothing
-- Remembering what clothing you have in your closet(s)
-- Recording outfits you've liked in the past
-- Testing combinations of clothing you have
+## Current app
 
-## Motivation for the Idea
+- One account can have multiple named closets; a closet is a container/location, **not** a clothing category. One Home closet is sufficient for most people.
+- Items have a category and type, colors, styles, brand, size, material, fit, length, dirty status, and optional photos. Front/back photos can be stored on one item.
+- Browse and filter items, or combine items across closets into saved outfits.
+- Save possible purchases with links, estimated prices, and notes; convert a wish to an owned item.
+- Firestore listeners sync changes automatically. Pull down on a list to explicitly refresh from the server.
+- The MCP server provides 15 read/write tools for closets, items, outfits, and wishlist entries. Bulk-create up to 50 items or wishes per call; it verifies a Firebase Auth ID token on **every request** and scopes access to that user's UID.
 
-Often times I rush in the morning to throw together a suitable and tasteful fit, but there are many articles that slip
-my mind and sit unused. This is the primary reason I am interested in creating this application; to make choosing an
-outfit
-a quicker and easier process. It takes time to put on clothing combinations to see if they fit together, which is time
-that
-can be saved using an application like Virtual Closet.
+## Get started
 
-## User Stories
+1. Open [`ios/VirtualCloset2.xcodeproj`](ios/VirtualCloset2.xcodeproj) in Xcode 26.6 or newer.
+2. Set up Firebase as described in [`ios/README.md`](ios/README.md), including a **local, untracked** `GoogleService-Info.plist`. This file and any personal clothing photos are intentionally excluded from git.
+3. Run on an iOS simulator or device; create an email/password account.
 
-As a user, I want to be able to ...
+The existing Firebase deployment uses project `callum-virtual-closet-2026`. The project-specific `.firebaserc` points to **live services**; review the target before deploying rules or functions. Hosting 2nd-gen Functions and new Storage buckets requires a billing-enabled Firebase plan. Do not commit service-account keys, refresh tokens, user photos, or import-progress files.
 
-- create & remove accounts
-- create & remove closets from accounts
-- add & remove clothing from my closets
-- search through closets
-- create & remove outfits out of clothing
-- modify outfits
-- search my catalogue
-- save my data automatically and if I choose
-- load my data automatically and if I choose
+### Tests
 
-# Refactoring Reflection
-If I were to redo my design, there are a couple of main things I would refactor.
-The first is the View class and respective subclasses of the swing UI, and the second
-is the way I implemented my classes with named accounts.
+```bash
+cd ios
+xcodebuild -project VirtualCloset2.xcodeproj -scheme VirtualCloset2 \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO test
+(cd functions && npm ci && npm test)
+```
 
-Notice in the UML diagram located in the project root that all subclasses of View
-contain a reference to an AccountManager with multiplicity 1; this could be refactored
-into the common superclass View, since this instance persists across the application
-lifecycle. In fact, since there is only ever one AccountManager, it could
-also be refactored to be a singleton class, removing the need for any classes to 
-track a reference to it. This would reduce the amount of code required overall.
-
-I would also refactor classes with relationships such as in the AccountManager and Account where 
-there are objects which must have a unique name within a container class. My implementation of these
-used a list to store the collected objects, and when the container was requested to add
-a new one, these objects would be searched in a linear fashion to see if there was another
-object with the same name. If there was, the new one could not be added, otherwise it was
-added as it was unique. The time efficiency of this could be improved by changing the implementation
-to map an object to its name in a HashMap, but at the same time this would reduce space efficiency. 
-Yet for the application it is unlikely that there will be sufficient data to the point
-there is a noticeable delay in these adding / removing procedures, and there will certainly
-be enough memory which makes the HashMap space complexity issue irrelevant.
+The Java prototype is preserved for reference, not used by the Swift app; its local JSON format is not automatically migrated.

@@ -1,2 +1,14 @@
-*.class
-workspace.xml
+# Local credentials and private wardrobe data
+**/GoogleService-Info.plist
+**/config.json
+photos/
+**/.virtual-closet-import-progress.json
+.pi/
+
+# Dependencies, generated files, and machine-specific IDE state
+**/node_modules/
+**/.DS_Store
+**/xcuserdata/
+**/*.xcuserstate
+**/.build/
+**/DerivedData/

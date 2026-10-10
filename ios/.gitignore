@@ -1,0 +1,5 @@
+GoogleService-Info.plist
+.DS_Store
+*.xcuserstate
+functions/node_modules/
+functions/.env*

@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "callum-virtual-closet-2026"
+  },
+  "targets": {},
+  "etags": {
+    "callum-virtual-closet-2026": {
+      "extensionInstances": {}
+    }
+  },
+  "dataconnectEmulatorConfig": {}
+}
