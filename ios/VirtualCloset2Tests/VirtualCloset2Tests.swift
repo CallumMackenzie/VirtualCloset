@@ -16,6 +16,13 @@ struct VirtualCloset2Tests {
         #expect(shirt.matchScore("relaxed") == 1)
         #expect(shirt.matchScore("red") == 0)
     }
+    @Test func onlySingleClosetHasDefaultDestination() {
+        let home = Closet(id: "home", name: "Home")
+        let storage = Closet(id: "storage", name: "Storage")
+        #expect(MainTabs.onlyClosetId(in: []) == nil)
+        #expect(MainTabs.onlyClosetId(in: [home]) == "home")
+        #expect(MainTabs.onlyClosetId(in: [home, storage]) == nil)
+    }
     @Test func itemIdentityDoesNotDependOnAttributes() {
         let first = Garment(), second = Garment()
         #expect(first.id != second.id)

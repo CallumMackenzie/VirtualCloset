@@ -46,14 +46,48 @@ struct AuthView: View {
 }
 
 struct MainTabs: View {
+    @EnvironmentObject private var store: ClosetStore
+    @State private var selectedTab: Tab = .closets
+    @State private var closetPath: [String] = []
+    @State private var showingClosetListByChoice = false
+
+    private enum Tab: Hashable { case closets, browse, outfits, wishlist, account }
+
     var body: some View {
-        TabView {
-            NavigationStack { ClosetsView() }.tabItem { Label("Closets", systemImage: "square.grid.2x2") }
-            NavigationStack { BrowseView() }.tabItem { Label("Browse", systemImage: "magnifyingglass") }
-            NavigationStack { OutfitsView() }.tabItem { Label("Outfits", systemImage: "person.crop.rectangle.stack") }
-            NavigationStack { WishlistView() }.tabItem { Label("Wishlist", systemImage: "heart") }
-            NavigationStack { AccountView() }.tabItem { Label("Account", systemImage: "person.circle") }
+        TabView(selection: $selectedTab) {
+            NavigationStack(path: $closetPath) {
+                ClosetsView()
+                    .navigationDestination(for: String.self) { BrowseView(closetId: $0) }
+            }
+            .tabItem { Label("Closets", systemImage: "square.grid.2x2") }
+            .tag(Tab.closets)
+            NavigationStack { BrowseView() }.tabItem { Label("Browse", systemImage: "magnifyingglass") }.tag(Tab.browse)
+            NavigationStack { OutfitsView() }.tabItem { Label("Outfits", systemImage: "person.crop.rectangle.stack") }.tag(Tab.outfits)
+            NavigationStack { WishlistView() }.tabItem { Label("Wishlist", systemImage: "heart") }.tag(Tab.wishlist)
+            NavigationStack { AccountView() }.tabItem { Label("Account", systemImage: "person.circle") }.tag(Tab.account)
         }
+        .onAppear { openOnlyCloset() }
+        .onChange(of: store.closets.map(\.id)) { _, _ in openOnlyCloset() }
+        .onChange(of: closetPath) { previous, current in
+            if !previous.isEmpty && current.isEmpty { showingClosetListByChoice = true }
+        }
+        .onChange(of: selectedTab) { _, selected in
+            if selected == .closets {
+                showingClosetListByChoice = false
+                openOnlyCloset()
+            }
+        }
+    }
+
+    static func onlyClosetId(in closets: [Closet]) -> String? {
+        closets.count == 1 ? closets.first?.id : nil
+    }
+
+    private func openOnlyCloset() {
+        guard selectedTab == .closets, !showingClosetListByChoice,
+              closetPath.isEmpty,
+              let id = Self.onlyClosetId(in: store.closets) else { return }
+        closetPath = [id]
     }
 }
 
@@ -67,9 +101,7 @@ struct ClosetsView: View {
         List {
             if store.closets.isEmpty { ContentUnavailableView("No closets yet", systemImage: "door.left.hand.open", description: Text("Create a closet to start adding pieces.")) }
             ForEach(store.closets.sorted { $0.name < $1.name }) { closet in
-                NavigationLink {
-                    BrowseView(closetId: closet.id)
-                } label: {
+                NavigationLink(value: closet.id) {
                     HStack { Text(closet.name); Spacer(); Text("\(store.items.filter { $0.closetId == closet.id }.count)").foregroundStyle(.secondary) }
                 }.swipeActions { Button("Delete", role: .destructive) { deleting = closet } }
             }

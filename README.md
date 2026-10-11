@@ -9,7 +9,7 @@ A SwiftUI iOS app for organizing clothing, shoes, accessories, outfits, and futu
 
 ## Current app
 
-- One account can have multiple named closets; a closet is a container/location, **not** a clothing category. One Home closet is sufficient for most people.
+- One account can have multiple named closets; a closet is a container/location, **not** a clothing category. One Home closet is sufficient for most people, and the Closets tab opens it automatically when it is the only closet.
 - Items have a category and type, colors, styles, brand, size, material, fit, length, dirty status, and optional photos. Front/back photos can be stored on one item.
 - Browse and filter items, or combine items across closets into saved outfits. The outfit editor has search and filters for closet, category/type, color, brand, style, size, fit, and clean status.
 - Save possible purchases with links, estimated prices, and notes; convert a wish to an owned item.
