@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import FirebaseAuth
 
 struct ContentView: View {
     @EnvironmentObject private var store: ClosetStore
@@ -219,47 +220,59 @@ struct BrowseView: View {
     }
 }
 
-struct PhotoThumbnail: View {
+// Reads the previous icon from disk/memory first; validates its Storage date in the background.
+struct CachedPhoto: View {
     @EnvironmentObject private var store: ClosetStore
     let path: String?
     let symbol: String
-    @State private var url: URL?
+    let fill: Bool
+    @State private var image: UIImage?
+    @State private var displayedKey: String?
+    private var cacheKey: String { "\(store.user?.uid ?? "")/\(path ?? "")" }
+
+    var body: some View {
+        ZStack {
+            if displayedKey == cacheKey, let image {
+                if fill { Image(uiImage: image).resizable().scaledToFill() }
+                else { Image(uiImage: image).resizable().scaledToFit() }
+            } else { Image(systemName: symbol).foregroundStyle(.secondary) }
+        }
+        .task(id: cacheKey) {
+            if displayedKey != cacheKey { image = nil; displayedKey = cacheKey }
+            guard let path, !path.isEmpty else { return }
+            if let cached = await store.cachedThumbnail(path), !Task.isCancelled { image = cached }
+            if let updated = await store.refreshedThumbnail(path), !Task.isCancelled { image = updated }
+        }
+    }
+}
+
+struct PhotoThumbnail: View {
+    let path: String?
+    let symbol: String
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10).fill(.quaternary)
-            if let url { AsyncImage(url: url) { image in image.resizable().scaledToFill() } placeholder: { Image(systemName: symbol) } }
-            else { Image(systemName: symbol).foregroundStyle(.secondary) }
+            CachedPhoto(path: path, symbol: symbol, fill: true)
         }
         .frame(width: 56, height: 56).clipShape(RoundedRectangle(cornerRadius: 10))
-        .task(id: path) { url = nil; if let path { url = await store.photoURL(path) } }
     }
 }
 
 struct GarmentPhotoGallery: View {
-    @EnvironmentObject private var store: ClosetStore
     let paths: [String]
-    @State private var urls: [String: URL] = [:]
     var body: some View {
         if paths.contains(where: { !$0.isEmpty }) {
             ScrollView(.horizontal) {
                 HStack(spacing: 12) {
                     ForEach(Array(paths.enumerated()).filter { !$0.element.isEmpty }, id: \.offset) { index, path in
                         VStack {
-                            if let url = urls[path] {
-                                AsyncImage(url: url) { image in
-                                    image.resizable().scaledToFit()
-                                } placeholder: { ProgressView() }
+                            CachedPhoto(path: path, symbol: "photo", fill: false)
                                 .frame(width: 240, height: 240)
-                            } else { ProgressView().frame(width: 240, height: 240) }
                             Text(index == 0 ? "Front / primary" : "Back / additional")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
                 }
-            }
-            .task(id: paths) {
-                urls = [:]
-                for path in paths where !path.isEmpty { urls[path] = await store.photoURL(path) }
             }
         }
     }

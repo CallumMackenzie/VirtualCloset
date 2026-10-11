@@ -18,6 +18,8 @@ final class ClosetStore: ObservableObject {
     private var listeners: [ListenerRegistration] = []
     private let db = Firestore.firestore()
     private let storage = Storage.storage()
+    private let thumbnailCache = ThumbnailCache()
+    private var thumbnailRefreshes: [String: (id: UUID, task: Task<UIImage?, Never>)] = [:]
 
     init() {
         authListener = Auth.auth().addStateDidChangeListener { [weak self] _, user in
@@ -116,6 +118,8 @@ final class ClosetStore: ObservableObject {
         }
         try await root.delete()
         try await user.delete()
+        for (key, pending) in thumbnailRefreshes where key.hasPrefix("\(user.uid)/") { pending.task.cancel() }
+        await thumbnailCache.removeAccount(user.uid)
     }
     enum AccountDeletionError: LocalizedError {
         case recentLoginRequired
@@ -232,9 +236,34 @@ final class ClosetStore: ObservableObject {
         batch.deleteDocument(try collection("wishlist").document(wish.id))
         try await batch.commit()
     }
-    func photoURL(_ path: String) async -> URL? {
-        guard let uid = user?.uid, !path.isEmpty else { return nil }
-        return try? await storage.reference(withPath: "users/\(uid)/\(path)").downloadURL()
+    func cachedThumbnail(_ path: String) async -> UIImage? {
+        guard let uid = user?.uid, path.hasSuffix("-thumb.jpg") else { return nil }
+        return await thumbnailCache.image(for: uid, path: path)
+    }
+
+    // Called only when a preview appears. Existing image remains visible while metadata is checked.
+    // The image bytes are downloaded only if Storage reports a newer modification date.
+    func refreshedThumbnail(_ path: String) async -> UIImage? {
+        guard let uid = user?.uid, path.hasSuffix("-thumb.jpg") else { return nil }
+        let key = "\(uid)/\(path)"
+        if let pending = thumbnailRefreshes[key] { return await pending.task.value }
+        let id = UUID()
+        let task = Task { [weak self] () -> UIImage? in
+            guard let self else { return nil }
+            let reference = storage.reference(withPath: "users/\(uid)/\(path)")
+            do {
+                let metadata = try await reference.getMetadata()
+                guard !Task.isCancelled,
+                      await thumbnailCache.needsRefresh(for: uid, path: path, remoteDate: metadata.updated) else { return nil }
+                let bytes = try await reference.data(maxSize: 2 * 1024 * 1024)
+                guard !Task.isCancelled else { return nil }
+                return await thumbnailCache.save(bytes, for: uid, path: path, updatedAt: metadata.updated)
+            } catch { return nil } // Offline or unavailable: leave the last known image in place.
+        }
+        thumbnailRefreshes[key] = (id, task)
+        let updated = await task.value
+        if thumbnailRefreshes[key]?.id == id { thumbnailRefreshes.removeValue(forKey: key) }
+        return updated
     }
     // Keep the original separately; never request it for list or gallery previews.
     private func uploadPhotoPair(_ image: UIImage, directory: String, id: String) async throws -> (original: String, thumbnail: String) {
@@ -266,6 +295,8 @@ final class ClosetStore: ObservableObject {
     }
     private func removePhoto(_ path: String?) async {
         guard let path, !path.isEmpty, let uid = user?.uid else { return }
+        thumbnailRefreshes["\(uid)/\(path)"]?.task.cancel()
         try? await storage.reference(withPath: "users/\(uid)/\(path)").delete()
+        await thumbnailCache.remove(path, for: uid)
     }
 }

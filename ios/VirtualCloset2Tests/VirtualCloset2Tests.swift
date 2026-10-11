@@ -13,6 +13,34 @@ struct VirtualCloset2Tests {
         #expect(icon?.cgImage?.width == 250)
         #expect(icon?.cgImage?.height == 250)
     }
+    @Test @MainActor func thumbnailsPersistAndOnlyRefreshWhenNewer() async {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ThumbnailCache(directory: directory)
+        let path = "items/item-thumb.jpg"
+        let older = Date(timeIntervalSince1970: 100)
+        let newer = Date(timeIntervalSince1970: 200)
+        let source = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 600)).image { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 400, height: 600))
+        }
+        let bytes = PhotoIcon.jpegData(from: source)!
+        #expect(await cache.needsRefresh(for: "accountA", path: path, remoteDate: older))
+        #expect(await cache.save(bytes, for: "accountA", path: path, updatedAt: older) != nil)
+        #expect(!(await cache.needsRefresh(for: "accountA", path: path, remoteDate: older)))
+        #expect(await cache.needsRefresh(for: "accountA", path: path, remoteDate: newer))
+        #expect(await cache.needsRefresh(for: "accountB", path: path, remoteDate: older))
+        #expect(await cache.save(bytes, for: "accountA", path: path, updatedAt: newer) != nil)
+        // An older response arriving late must not roll the cache back.
+        #expect(await cache.save(bytes, for: "accountA", path: path, updatedAt: older) != nil)
+        #expect(!(await cache.needsRefresh(for: "accountA", path: path, remoteDate: newer)))
+
+        let reopened = ThumbnailCache(directory: directory)
+        #expect(await reopened.image(for: "accountA", path: path) != nil)
+        #expect(!(await reopened.needsRefresh(for: "accountA", path: path, remoteDate: newer)))
+        await reopened.removeAccount("accountA")
+        #expect(await reopened.image(for: "accountA", path: path) == nil)
+    }
     @Test func categoriesHaveTypes() {
         for category in GarmentCategory.allCases { #expect(!category.types.isEmpty) }
         #expect(GarmentCategory.accessories.types.contains("Scarf"))

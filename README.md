@@ -11,7 +11,7 @@ A SwiftUI iOS app for organizing clothing, shoes, accessories, outfits, and futu
 
 - One account can have multiple named closets; a closet is a container/location, **not** a clothing category. One Home closet is sufficient for most people, and the Closets tab opens it automatically when it is the only closet.
 - Items have a category and type, colors, styles, brand, size, material, fit, length, dirty status, and optional photos. Front/back photos can be stored on one item.
-- Browse and filter items, or combine items across closets into saved outfits. The outfit editor has search and filters for closet, category/type, color, brand, style, size, fit, and clean status. Image previews use stored 250×250 icons; originals are kept separately for future full-resolution outfit views.
+- Browse and filter items, or combine items across closets into saved outfits. The outfit editor has search and filters for closet, category/type, color, brand, style, size, fit, and clean status. Image previews use stored and locally cached 250×250 icons; originals are kept separately for future full-resolution outfit views.
 - Save possible purchases with links, estimated prices, and notes; convert a wish to an owned item.
 - Firestore listeners sync changes automatically. Pull down on a list to explicitly refresh from the server.
 - The MCP server provides 15 read/write tools for closets, items, outfits, and wishlist entries. Bulk-create up to 50 items or wishes per call; it verifies a Firebase Auth ID token on **every request** and scopes access to that user's UID.
