@@ -97,6 +97,40 @@ struct Garment: Identifiable {
     }
 }
 
+// Client-side filtering for the outfit picker; Firestore listeners already keep the items current.
+struct GarmentFilter {
+    var query = ""
+    var closetId = "All"
+    var category = "All"
+    var type = "All"
+    var color = "All"
+    var brand = "All"
+    var style = "All"
+    var size = "All"
+    var fit = "All"
+    var cleanOnly = false
+
+    var isActive: Bool {
+        !query.trimmed.isEmpty || cleanOnly ||
+        [closetId, category, type, color, brand, style, size, fit].contains { $0 != "All" }
+    }
+
+    func matches(_ item: Garment) -> Bool {
+        if closetId != "All" && item.closetId != closetId { return false }
+        if category != "All" && item.category.rawValue != category { return false }
+        if type != "All" && item.displayType.localizedCaseInsensitiveCompare(type) != .orderedSame { return false }
+        if color != "All" && !item.colors.contains(where: { $0.localizedCaseInsensitiveCompare(color) == .orderedSame }) { return false }
+        if brand != "All" && item.brand.localizedCaseInsensitiveCompare(brand) != .orderedSame { return false }
+        if style != "All" && !item.styles.contains(where: { $0.localizedCaseInsensitiveCompare(style) == .orderedSame }) { return false }
+        if size != "All" && item.size.rawValue != size { return false }
+        if fit != "All" && item.fit.rawValue != fit { return false }
+        if cleanOnly && item.isDirty { return false }
+
+        let words = query.lowercased().split(whereSeparator: \.isWhitespace)
+        return words.isEmpty || item.matchScore(query) == words.count
+    }
+}
+
 struct Outfit: Identifiable {
     var id: String = UUID().uuidString
     var name: String = ""

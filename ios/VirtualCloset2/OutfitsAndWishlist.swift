@@ -40,8 +40,25 @@ struct OutfitEditor: View {
     @EnvironmentObject private var store: ClosetStore
     @Environment(\.dismiss) private var dismiss
     @State private var outfit: Outfit
+    @State private var filters = GarmentFilter()
     @State private var busy = false
     init(outfit: Outfit) { _outfit = State(initialValue: outfit) }
+
+    private var availableItems: [Garment] {
+        store.items.filter { !outfit.itemIds.contains($0.id) && filters.matches($0) }
+            .sorted { first, second in
+                let left = first.matchScore(filters.query)
+                let right = second.matchScore(filters.query)
+                return left == right ? first.name.localizedStandardCompare(second.name) == .orderedAscending : left > right
+            }
+    }
+    private var types: [String] {
+        options(store.items.filter { filters.category == "All" || $0.category.rawValue == filters.category }
+            .map(\.displayType))
+    }
+    private func options(_ values: [String]) -> [String] {
+        Array(Set(values.filter { !$0.trimmed.isEmpty })).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
     var body: some View {
         NavigationStack {
             Form {
@@ -58,12 +75,61 @@ struct OutfitEditor: View {
                         } else { Text("Unavailable item").foregroundStyle(.secondary) }
                     }
                 }
-                Section("Add from any closet") {
-                    ForEach(store.items.filter { !outfit.itemIds.contains($0.id) }.sorted { $0.name < $1.name }) { item in
+                Section("Find pieces") {
+                    TextField("Search name, type, color, style…", text: $filters.query)
+                        .autocorrectionDisabled()
+                    Picker("Closet", selection: $filters.closetId) {
+                        Text("All closets").tag("All")
+                        ForEach(store.closets) { Text($0.name).tag($0.id) }
+                    }
+                    Picker("Category", selection: $filters.category) {
+                        Text("All categories").tag("All")
+                        ForEach(GarmentCategory.allCases) { Text($0.rawValue).tag($0.rawValue) }
+                    }
+                    .onChange(of: filters.category) { _, _ in filters.type = "All" }
+                    Toggle("Clean items only", isOn: $filters.cleanOnly)
+                    DisclosureGroup("More filters") {
+                        Picker("Type", selection: $filters.type) {
+                            Text("All types").tag("All")
+                            ForEach(types, id: \.self) { Text($0).tag($0) }
+                        }
+                        Picker("Color", selection: $filters.color) {
+                            Text("All colors").tag("All")
+                            ForEach(options(store.items.flatMap(\.colors)), id: \.self) { Text($0).tag($0) }
+                        }
+                        Picker("Brand", selection: $filters.brand) {
+                            Text("All brands").tag("All")
+                            ForEach(options(store.items.map(\.brand)), id: \.self) { Text($0).tag($0) }
+                        }
+                        Picker("Style", selection: $filters.style) {
+                            Text("All styles").tag("All")
+                            ForEach(options(store.items.flatMap(\.styles)), id: \.self) { Text($0).tag($0) }
+                        }
+                        Picker("Size", selection: $filters.size) {
+                            Text("All sizes").tag("All")
+                            ForEach(GarmentSize.allCases) { Text($0.rawValue).tag($0.rawValue) }
+                        }
+                        Picker("Fit", selection: $filters.fit) {
+                            Text("All fits").tag("All")
+                            ForEach(GarmentFit.allCases) { Text($0.rawValue).tag($0.rawValue) }
+                        }
+                    }
+                    if filters.isActive { Button("Clear search and filters") { filters = GarmentFilter() } }
+                }
+                Section("Add pieces (\(availableItems.count))") {
+                    if availableItems.isEmpty {
+                        Text(store.items.count == outfit.itemIds.count ? "All your pieces are in this outfit." : "No pieces match. Try clearing a filter.")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(availableItems) { item in
                         Button { outfit.itemIds.append(item.id) } label: {
                             HStack {
                                 PhotoThumbnail(path: item.photoPath, symbol: item.category.symbol)
-                                Text(item.name).foregroundStyle(.primary)
+                                VStack(alignment: .leading) {
+                                    Text(item.name).foregroundStyle(.primary)
+                                    Text("\(item.displayType) · \(store.closets.first { $0.id == item.closetId }?.name ?? "Unknown closet")")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
                                 Spacer()
                                 Image(systemName: "plus.circle")
                             }
@@ -72,6 +138,7 @@ struct OutfitEditor: View {
                 }
                 if busy { ProgressView() }
             }
+            .refreshable { await store.refresh() }
             .navigationTitle("Outfit")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }

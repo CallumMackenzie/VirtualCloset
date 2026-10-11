@@ -22,6 +22,43 @@ struct VirtualCloset2Tests {
         #expect(GarmentFit.allCases.contains(.baggy))
         #expect(GarmentLength.allCases.contains(.cropped))
     }
+    @Test func outfitPickerFiltersAcrossAttributesAndSearchTerms() {
+        var shirt = Garment()
+        shirt.name = "Blue Oxford Shirt"
+        shirt.closetId = "home"
+        shirt.category = .tops
+        shirt.type = "Shirt"
+        shirt.colors = ["Blue", "White"]
+        shirt.styles = ["Formal"]
+        shirt.brand = "Acme"
+        shirt.size = .m
+        shirt.fit = .slim
+
+        var filter = GarmentFilter()
+        #expect(filter.matches(shirt))
+        filter.query = "blue formal"
+        #expect(filter.matches(shirt))
+        filter.query = "blue hoodie"
+        #expect(!filter.matches(shirt))
+        filter.query = ""
+        filter.category = "Tops"
+        filter.type = "Shirt"
+        filter.closetId = "home"
+        filter.color = "blue"
+        filter.brand = "acme"
+        filter.style = "formal"
+        filter.size = "M"
+        filter.fit = "Slim"
+        filter.cleanOnly = true
+        #expect(filter.matches(shirt))
+        #expect(filter.isActive)
+        shirt.isDirty = true
+        #expect(!filter.matches(shirt))
+        filter.cleanOnly = false
+        filter.closetId = "storage"
+        #expect(!filter.matches(shirt))
+        #expect(!GarmentFilter().isActive)
+    }
     @Test func tagsTrimEmptyValues() {
         #expect(" blue, , cotton ,".tags == ["blue", "cotton"])
     }
