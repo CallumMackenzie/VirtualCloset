@@ -123,14 +123,62 @@ struct VirtualCloset2Tests {
         #expect(first.contains { $0.id == shirt.id })
         #expect(first.contains { $0.id == shoes.id })
         #expect(!first.contains { $0.id == otherPants.id })
-        #expect(!first.contains { $0.id == clashing.id })
+        #expect(first.first?.id == shirt.id)
+        #expect(first.firstIndex(where: { $0.id == clashing.id })! > first.firstIndex(where: { $0.id == shirt.id })!)
         let next = OutfitRecommendations.suggest(selected: [pants, shirt], available: available)
-        #expect(!next.contains { $0.item.category == .bottoms || $0.item.category == .tops })
+        #expect(!next.contains { $0.item.category == .bottoms })
         #expect(next.contains { $0.id == shoes.id })
         // Search keeps the original filtered results and relevance sorting; no recommended strip.
         var filter = GarmentFilter(); filter.query = "cream"
         #expect(filter.matches(shirt))
         #expect(OutfitRecommendations.suggest(selected: [pants], available: available.filter(filter.matches), query: filter.query).isEmpty)
+    }
+    @Test func recommendationsIncludeStrongMatchesAcrossDifferentPalettesAndBeyondEightRows() {
+        var blackPants = Garment(); blackPants.category = .bottoms; blackPants.colors = ["Black"]
+        var oliveTop = Garment(); oliveTop.category = .tops; oliveTop.colors = ["Olive green"]
+        var goldChain = Garment(); goldChain.category = .accessories; goldChain.type = "Jewellery"; goldChain.colors = ["Gold"]
+        // No single bundled palette contains black, olive and gold, but gold pairs with each.
+        let mixed = OutfitRecommendations.suggest(selected: [blackPants, oliveTop], available: [goldChain])
+        #expect(mixed.map(\.id) == [goldChain.id])
+
+        var greyShoes = Garment(); greyShoes.category = .shoes; greyShoes.colors = ["Grey"]
+        var creamSweater = Garment(); creamSweater.category = .tops; creamSweater.type = "Sweater"; creamSweater.colors = ["Cream"]
+        #expect(OutfitRecommendations.suggest(selected: [blackPants, greyShoes], available: [creamSweater]).contains { $0.id == creamSweater.id })
+        let whiteTops = (0..<12).map { index -> Garment in
+            var top = Garment(); top.name = "White top \(index)"; top.category = .tops; top.colors = ["White"]
+            return top
+        }
+        #expect(OutfitRecommendations.suggest(selected: [blackPants], available: whiteTops).count == 12)
+    }
+    @Test func explicitNameColorsSupplementIncorrectImportedTags() {
+        var pants = Garment(); pants.name = "Navy pinstripe pants"; pants.category = .bottoms; pants.colors = ["Black", "Grey"]
+        var shirt = Garment(); shirt.name = "Olive shirt"; shirt.category = .tops; shirt.colors = ["Olive green"]
+        let navyOlive = OutfitPalette(name: "Navy and Olive", colors: ["navy", "olive"], source: URL(string: "https://example.com")!)
+        let results = OutfitRecommendations.suggest(selected: [pants], available: [shirt], palettes: [navyOlive])
+        #expect(results.first?.palette?.name == "Navy and Olive")
+    }
+    @Test func monochromePairDoesNotClaimAnUnrelatedPaletteAccent() {
+        var pants = Garment(); pants.category = .bottoms; pants.colors = ["Black"]
+        var shirt = Garment(); shirt.category = .tops; shirt.colors = ["Black"]
+        let blackAndGold = OutfitPalette(name: "Black and Gold", colors: ["black", "gold"], source: URL(string: "https://example.com")!)
+        let match = OutfitRecommendations.suggest(selected: [pants], available: [shirt], palettes: [blackAndGold])
+        #expect(match.first?.palette == nil)
+    }
+    @Test func dirtyPiecesAreRankedLowerRatherThanHidden() {
+        var pants = Garment(); pants.category = .bottoms; pants.colors = ["Black"]
+        var clean = Garment(); clean.name = "White shirt"; clean.category = .tops; clean.colors = ["White"]
+        var dirty = Garment(); dirty.name = "Another white shirt"; dirty.category = .tops; dirty.type = "Sweater"; dirty.colors = ["White"]; dirty.isDirty = true
+        let results = OutfitRecommendations.suggest(selected: [pants], available: [dirty, clean])
+        #expect(results.map(\.id) == [clean.id, dirty.id])
+    }
+    @Test func differentTopLayersAreAllowedButDuplicateBottomsAndTypesAreNot() {
+        var pants = Garment(); pants.category = .bottoms; pants.colors = ["Black"]
+        var tee = Garment(); tee.category = .tops; tee.type = "T-shirt"; tee.colors = ["White"]
+        var sweater = Garment(); sweater.category = .tops; sweater.type = "Sweater"; sweater.colors = ["Cream"]
+        var otherTee = Garment(); otherTee.category = .tops; otherTee.type = "T-shirt"; otherTee.colors = ["Cream"]
+        var secondPants = Garment(); secondPants.category = .bottoms; secondPants.colors = ["Grey"]
+        let results = OutfitRecommendations.suggest(selected: [pants, tee], available: [sweater, otherTee, secondPants])
+        #expect(results.map(\.id) == [sweater.id])
     }
     @Test func onePieceAndAccessoriesDoNotSuggestDuplicateTypes() {
         var dress = Garment(); dress.category = .onePieces; dress.colors = ["Black"]

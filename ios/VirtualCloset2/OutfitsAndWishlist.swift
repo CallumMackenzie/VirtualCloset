@@ -132,7 +132,7 @@ struct OutfitEditor: View {
                                     PhotoThumbnail(path: suggestion.item.thumbnailPath, symbol: suggestion.item.category.symbol)
                                     VStack(alignment: .leading) {
                                         Text(suggestion.item.name).foregroundStyle(.primary)
-                                        Text("\(suggestion.item.displayType) · \(suggestion.palette.name) colors")
+                                        Text("\(suggestion.item.displayType) · \(suggestion.reason)\(suggestion.item.isDirty ? " · Dirty" : "")")
                                             .font(.caption).foregroundStyle(.secondary)
                                     }
                                     Spacer()
@@ -143,7 +143,7 @@ struct OutfitEditor: View {
                     } header: {
                         Text("Recommended (\(recommended.count))")
                     } footer: {
-                        Text("Suggested from colors and types that complement your selected pieces.")
+                        Text("Ranked by color fit. Adding a piece updates the suggestions.")
                     }
                 }
                 Section(recommended.isEmpty ? "Add pieces (\(otherItems.count))" : "More pieces (\(otherItems.count))") {
