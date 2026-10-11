@@ -186,7 +186,7 @@ struct BrowseView: View {
                 ForEach(visible) { item in
                     Button { editing = item } label: {
                         HStack(spacing: 14) {
-                            PhotoThumbnail(path: item.photoPath, symbol: item.category.symbol)
+                            PhotoThumbnail(path: item.thumbnailPath, symbol: item.category.symbol)
                             VStack(alignment: .leading) {
                                 Text(item.name).foregroundStyle(.primary).font(.headline)
                                 Text("\(item.displayType) · \(store.closets.first { $0.id == item.closetId }?.name ?? "Closet removed")") .foregroundStyle(.secondary).font(.caption)
@@ -240,10 +240,10 @@ struct GarmentPhotoGallery: View {
     let paths: [String]
     @State private var urls: [String: URL] = [:]
     var body: some View {
-        if !paths.isEmpty {
+        if paths.contains(where: { !$0.isEmpty }) {
             ScrollView(.horizontal) {
                 HStack(spacing: 12) {
-                    ForEach(Array(paths.enumerated()), id: \.offset) { index, path in
+                    ForEach(Array(paths.enumerated()).filter { !$0.element.isEmpty }, id: \.offset) { index, path in
                         VStack {
                             if let url = urls[path] {
                                 AsyncImage(url: url) { image in
@@ -258,7 +258,8 @@ struct GarmentPhotoGallery: View {
                 }
             }
             .task(id: paths) {
-                for path in paths { urls[path] = await store.photoURL(path) }
+                urls = [:]
+                for path in paths where !path.isEmpty { urls[path] = await store.photoURL(path) }
             }
         }
     }
@@ -269,14 +270,23 @@ struct PhotoPicker: View {
     var existingPath: String?
     var symbol: String = "photo"
     @State private var selection: PhotosPickerItem?
+    @State private var preview: UIImage?
     var body: some View {
         HStack {
-            if let image { Image(uiImage: image).resizable().scaledToFill().frame(width: 72, height: 72).clipShape(RoundedRectangle(cornerRadius: 10)) }
-            else { PhotoThumbnail(path: existingPath, symbol: symbol) }
+            if image != nil, let preview {
+                Image(uiImage: preview).resizable().scaledToFill().frame(width: 72, height: 72).clipShape(RoundedRectangle(cornerRadius: 10))
+            } else { PhotoThumbnail(path: existingPath, symbol: symbol) }
             PhotosPicker(image == nil && existingPath == nil ? "Add a photo (recommended)" : "Change photo", selection: $selection, matching: .images)
         }
         .onChange(of: selection) { _, newValue in
-            Task { if let data = try? await newValue?.loadTransferable(type: Data.self), let selected = UIImage(data: data) { image = selected } }
+            Task {
+                if let data = try? await newValue?.loadTransferable(type: Data.self),
+                   let selected = UIImage(data: data),
+                   let icon = PhotoIcon.jpegData(from: selected).flatMap(UIImage.init(data:)) {
+                    preview = icon
+                    image = selected
+                }
+            }
         }
     }
 }
@@ -298,8 +308,8 @@ struct ItemEditor: View {
         NavigationStack {
             Form {
                 Section("Photos") {
-                    PhotoPicker(image: $image, existingPath: item.photoPath, symbol: item.category.symbol)
-                    GarmentPhotoGallery(paths: item.photoPaths)
+                    PhotoPicker(image: $image, existingPath: item.thumbnailPath, symbol: item.category.symbol)
+                    GarmentPhotoGallery(paths: item.thumbnailPaths)
                 }
                 Section("Essentials") {
                     TextField("Name", text: $item.name)

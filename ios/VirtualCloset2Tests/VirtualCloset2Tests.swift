@@ -1,7 +1,18 @@
 import Testing
+import UIKit
 @testable import VirtualCloset2
 
 struct VirtualCloset2Tests {
+    @Test @MainActor func iconIsExactly250PixelsOnRetinaDevices() {
+        let source = UIGraphicsImageRenderer(size: CGSize(width: 600, height: 400)).image { context in
+            UIColor.blue.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 600, height: 400))
+        }
+        let jpeg = PhotoIcon.jpegData(from: source)
+        let icon = jpeg.flatMap(UIImage.init(data:))
+        #expect(icon?.cgImage?.width == 250)
+        #expect(icon?.cgImage?.height == 250)
+    }
     @Test func categoriesHaveTypes() {
         for category in GarmentCategory.allCases { #expect(!category.types.isEmpty) }
         #expect(GarmentCategory.accessories.types.contains("Scarf"))

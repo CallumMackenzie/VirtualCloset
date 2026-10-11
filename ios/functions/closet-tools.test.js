@@ -75,6 +75,29 @@ test('outfit refuses foreign/missing item IDs; empty wishlist can be bulk create
   assert.equal((await invoke('list_wishlist', {})).length, 2);
 });
 
+test('item edits and wish purchases retain originals and thumbnails', async () => {
+  const { invoke, records } = fakeStore();
+  const closet = await invoke('create_closet', { name: 'Home' });
+  const [created] = await invoke('create_items', { items: [{ name: 'Shirt', closetId: closet.id, category: 'Tops' }] });
+  const itemKey = `users/signed-in-user/items/${created.id}`;
+  Object.assign(records.get(itemKey), {
+    photoPath: 'items/shirt.jpg', photoPaths: ['items/shirt.jpg'],
+    thumbnailPath: 'items/shirt-thumb.jpg', thumbnailPaths: ['items/shirt-thumb.jpg']
+  });
+  await invoke('update_item', { itemId: created.id, changes: { name: 'New shirt' } });
+  assert.equal(records.get(itemKey).thumbnailPath, 'items/shirt-thumb.jpg');
+  assert.deepEqual(records.get(itemKey).thumbnailPaths, ['items/shirt-thumb.jpg']);
+
+  const [wish] = await invoke('create_wishes', { wishes: [{ name: 'Boots' }] });
+  Object.assign(records.get(`users/signed-in-user/wishlist/${wish.id}`), {
+    photoPath: 'wishlist/boots.jpg', thumbnailPath: 'wishlist/boots-thumb.jpg'
+  });
+  const { itemId } = await invoke('mark_purchased', { wishId: wish.id, closetId: closet.id, category: 'Shoes' });
+  const purchased = records.get(`users/signed-in-user/items/${itemId}`);
+  assert.equal(purchased.photoPath, 'wishlist/boots.jpg');
+  assert.deepEqual(purchased.thumbnailPaths, ['wishlist/boots-thumb.jpg']);
+});
+
 test('write tools marked writable; delete tools marked destructive', () => {
   const { calls } = fakeStore();
   assert.equal(calls.get('list_items').config.annotations.readOnlyHint, true);

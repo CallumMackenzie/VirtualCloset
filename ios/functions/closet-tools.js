@@ -74,6 +74,8 @@ export function registerClosetTools(server, db, uid) {
       brand: input.brand || '', material: input.material || '', size: input.size || 'Unknown',
       fit: input.fit || 'Unknown', length: input.length || 'Unknown', isDirty: input.isDirty ?? false,
       photoPath: original.photoPath || '', photoPaths: original.photoPaths || (original.photoPath ? [original.photoPath] : []),
+      thumbnailPath: original.thumbnailPath || '',
+      thumbnailPaths: original.thumbnailPaths || (original.thumbnailPath ? [original.thumbnailPath] : []),
       createdAt: original.createdAt || Timestamp.now(), updatedAt: Timestamp.now()
     };
   }
@@ -102,7 +104,7 @@ export function registerClosetTools(server, db, uid) {
   add('delete_item', 'Delete an item and remove it from outfits. Photo deletion is not supported by this tool: delete photos from the app first.', { itemId: id }, async ({ itemId }) => {
     const doc = ref(root, 'items', itemId), snap = await doc.get();
     if (!snap.exists) throw Error('Item not found');
-    if (snap.data().photoPath || snap.data().photoPaths?.length) throw Error('Item has photos; remove it in the iOS app instead');
+    if (snap.data().photoPath || snap.data().photoPaths?.length || snap.data().thumbnailPath || snap.data().thumbnailPaths?.length) throw Error('Item has photos; remove it in the iOS app instead');
     const outfits = (await root.collection('outfits').get()).docs.filter(o => (o.data().itemIds || []).includes(itemId));
     if (outfits.length >= 499) throw Error('Too many referencing outfits to delete atomically');
     const batch = db.batch(); batch.delete(doc);
@@ -132,7 +134,7 @@ export function registerClosetTools(server, db, uid) {
     for (const wish of wishes) {
       const doc = root.collection('wishlist').doc(); batch.set(doc, {
         name: wish.name, brand: wish.brand || '', url: wish.url || '', price: wish.price || '',
-        currency: wish.currency || 'USD', notes: wish.notes || '', photoPath: '', createdAt: Timestamp.now()
+        currency: wish.currency || 'USD', notes: wish.notes || '', photoPath: '', thumbnailPath: '', createdAt: Timestamp.now()
       }); created.push({ id: doc.id, name: wish.name });
     }
     await batch.commit(); return created;
@@ -147,7 +149,7 @@ export function registerClosetTools(server, db, uid) {
   add('delete_wish', 'Delete a wishlist entry without a photo. Use the app for photographed entries.', { wishId: id }, async ({ wishId }) => {
     const doc = ref(root, 'wishlist', wishId), snap = await doc.get();
     if (!snap.exists) throw Error('Wishlist entry not found');
-    if (snap.data().photoPath) throw Error('Entry has a photo; delete it in the iOS app instead');
+    if (snap.data().photoPath || snap.data().thumbnailPath) throw Error('Entry has a photo; delete it in the iOS app instead');
     await doc.delete(); return { deleted: wishId };
   });
   add('mark_purchased', 'Convert a wishlist entry to a clothing item in a closet (retaining any photo).', {
@@ -159,6 +161,9 @@ export function registerClosetTools(server, db, uid) {
     const w = wish.data();
     const item = await prepareItem({ name: w.name, brand: w.brand, closetId, category, type });
     item.photoPath = w.photoPath || '';
+    item.photoPaths = w.photoPath ? [w.photoPath] : [];
+    item.thumbnailPath = w.thumbnailPath || '';
+    item.thumbnailPaths = w.thumbnailPath ? [w.thumbnailPath] : [];
     const doc = root.collection('items').doc(), batch = db.batch();
     batch.set(doc, item); batch.delete(wishDoc); await batch.commit();
     return { itemId: doc.id, wishId };

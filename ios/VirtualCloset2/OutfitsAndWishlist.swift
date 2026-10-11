@@ -17,7 +17,7 @@ struct OutfitsView: View {
                         }
                         Spacer()
                         ForEach(Array(outfit.itemIds.prefix(3)), id: \.self) { id in
-                            if let item = store.items.first(where: { $0.id == id }) { PhotoThumbnail(path: item.photoPath, symbol: item.category.symbol) }
+                            if let item = store.items.first(where: { $0.id == id }) { PhotoThumbnail(path: item.thumbnailPath, symbol: item.category.symbol) }
                         }
                     }
                 }.swipeActions { Button("Delete", role: .destructive) { deleting = outfit } }
@@ -67,7 +67,7 @@ struct OutfitEditor: View {
                     ForEach(outfit.itemIds, id: \.self) { id in
                         if let item = store.items.first(where: { $0.id == id }) {
                             HStack {
-                                PhotoThumbnail(path: item.photoPath, symbol: item.category.symbol)
+                                PhotoThumbnail(path: item.thumbnailPath, symbol: item.category.symbol)
                                 Text(item.name)
                                 Spacer()
                                 Button("Remove", systemImage: "minus.circle") { outfit.itemIds.removeAll { $0 == id } }.labelStyle(.iconOnly)
@@ -124,7 +124,7 @@ struct OutfitEditor: View {
                     ForEach(availableItems) { item in
                         Button { outfit.itemIds.append(item.id) } label: {
                             HStack {
-                                PhotoThumbnail(path: item.photoPath, symbol: item.category.symbol)
+                                PhotoThumbnail(path: item.thumbnailPath, symbol: item.category.symbol)
                                 VStack(alignment: .leading) {
                                     Text(item.name).foregroundStyle(.primary)
                                     Text("\(item.displayType) · \(store.closets.first { $0.id == item.closetId }?.name ?? "Unknown closet")")
@@ -164,7 +164,7 @@ struct WishlistView: View {
             ForEach(store.wishes.sorted { $0.createdAt > $1.createdAt }) { wish in
                 Button { editing = wish } label: {
                     HStack {
-                        PhotoThumbnail(path: wish.photoPath, symbol: "heart")
+                        PhotoThumbnail(path: wish.thumbnailPath, symbol: "heart")
                         VStack(alignment: .leading) {
                             Text(wish.name).font(.headline).foregroundStyle(.primary)
                             if !wish.brand.isEmpty { Text(wish.brand).font(.caption).foregroundStyle(.secondary) }
@@ -201,7 +201,7 @@ struct WishEditor: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Photo") { PhotoPicker(image: $image, existingPath: wish.photoPath) }
+                Section("Photo") { PhotoPicker(image: $image, existingPath: wish.thumbnailPath) }
                 Section("Purchase idea") {
                     TextField("Name", text: $wish.name)
                     TextField("Brand", text: $wish.brand)

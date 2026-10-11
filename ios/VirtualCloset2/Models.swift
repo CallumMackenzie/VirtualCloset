@@ -59,8 +59,11 @@ struct Garment: Identifiable {
     var fit: GarmentFit = .unknown
     var length: GarmentLength = .unknown
     var isDirty: Bool = false
+    // Originals are retained for future full-resolution views; UI previews use thumbnails only.
     var photoPath: String? = nil
     var photoPaths: [String] = []
+    var thumbnailPath: String? = nil
+    var thumbnailPaths: [String] = []
     var createdAt: Date = .now
     var updatedAt: Date = .now
     var displayType: String { type == "Other" && !customType.isEmpty ? customType : type }
@@ -78,6 +81,8 @@ struct Garment: Identifiable {
         length = GarmentLength(rawValue: d["length"] as? String ?? "") ?? .unknown
         isDirty = d["isDirty"] as? Bool ?? false; photoPath = d["photoPath"] as? String
         photoPaths = d["photoPaths"] as? [String] ?? photoPath.map { $0.isEmpty ? [] : [$0] } ?? []
+        thumbnailPath = d["thumbnailPath"] as? String
+        thumbnailPaths = d["thumbnailPaths"] as? [String] ?? thumbnailPath.map { $0.isEmpty ? [] : [$0] } ?? []
         createdAt = (d["createdAt"] as? Timestamp)?.dateValue() ?? .now
         updatedAt = (d["updatedAt"] as? Timestamp)?.dateValue() ?? .now
     }
@@ -85,7 +90,8 @@ struct Garment: Identifiable {
         ["closetId": closetId, "name": name, "category": category.rawValue, "type": type,
          "customType": customType, "styles": styles, "colors": colors, "brand": brand,
          "size": size.rawValue, "material": material, "fit": fit.rawValue, "length": length.rawValue,
-         "isDirty": isDirty, "photoPath": photoPath ?? "", "photoPaths": photoPaths, "createdAt": Timestamp(date: createdAt),
+         "isDirty": isDirty, "photoPath": photoPath ?? "", "photoPaths": photoPaths,
+         "thumbnailPath": thumbnailPath ?? "", "thumbnailPaths": thumbnailPaths, "createdAt": Timestamp(date: createdAt),
          "updatedAt": Timestamp(date: updatedAt)]
     }
     func matchScore(_ query: String) -> Int {
@@ -155,6 +161,7 @@ struct Wish: Identifiable {
     var currency: String = "USD"
     var notes: String = ""
     var photoPath: String? = nil
+    var thumbnailPath: String? = nil
     var createdAt: Date = .now
     init() {}
     init?(snapshot: DocumentSnapshot) {
@@ -163,11 +170,12 @@ struct Wish: Identifiable {
         brand = d["brand"] as? String ?? ""; url = d["url"] as? String ?? ""
         price = d["price"] as? String ?? ""; currency = d["currency"] as? String ?? "USD"
         notes = d["notes"] as? String ?? ""; photoPath = d["photoPath"] as? String
+        thumbnailPath = d["thumbnailPath"] as? String
         createdAt = (d["createdAt"] as? Timestamp)?.dateValue() ?? .now
     }
     var data: [String: Any] {
         ["name": name, "brand": brand, "url": url, "price": price, "currency": currency,
-         "notes": notes, "photoPath": photoPath ?? "", "createdAt": Timestamp(date: createdAt)]
+         "notes": notes, "photoPath": photoPath ?? "", "thumbnailPath": thumbnailPath ?? "", "createdAt": Timestamp(date: createdAt)]
     }
 }
 

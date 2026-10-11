@@ -100,8 +100,11 @@ final class ClosetStore: ObservableObject {
             var documents = try await root.collection(name).getDocuments(source: .server).documents
             if name == "items" || name == "wishlist" {
                 for document in documents {
-                    let paths = document.data()["photoPaths"] as? [String] ?? [document.data()["photoPath"] as? String ?? ""]
-                    for path in paths { await removePhoto(path) }
+                    let data = document.data()
+                    let paths = (data["photoPaths"] as? [String] ?? []) +
+                        (data["thumbnailPaths"] as? [String] ?? []) +
+                        [data["photoPath"] as? String ?? "", data["thumbnailPath"] as? String ?? ""]
+                    for path in Set(paths) { await removePhoto(path) }
                 }
             }
             while !documents.isEmpty {
@@ -138,7 +141,7 @@ final class ClosetStore: ObservableObject {
         }
         batch.deleteDocument(try collection("closets").document(closet.id))
         try await batch.commit()
-        for item in related { for path in item.photoPaths { await removePhoto(path) } }
+        for item in related { await removeItemPhotos(item) }
     }
     func saveItem(_ item: Garment, photo: UIImage? = nil) async throws {
         guard !item.name.trimmed.isEmpty, !item.closetId.isEmpty,
@@ -146,13 +149,29 @@ final class ClosetStore: ObservableObject {
         var updated = item
         updated.name = item.name.trimmed; updated.updatedAt = .now
         if let photo {
-            updated.photoPath = try await upload(photo, path: "items/\(item.id)-\(UUID().uuidString).jpg")
-            updated.photoPaths = [updated.photoPath!] + item.photoPaths.filter { $0 != item.photoPath }
+            let pair = try await uploadPhotoPair(photo, directory: "items", id: item.id)
+            updated.photoPath = pair.original
+            updated.thumbnailPath = pair.thumbnail
+            let remaining = item.photoPaths.filter { $0 != item.photoPath }
+            updated.photoPaths = [pair.original] + remaining
+            updated.thumbnailPaths = [pair.thumbnail] + remaining.map { path in
+                guard let index = item.photoPaths.firstIndex(of: path), item.thumbnailPaths.indices.contains(index) else { return "" }
+                return item.thumbnailPaths[index]
+            }
         }
         do {
             try await collection("items").document(item.id).setData(updated.data)
-            if photo != nil { await removePhoto(item.photoPath) }
-        } catch { if photo != nil { await removePhoto(updated.photoPath) }; throw error }
+            if photo != nil {
+                await removePhoto(item.photoPath)
+                await removePhoto(item.thumbnailPath)
+            }
+        } catch {
+            if photo != nil {
+                await removePhoto(updated.photoPath)
+                await removePhoto(updated.thumbnailPath)
+            }
+            throw error
+        }
     }
     func deleteItem(_ item: Garment) async throws {
         let allOutfits = try await collection("outfits").getDocuments(source: .server).documents.compactMap(Outfit.init(snapshot:))
@@ -164,7 +183,7 @@ final class ClosetStore: ObservableObject {
             batch.setData(outfit.data, forDocument: try collection("outfits").document(outfit.id))
         }
         try await batch.commit()
-        for path in item.photoPaths { await removePhoto(path) }
+        await removeItemPhotos(item)
     }
     func saveOutfit(_ outfit: Outfit) async throws {
         guard !outfit.name.trimmed.isEmpty else { throw StoreError.invalidInput }
@@ -177,21 +196,37 @@ final class ClosetStore: ObservableObject {
     func saveWish(_ wish: Wish, photo: UIImage? = nil) async throws {
         guard !wish.name.trimmed.isEmpty else { throw StoreError.invalidInput }
         var updated = wish; updated.name = wish.name.trimmed
-        if let photo { updated.photoPath = try await upload(photo, path: "wishlist/\(wish.id)-\(UUID().uuidString).jpg") }
+        if let photo {
+            let pair = try await uploadPhotoPair(photo, directory: "wishlist", id: wish.id)
+            updated.photoPath = pair.original
+            updated.thumbnailPath = pair.thumbnail
+        }
         do {
             try await collection("wishlist").document(updated.id).setData(updated.data)
-            if photo != nil { await removePhoto(wish.photoPath) }
-        } catch { if photo != nil { await removePhoto(updated.photoPath) }; throw error }
+            if photo != nil {
+                await removePhoto(wish.photoPath)
+                await removePhoto(wish.thumbnailPath)
+            }
+        } catch {
+            if photo != nil {
+                await removePhoto(updated.photoPath)
+                await removePhoto(updated.thumbnailPath)
+            }
+            throw error
+        }
     }
     func deleteWish(_ wish: Wish) async throws {
         try await collection("wishlist").document(wish.id).delete()
         await removePhoto(wish.photoPath)
+        await removePhoto(wish.thumbnailPath)
     }
     // Convert with a single Firestore batch. Reuse the photo path; don't delete its file.
     func purchase(_ wish: Wish, as item: Garment) async throws {
         guard !item.closetId.isEmpty, !item.name.trimmed.isEmpty else { throw StoreError.invalidInput }
         var item = item; item.photoPath = wish.photoPath
+        item.thumbnailPath = wish.thumbnailPath
         item.photoPaths = wish.photoPath.map { [$0] } ?? []
+        item.thumbnailPaths = wish.thumbnailPath.map { [$0] } ?? []
         let batch = db.batch()
         batch.setData(item.data, forDocument: try collection("items").document(item.id))
         batch.deleteDocument(try collection("wishlist").document(wish.id))
@@ -201,17 +236,33 @@ final class ClosetStore: ObservableObject {
         guard let uid = user?.uid, !path.isEmpty else { return nil }
         return try? await storage.reference(withPath: "users/\(uid)/\(path)").downloadURL()
     }
-    private func upload(_ image: UIImage, path: String) async throws -> String {
-        guard let uid = user?.uid, let bytes = image.jpegData(compressionQuality: 0.7) else { throw StoreError.invalidInput }
+    // Keep the original separately; never request it for list or gallery previews.
+    private func uploadPhotoPair(_ image: UIImage, directory: String, id: String) async throws -> (original: String, thumbnail: String) {
+        guard let full = image.jpegData(compressionQuality: 0.7),
+              let thumbnail = PhotoIcon.jpegData(from: image) else { throw StoreError.invalidInput }
+        let base = "\(directory)/\(id)-\(UUID().uuidString)"
+        let original = "\(base).jpg", icon = "\(base)-thumb.jpg"
+        try await upload(full, path: original)
+        do { try await upload(thumbnail, path: icon) }
+        catch { await removePhoto(original); throw error }
+        return (original, icon)
+    }
+    private func upload(_ bytes: Data, path: String) async throws {
+        guard let uid = user?.uid else { throw StoreError.signedOut }
         let key = "users/\(uid)/\(path)"
-        let metadata = StorageMetadata(); metadata.contentType = "image/jpeg"
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+        metadata.cacheControl = "private, max-age=31536000, immutable"
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             storage.reference(withPath: key).putData(bytes, metadata: metadata) { _, error in
                 if let error { continuation.resume(throwing: error) }
                 else { continuation.resume(returning: ()) }
             }
         }
-        return path
+    }
+    private func removeItemPhotos(_ item: Garment) async {
+        let paths = item.photoPaths + item.thumbnailPaths + [item.photoPath, item.thumbnailPath].compactMap { $0 }
+        for path in Set(paths) { await removePhoto(path) }
     }
     private func removePhoto(_ path: String?) async {
         guard let path, !path.isEmpty, let uid = user?.uid else { return }
