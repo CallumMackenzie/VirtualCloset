@@ -49,15 +49,28 @@ struct MainTabs: View {
     @EnvironmentObject private var store: ClosetStore
     @State private var selectedTab: Tab = .closets
     @State private var closetPath: [String] = []
-    @State private var showingClosetListByChoice = false
+    @State private var showingClosetList = false
 
     private enum Tab: Hashable { case closets, browse, outfits, wishlist, account }
 
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack(path: $closetPath) {
-                ClosetsView()
-                    .navigationDestination(for: String.self) { BrowseView(closetId: $0) }
+                Group {
+                    if let id = Self.onlyClosetId(in: store.closets), !showingClosetList {
+                        BrowseView(closetId: id)
+                            .toolbar {
+                                ToolbarItem(placement: .topBarLeading) {
+                                    Button("All closets", systemImage: "square.grid.2x2") {
+                                        showingClosetList = true
+                                    }
+                                }
+                            }
+                    } else {
+                        ClosetsView()
+                    }
+                }
+                .navigationDestination(for: String.self) { BrowseView(closetId: $0) }
             }
             .tabItem { Label("Closets", systemImage: "square.grid.2x2") }
             .tag(Tab.closets)
@@ -66,28 +79,16 @@ struct MainTabs: View {
             NavigationStack { WishlistView() }.tabItem { Label("Wishlist", systemImage: "heart") }.tag(Tab.wishlist)
             NavigationStack { AccountView() }.tabItem { Label("Account", systemImage: "person.circle") }.tag(Tab.account)
         }
-        .onAppear { openOnlyCloset() }
-        .onChange(of: store.closets.map(\.id)) { _, _ in openOnlyCloset() }
-        .onChange(of: closetPath) { previous, current in
-            if !previous.isEmpty && current.isEmpty { showingClosetListByChoice = true }
-        }
         .onChange(of: selectedTab) { _, selected in
             if selected == .closets {
-                showingClosetListByChoice = false
-                openOnlyCloset()
+                closetPath = []
+                showingClosetList = false
             }
         }
     }
 
     static func onlyClosetId(in closets: [Closet]) -> String? {
         closets.count == 1 ? closets.first?.id : nil
-    }
-
-    private func openOnlyCloset() {
-        guard selectedTab == .closets, !showingClosetListByChoice,
-              closetPath.isEmpty,
-              let id = Self.onlyClosetId(in: store.closets) else { return }
-        closetPath = [id]
     }
 }
 
