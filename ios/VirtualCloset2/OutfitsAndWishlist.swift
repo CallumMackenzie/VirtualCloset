@@ -52,6 +52,14 @@ struct OutfitEditor: View {
                 return left == right ? first.name.localizedStandardCompare(second.name) == .orderedAscending : left > right
             }
     }
+    private var recommended: [OutfitRecommendation] {
+        let selected = outfit.itemIds.compactMap { id in store.items.first(where: { $0.id == id }) }
+        return OutfitRecommendations.suggest(selected: selected, available: availableItems, query: filters.query)
+    }
+    private var otherItems: [Garment] {
+        let recommendedIds = Set(recommended.map(\.id))
+        return availableItems.filter { !recommendedIds.contains($0.id) }
+    }
     private var types: [String] {
         options(store.items.filter { filters.category == "All" || $0.category.rawValue == filters.category }
             .map(\.displayType))
@@ -116,12 +124,36 @@ struct OutfitEditor: View {
                     }
                     if filters.isActive { Button("Clear search and filters") { filters = GarmentFilter() } }
                 }
-                Section("Add pieces (\(availableItems.count))") {
-                    if availableItems.isEmpty {
-                        Text(store.items.count == outfit.itemIds.count ? "All your pieces are in this outfit." : "No pieces match. Try clearing a filter.")
+                if !recommended.isEmpty {
+                    Section {
+                        ForEach(recommended) { suggestion in
+                            Button { outfit.itemIds.append(suggestion.item.id) } label: {
+                                HStack {
+                                    PhotoThumbnail(path: suggestion.item.thumbnailPath, symbol: suggestion.item.category.symbol)
+                                    VStack(alignment: .leading) {
+                                        Text(suggestion.item.name).foregroundStyle(.primary)
+                                        Text("\(suggestion.item.displayType) · \(suggestion.palette.name) colors")
+                                            .font(.caption).foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "plus.circle")
+                                }
+                            }
+                        }
+                    } header: {
+                        Text("Recommended (\(recommended.count))")
+                    } footer: {
+                        Text("Suggested from colors and types that complement your selected pieces.")
+                    }
+                }
+                Section(recommended.isEmpty ? "Add pieces (\(otherItems.count))" : "More pieces (\(otherItems.count))") {
+                    if otherItems.isEmpty {
+                        Text(availableItems.isEmpty
+                             ? (store.items.count == outfit.itemIds.count ? "All your pieces are in this outfit." : "No pieces match. Try clearing a filter.")
+                             : "All matching pieces are recommended above.")
                             .foregroundStyle(.secondary)
                     }
-                    ForEach(availableItems) { item in
+                    ForEach(otherItems) { item in
                         Button { outfit.itemIds.append(item.id) } label: {
                             HStack {
                                 PhotoThumbnail(path: item.thumbnailPath, symbol: item.category.symbol)

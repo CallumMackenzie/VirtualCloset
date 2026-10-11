@@ -105,6 +105,42 @@ struct VirtualCloset2Tests {
         #expect(!filter.matches(shirt))
         #expect(!GarmentFilter().isActive)
     }
+    @Test func outfitPalettesAreBundledWithSources() {
+        #expect(OutfitPalette.all.count >= 20)
+        #expect(OutfitPalette.all.allSatisfy { $0.colors.count >= 2 && $0.source.scheme == "https" })
+        #expect(OutfitRecommendations.color("Olive green") == "olive")
+        #expect(OutfitRecommendations.color("Dark brown") == "chocolate")
+        #expect(OutfitRecommendations.color("Blue-grey") == "slate")
+    }
+    @Test func recommendationsMatchColorsWithoutRepeatingBottomsOrTops() {
+        var pants = Garment(); pants.name = "Navy pants"; pants.category = .bottoms; pants.colors = ["Navy"]
+        var otherPants = Garment(); otherPants.name = "White jeans"; otherPants.category = .bottoms; otherPants.colors = ["White"]
+        var shirt = Garment(); shirt.name = "Cream shirt"; shirt.category = .tops; shirt.colors = ["Cream"]
+        var shoes = Garment(); shoes.name = "Brown shoes"; shoes.category = .shoes; shoes.colors = ["Brown"]
+        var clashing = Garment(); clashing.name = "Pink shirt"; clashing.category = .tops; clashing.colors = ["Pink"]
+        let available = [otherPants, shirt, shoes, clashing]
+        let first = OutfitRecommendations.suggest(selected: [pants], available: available)
+        #expect(first.contains { $0.id == shirt.id })
+        #expect(first.contains { $0.id == shoes.id })
+        #expect(!first.contains { $0.id == otherPants.id })
+        #expect(!first.contains { $0.id == clashing.id })
+        let next = OutfitRecommendations.suggest(selected: [pants, shirt], available: available)
+        #expect(!next.contains { $0.item.category == .bottoms || $0.item.category == .tops })
+        #expect(next.contains { $0.id == shoes.id })
+        // Search keeps the original filtered results and relevance sorting; no recommended strip.
+        var filter = GarmentFilter(); filter.query = "cream"
+        #expect(filter.matches(shirt))
+        #expect(OutfitRecommendations.suggest(selected: [pants], available: available.filter(filter.matches), query: filter.query).isEmpty)
+    }
+    @Test func onePieceAndAccessoriesDoNotSuggestDuplicateTypes() {
+        var dress = Garment(); dress.category = .onePieces; dress.colors = ["Black"]
+        var top = Garment(); top.category = .tops; top.colors = ["White"]
+        var bottom = Garment(); bottom.category = .bottoms; bottom.colors = ["White"]
+        var goldBelt = Garment(); goldBelt.category = .accessories; goldBelt.type = "Belt"; goldBelt.colors = ["Gold"]
+        var goldHat = Garment(); goldHat.category = .accessories; goldHat.type = "Hat"; goldHat.colors = ["Gold"]
+        let suggestions = OutfitRecommendations.suggest(selected: [dress, goldBelt], available: [top, bottom, goldHat, goldBelt])
+        #expect(suggestions.map(\.id) == [goldHat.id])
+    }
     @Test func tagsTrimEmptyValues() {
         #expect(" blue, , cotton ,".tags == ["blue", "cotton"])
     }
